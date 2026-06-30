@@ -33,8 +33,7 @@ Route::middleware(['auth'])->group(function () {
 
     Route::post('/businesses/{business}', [BusinessController::class, 'destroy'])
         ->name('businesses.destroy');
-        
-        
+         
     Route::get('/delete-test/{id}', function ($id) {
         return Business::find($id)->delete();
     });
