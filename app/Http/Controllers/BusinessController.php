@@ -15,13 +15,19 @@ class BusinessController extends Controller
         $query = Business::query()->latest();
 
         if ($request->search) {
-            $query->where('business_name', 'like', "%{$request->search}%")
+            $query->where(function ($q) {
+                $q->where('business_name', 'like', "%{$request->search}%")
                 ->orWhere('mobile', 'like', "%{$request->search}%");
+            });
+        }
+
+        if ($request->status) {
+            $query->where('status', $request->status);
         }
 
         return Inertia::render('Businesses/Index', [
             'businesses' => $query->paginate(10),
-            'filters' => $request->only('search'),
+            'filters' => $request->only(['search', 'status']),
         ]);
     }
 
