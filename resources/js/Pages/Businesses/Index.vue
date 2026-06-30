@@ -155,14 +155,19 @@ const confirmDelete = (id) => {
         })
     }
 }
-router.get(route('businesses.index'), {
-    page: page,
-    search: search.value,
-    status: status.value
-}, {
-    preserveState: true,
-    replace: true
-})
+/* =====================
+   PAGINATION
+===================== */
+const goToPage = (page) => {
+    router.get(route('businesses.index'), {
+        page,
+        search: search.value,
+        status: status.value
+    }, {
+        preserveState: true,
+        replace: true
+    })
+}
 
 </script>
 
@@ -264,8 +269,14 @@ router.get(route('businesses.index'), {
                             </td>
                         </tr>
                     </tbody>
-
                 </table>
+                <button @click="goToPage(businesses.current_page - 1)">
+                    قبلی
+                </button>
+
+                <button @click="goToPage(businesses.current_page + 1)">
+                    بعدی
+                </button>
             </div>
 
         </div>
