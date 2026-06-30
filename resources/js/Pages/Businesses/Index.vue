@@ -171,17 +171,19 @@ const goToPage = (page) => {
 /* =====================
    CHANGE STATUS
 ===================== */
-const changeStatus = (id, newStatus) => {
+const changeStatus = (id, status) => {
+console.log(route('businesses.update', 1))
+
     router.put(route('businesses.update', id), {
-        status: newStatus
+        status: status
     }, {
         preserveScroll: true,
+        preserveState: true,
         onSuccess: () => {
             showToast('وضعیت تغییر کرد')
         }
     })
 }
-
 </script>
 
 <template>
