@@ -28,7 +28,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/businesses/{business}/edit', [BusinessController::class, 'edit'])
         ->name('businesses.edit');
 
-    Route::put('/businesses/{business}', [BusinessController::class, 'update'])
+    Route::post('/businesses/{business}', [BusinessController::class, 'update'])
         ->name('businesses.update');
 
     Route::post('/businesses/{business}', [BusinessController::class, 'destroy'])
