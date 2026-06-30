@@ -172,7 +172,7 @@ const goToPage = (page) => {
    CHANGE STATUS
 ===================== */
 const changeStatus = (id, status) => {
-console.log(route('businesses.update', 1))
+// console.log(route('businesses.update', 1))
 
     router.post(route('businesses.update', id), {
         status: status
