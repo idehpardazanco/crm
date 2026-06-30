@@ -12,8 +12,7 @@ class BusinessController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Business::query()
-            ->latest();
+        $query = Business::query()->latest();
 
         if ($request->search) {
             $query->where('business_name', 'like', "%{$request->search}%")
