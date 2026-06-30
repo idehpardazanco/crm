@@ -272,24 +272,22 @@ const goToPage = (page) => {
                 </table>
             </div>
             <div class="flex gap-2 mt-4 flex-wrap">
-
-    <button
-        v-for="(link, index) in businesses.links"
-        :key="index"
-        :disabled="!link.url"
-        @click="link.url && router.get(link.url, {
-            preserveState: true,
-            preserveScroll: true
-        })"
-        v-html="link.label"
-        class="px-3 py-1 border rounded"
-        :class="{
-            'bg-blue-600 text-white': link.active,
-            'opacity-50': !link.url
-        }"
-    />
-
-</div>
+                <button
+                    v-for="(link, index) in businesses.links"
+                    :key="index"
+                    :disabled="!link.url"
+                    @click="link.url && router.get(link.url, {
+                        preserveState: true,
+                        preserveScroll: true
+                    })"
+                    v-html="link.label"
+                    class="px-3 py-1 border rounded"
+                    :class="{
+                        'bg-blue-600 text-white': link.active,
+                        'opacity-50': !link.url
+                    }"
+                />
+            </div>
         </div>
     </AuthenticatedLayout>
 
