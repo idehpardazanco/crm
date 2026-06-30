@@ -20,11 +20,9 @@ class BusinessController extends Controller
                 ->orWhere('mobile', 'like', "%{$request->search}%");
             });
         }
-
         if ($request->status) {
             $query->where('status', $request->status);
         }
-
         return Inertia::render('Businesses/Index', [
             'businesses' => $query->paginate(10),
             'filters' => $request->only(['search', 'status']),
