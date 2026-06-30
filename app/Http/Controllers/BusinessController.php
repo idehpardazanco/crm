@@ -15,7 +15,7 @@ class BusinessController extends Controller
         $query = Business::query()->latest();
 
         if ($request->search) {
-            $query->where(function ($q) {
+           $query->where(function ($q) use ($search) {
                 $q->where('business_name', 'like', "%{$request->search}%")
                 ->orWhere('mobile', 'like', "%{$request->search}%");
             });
