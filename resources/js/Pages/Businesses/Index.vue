@@ -244,8 +244,10 @@ const changeStatus = (id, newStatus) => {
                             <td class="p-3">{{ b.city }}</td>
 
                             <td class="p-3">
-                                <span
-                                    class="px-2 py-1 rounded text-xs font-bold"
+                                <select
+                                    :value="b.status"
+                                    @change="changeStatus(b.id, $event.target.value)"
+                                    class="border p-1 rounded text-xs font-bold"
                                     :class="{
                                         'bg-yellow-100 text-yellow-700': b.status === 'new',
                                         'bg-blue-100 text-blue-700': b.status === 'called',
@@ -254,8 +256,12 @@ const changeStatus = (id, newStatus) => {
                                         'bg-purple-100 text-purple-700': b.status === 'interested',
                                     }"
                                 >
-                                    {{ b.status }}
-                                </span>
+                                    <option value="new">new</option>
+                                    <option value="called">called</option>
+                                    <option value="interested">interested</option>
+                                    <option value="customer">customer</option>
+                                    <option value="rejected">rejected</option>
+                                </select>
                             </td>
 
                             <td class="p-3 flex gap-2">
