@@ -129,17 +129,17 @@ const submit = () => {
 const confirmDelete = (id) => {
 console.log('CLICKED DELETE:', id)
 
-    router.post(`/businesses/${id}`, {
-        onStart: () => console.log('START'),
-        onSuccess: () => console.log('SUCCESS'),
-        onError: (err) => console.log('ERROR', err),
-        onFinish: () => console.log('FINISH'),
-    })
+    // router.post(`/businesses/${id}`, {
+    //     onStart: () => console.log('START'),
+    //     onSuccess: () => console.log('SUCCESS'),
+    //     onError: (err) => console.log('ERROR', err),
+    //     onFinish: () => console.log('FINISH'),
+    // })
 
     if (!id) return
 
     if (confirm('آیا مطمئنی؟')) {
-        router.delete(`/businesses/${id}`, {
+        router.post(`/businesses/${id}`, {
             preserveScroll: true,
             onSuccess: () => showToast('حذف شد'),
         })
