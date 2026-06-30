@@ -13,11 +13,12 @@ class BusinessController extends Controller
     public function index(Request $request)
     {
         $query = Business::query()->latest();
+        $search=$request->search;
 
-        if ($request->search) {
+        if ($search) {
            $query->where(function ($q) use ($search) {
-                $q->where('business_name', 'like', "%{$request->search}%")
-                ->orWhere('mobile', 'like', "%{$request->search}%");
+                $q->where('business_name', 'like', "%{$search}%")
+                ->orWhere('mobile', 'like', "%{$search}%");
             });
         }
         if ($request->status) {
