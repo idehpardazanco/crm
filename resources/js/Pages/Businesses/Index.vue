@@ -186,6 +186,14 @@ const status = ref(props.filters?.status || '')
                 placeholder="جستجو نام یا موبایل..."
                 class="border p-2 rounded w-full mb-4 focus:outline-none focus:ring"
             />
+            <input v-model="search" placeholder="جستجو..." />
+
+            <!-- <select v-model="status">
+                <option value="">همه</option>
+                <option value="new">جدید</option>
+                <option value="called">تماس گرفته شده</option>
+                <option value="customer">مشتری</option>
+            </select> -->
             <select v-model="status" class="border p-2 rounded mb-4 ml-2">
                 <option value="">همه وضعیت‌ها</option>
                 <option value="new">جدید</option>
