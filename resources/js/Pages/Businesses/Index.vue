@@ -247,6 +247,7 @@ const changeStatus = (id, status) => {
                                 <select
                                     :value="b.status"
                                     @change="changeStatus(b.id, $event.target.value)"
+                                    class="px-2 py-1 rounded text-xs font-bold border-none outline-none"
                                 >
                                     <option value="new">new</option>
                                     <option value="called">called</option>
