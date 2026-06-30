@@ -174,7 +174,7 @@ const goToPage = (page) => {
 const changeStatus = (id, status) => {
 console.log(route('businesses.update', 1))
 
-    router.put(route('businesses.update', id), {
+    router.post(route('businesses.update', id), {
         status: status
     }, {
         preserveScroll: true,
