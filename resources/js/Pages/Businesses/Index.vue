@@ -251,49 +251,16 @@ const changeStatus = (id, status) => {
                                     @change="changeStatus(b.id, $event.target.value)"
                                     
                                 >
-                                    <option value="new">new</option>
-                                    <option value="called">called</option>
-                                    <option value="interested">interested</option>
-                                    <option value="customer">customer</option>
-                                    <option value="rejected">rejected</option>
+                                    <option value="new">جدید</option>
+                                    <option value="called">تماس گرفته شده</option>
+                                    <option value="interested">علاقه‌مند</option>
+                                    <option value="customer">مشتری</option>
+                                    <option value="rejected">رد شده</option>
                                 </select>
                             </td>
 
                             <td class="p-3 flex gap-2">
-                                <button
-                                    @click="changeStatus(b.id, 'called')"
-                                    class="text-yellow-600"
-                                >
-                                    تماس
-                                </button>
-
-                                <button
-                                    @click="changeStatus(b.id, 'interested')"
-                                    class="text-purple-600"
-                                >
-                                    علاقه‌مند
-                                </button>
-
-                                <button
-                                    @click="changeStatus(b.id, 'customer')"
-                                    class="text-green-600"
-                                >
-                                    مشتری
-                                </button>
-
-                                <button
-                                    @click="openEdit(b)"
-                                    class="text-blue-600"
-                                >
-                                    ویرایش
-                                </button>
-
-                                <button
-                                    @click="confirmDelete(b.id)"
-                                    class="text-red-600"
-                                >
-                                    حذف
-                                </button>
+                                
                             </td>
                         </tr>
 
