@@ -14,10 +14,10 @@ const props = defineProps({
 /* =====================
    SEARCH
 ===================== */
-const props = defineProps({
-    businesses: Object,
-    filters: Object
-})
+// const props = defineProps({
+//     businesses: Object,
+//     filters: Object
+// })
 const search = ref(props.filters?.search || '')
 const status = ref(props.filters?.status || '')
 
