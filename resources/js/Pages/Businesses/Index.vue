@@ -127,7 +127,7 @@ const submit = () => {
 ===================== */
 
 const confirmDelete = (id) => {
-// console.log('CLICKED DELETE:', id)
+console.log('CLICKED DELETE:', id)
 
     // router.post(`/businesses/${id}`, {
     //     onStart: () => console.log('START'),
@@ -174,12 +174,7 @@ const confirmDelete = (id) => {
                 placeholder="جستجو نام یا موبایل..."
                 class="border p-2 rounded w-full mb-4 focus:outline-none focus:ring"
             />
-            
-
-            <!-- TABLE -->
-             
-            <div class="overflow-x-auto bg-white shadow rounded-lg">
-                <select v-model="status" class="border p-2 rounded mb-4 ml-2">
+            <select v-model="status" class="border p-2 rounded mb-4 ml-2">
                 <option value="">همه وضعیت‌ها</option>
                 <option value="new">جدید</option>
                 <option value="called">تماس گرفته شده</option>
@@ -187,6 +182,9 @@ const confirmDelete = (id) => {
                 <option value="rejected">رد شده</option>
                 <option value="interested">علاقه‌مند</option>
             </select>
+
+            <!-- TABLE -->
+            <div class="overflow-x-auto bg-white shadow rounded-lg">
                 <table class="w-full text-sm border-collapse">
 
                     <thead class="bg-gray-100">
