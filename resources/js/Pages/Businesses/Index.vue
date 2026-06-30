@@ -270,15 +270,14 @@ const goToPage = (page) => {
                         </tr>
                     </tbody>
                 </table>
-                <button @click="goToPage(businesses.current_page - 1)">
+            </div>
+            <button @click="goToPage(businesses.current_page - 1)">
                     قبلی
                 </button>
 
                 <button @click="goToPage(businesses.current_page + 1)">
                     بعدی
                 </button>
-            </div>
-
         </div>
     </AuthenticatedLayout>
 
