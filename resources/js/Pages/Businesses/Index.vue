@@ -156,7 +156,6 @@ const confirmDelete = (id) => {
         })
     }
 }
-const status = ref(props.filters?.status || '')
 
 </script>
 
