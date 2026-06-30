@@ -261,6 +261,20 @@ const changeStatus = (id, status) => {
 
                             <td class="p-3 flex gap-2">
                                 
+
+                                <button
+                                    @click="openEdit(b)"
+                                    class="text-blue-600"
+                                >
+                                    ویرایش
+                                </button>
+
+                                <button
+                                    @click="confirmDelete(b.id)"
+                                    class="text-red-600"
+                                >
+                                    حذف
+                                </button>
                             </td>
                         </tr>
 
