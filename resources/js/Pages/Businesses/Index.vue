@@ -19,6 +19,7 @@ const props = defineProps({
     filters: Object
 })
 const search = ref(props.filters?.search || '')
+const status = ref(props.filters?.status || '')
 
 watch([search, status], ([searchVal, statusVal]) => {
     router.get(
