@@ -168,6 +168,19 @@ const goToPage = (page) => {
         replace: true
     })
 }
+/* =====================
+   CHANGE STATUS
+===================== */
+const changeStatus = (id, newStatus) => {
+    router.put(route('businesses.update', id), {
+        status: newStatus
+    }, {
+        preserveScroll: true,
+        onSuccess: () => {
+            showToast('وضعیت تغییر کرد')
+        }
+    })
+}
 
 </script>
 
