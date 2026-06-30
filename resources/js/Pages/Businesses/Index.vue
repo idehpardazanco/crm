@@ -1,0 +1,306 @@
+<script setup>
+import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue'
+import { Head, router, useForm } from '@inertiajs/vue3'
+import { ref, watch } from 'vue'
+
+/* =====================
+   PROPS
+===================== */
+const props = defineProps({
+    businesses: Object,
+    filters: Object
+})
+
+/* =====================
+   SEARCH
+===================== */
+const search = ref(props.filters?.search || '')
+
+watch(search, (value) => {
+    router.get(
+        route('businesses.index'),
+        { search: value },
+        { preserveState: true, replace: true }
+    )
+})
+
+/* =====================
+   MODAL STATE
+===================== */
+const showModal = ref(false)
+const isEdit = ref(false)
+
+/* =====================
+   LOADING GUARD
+===================== */
+const isLoading = ref(false)
+
+/* =====================
+   TOAST
+===================== */
+const toast = ref(null)
+
+const showToast = (message) => {
+    toast.value = message
+    setTimeout(() => {
+        toast.value = null
+    }, 3000)
+}
+
+/* =====================
+   FORM
+===================== */
+const form = useForm({
+    id: null,
+    business_name: '',
+    contact_name: '',
+    mobile: '',
+    phone: '',
+    city: '',
+    category: '',
+    source: '',
+    status: 'new',
+    description: ''
+})
+
+/* =====================
+   CREATE
+===================== */
+const openCreate = () => {
+    isEdit.value = false
+    form.reset()
+    showModal.value = true
+}
+
+/* =====================
+   EDIT
+===================== */
+const openEdit = (business) => {
+    isEdit.value = true
+
+    form.id = business.id
+    form.business_name = business.business_name
+    form.contact_name = business.contact_name
+    form.mobile = business.mobile
+    form.phone = business.phone
+    form.city = business.city
+    form.category = business.category
+    form.source = business.source
+    form.status = business.status
+    form.description = business.description
+
+    showModal.value = true
+}
+
+/* =====================
+   SUBMIT (FIXED - NO DUPLICATE)
+===================== */
+const submit = () => {
+    if (isLoading.value) return
+    isLoading.value = true
+
+    if (isEdit.value) {
+        form.put(route('businesses.update', form.id), {
+            onSuccess: () => {
+                showModal.value = false
+                showToast('ویرایش با موفقیت انجام شد')
+            },
+            onFinish: () => {
+                isLoading.value = false
+            }
+        })
+    } else {
+        form.post(route('businesses.store'), {
+            onSuccess: () => {
+                showModal.value = false
+                showToast('مخاطب با موفقیت ذخیره شد')
+            },
+            onFinish: () => {
+                isLoading.value = false
+            }
+        })
+    }
+}
+
+/* =====================
+   DELETE (FIXED)
+===================== */
+
+const confirmDelete = (id) => {
+console.log('CLICKED DELETE:', id)
+
+    router.delete(`/businesses/${id}`, {
+        onStart: () => console.log('START'),
+        onSuccess: () => console.log('SUCCESS'),
+        onError: (err) => console.log('ERROR', err),
+        onFinish: () => console.log('FINISH'),
+    })
+
+    if (!id) return
+
+    if (confirm('آیا مطمئنی؟')) {
+        router.delete(`/businesses/${id}`, {
+            preserveScroll: true,
+            onSuccess: () => showToast('حذف شد'),
+        })
+    }
+}
+
+</script>
+
+<template>
+    
+    <Head title="مخاطبین" />
+
+    <AuthenticatedLayout>
+        <div class="p-6">
+
+            <!-- HEADER -->
+            <div class="flex justify-between items-center mb-6">
+                <h1 class="text-xl font-bold">مخاطبین</h1>
+
+                <button
+                    @click="openCreate"
+                    class="bg-blue-600 text-white px-4 py-2 rounded-lg"
+                >
+                    + مخاطب جدید
+                </button>
+            </div>
+
+            <!-- SEARCH -->
+            <input
+                v-model="search"
+                type="text"
+                placeholder="جستجو نام یا موبایل..."
+                class="border p-2 rounded w-full mb-4 focus:outline-none focus:ring"
+            />
+
+            <!-- TABLE -->
+            <div class="overflow-x-auto bg-white shadow rounded-lg">
+                <table class="w-full text-sm border-collapse">
+
+                    <thead class="bg-gray-100">
+                        <tr>
+                            <th class="p-3 text-right">نام کسب‌وکار</th>
+                            <th class="p-3 text-right">موبایل</th>
+                            <th class="p-3 text-right">شهر</th>
+                            <th class="p-3 text-right">وضعیت</th>
+                            <th class="p-3 text-right">عملیات</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        <tr
+                            v-for="b in businesses.data"
+                            :key="b.id"
+                            class="border-t hover:bg-gray-50"
+                        >
+                            <td class="p-3">{{ b.business_name }}</td>
+                            <td class="p-3">{{ b.mobile }}</td>
+                            <td class="p-3">{{ b.city }}</td>
+
+                            <td class="p-3">
+                                <span
+                                    class="px-2 py-1 rounded text-xs font-bold"
+                                    :class="{
+                                        'bg-yellow-100 text-yellow-700': b.status === 'new',
+                                        'bg-blue-100 text-blue-700': b.status === 'called',
+                                        'bg-green-100 text-green-700': b.status === 'customer',
+                                        'bg-red-100 text-red-700': b.status === 'rejected',
+                                        'bg-purple-100 text-purple-700': b.status === 'interested',
+                                    }"
+                                >
+                                    {{ b.status }}
+                                </span>
+                            </td>
+
+                            <td class="p-3 flex gap-2">
+                                <button
+                                    @click="openEdit(b)"
+                                    class="text-blue-600"
+                                >
+                                    ویرایش
+                                </button>
+
+                                <button
+                                    type="button"
+                                    @click="confirmDelete(b.id)"
+                                    class="text-red-600"
+                                >
+                                    حذف
+                                </button>
+                            </td>
+                        </tr>
+
+                        <tr v-if="businesses.data.length === 0">
+                            <td colspan="5" class="text-center p-6 text-gray-500">
+                                هیچ مخاطبی یافت نشد
+                            </td>
+                        </tr>
+                    </tbody>
+
+                </table>
+            </div>
+
+        </div>
+    </AuthenticatedLayout>
+
+    <!-- MODAL -->
+    <div
+        v-if="showModal"
+        class="fixed inset-0 bg-black/50 flex items-center justify-center"
+    >
+        <div class="bg-white w-[500px] p-6 rounded-lg">
+
+            <h2 class="text-lg font-bold mb-4">
+                {{ isEdit ? 'ویرایش مخاطب' : 'ایجاد مخاطب' }}
+            </h2>
+
+            <div class="space-y-2">
+
+                <input v-model="form.business_name" placeholder="نام کسب‌وکار" class="border p-2 w-full" />
+                <input v-model="form.contact_name" placeholder="نام شخص" class="border p-2 w-full" />
+                <input v-model="form.mobile" placeholder="موبایل" class="border p-2 w-full" />
+                <!-- <input v-model="form.phone" placeholder="تلفن" class="border p-2 w-full" /> -->
+                <input v-model="form.city" placeholder="شهر" class="border p-2 w-full" />
+                <!-- <input v-model="form.category" placeholder="دسته‌بندی" class="border p-2 w-full" /> -->
+                <!-- <input v-model="form.source" placeholder="منبع" class="border p-2 w-full" /> -->
+
+                <textarea
+                    v-model="form.description"
+                    placeholder="توضیحات"
+                    class="border p-2 w-full"
+                ></textarea>
+
+            </div>
+
+            <div class="flex justify-end gap-2 mt-4">
+
+                <button
+                    @click="showModal = false"
+                    class="px-4 py-2 border"
+                >
+                    لغو
+                </button>
+
+                <button
+                    @click="submit"
+                    class="px-4 py-2 bg-green-600 text-white"
+                >
+                    ذخیره
+                </button>
+
+            </div>
+
+        </div>
+    </div>
+
+    <!-- TOAST -->
+    <div
+        v-if="toast"
+        class="fixed bottom-4 right-4 bg-green-600 text-white px-4 py-2 rounded"
+    >
+        {{ toast }}
+    </div>
+
+</template>
