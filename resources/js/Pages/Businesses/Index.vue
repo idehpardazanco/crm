@@ -138,7 +138,6 @@ const submit = () => {
 ===================== */
 
 const confirmDelete = (id) => {
-// console.log('CLICKED DELETE:', id)
 
     // router.post(`/businesses/${id}`, {
     //     onStart: () => console.log('START'),
@@ -156,6 +155,14 @@ const confirmDelete = (id) => {
         })
     }
 }
+router.get(route('businesses.index'), {
+    page: page,
+    search: search.value,
+    status: status.value
+}, {
+    preserveState: true,
+    replace: true
+})
 
 </script>
 
