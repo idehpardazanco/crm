@@ -247,14 +247,7 @@ const changeStatus = (id, status) => {
                                 <select
                                     :value="b.status"
                                     @change="changeStatus(b.id, $event.target.value)"
-                                    class="px-2 py-1 rounded text-xs font-bold border-none outline-none"
-                                      :class="{
-                                        'bg-yellow-100 text-yellow-700': b.status === 'new',
-                                        'bg-blue-100 text-blue-700': b.status === 'called',
-                                        'bg-purple-100 text-purple-700': b.status === 'interested',
-                                        'bg-green-100 text-green-700': b.status === 'customer',
-                                        'bg-red-100 text-red-700': b.status === 'rejected',
-                                    }"
+                                    
                                 >
                                     <option value="new">new</option>
                                     <option value="called">called</option>
