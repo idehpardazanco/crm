@@ -259,6 +259,27 @@ const changeStatus = (id, status) => {
 
                             <td class="p-3 flex gap-2">
                                 <button
+                                    @click="changeStatus(b.id, 'called')"
+                                    class="text-yellow-600"
+                                >
+                                    تماس
+                                </button>
+
+                                <button
+                                    @click="changeStatus(b.id, 'interested')"
+                                    class="text-purple-600"
+                                >
+                                    علاقه‌مند
+                                </button>
+
+                                <button
+                                    @click="changeStatus(b.id, 'customer')"
+                                    class="text-green-600"
+                                >
+                                    مشتری
+                                </button>
+
+                                <button
                                     @click="openEdit(b)"
                                     class="text-blue-600"
                                 >
@@ -266,7 +287,6 @@ const changeStatus = (id, status) => {
                                 </button>
 
                                 <button
-                                    type="button"
                                     @click="confirmDelete(b.id)"
                                     class="text-red-600"
                                 >
