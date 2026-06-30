@@ -14,13 +14,23 @@ const props = defineProps({
 /* =====================
    SEARCH
 ===================== */
+const props = defineProps({
+    businesses: Object,
+    filters: Object
+})
 const search = ref(props.filters?.search || '')
 
-watch(search, (value) => {
+watch([search, status], ([searchVal, statusVal]) => {
     router.get(
         route('businesses.index'),
-        { search: value },
-        { preserveState: true, replace: true }
+        {
+            search: searchVal,
+            status: statusVal
+        },
+        {
+            preserveState: true,
+            replace: true
+        }
     )
 })
 
@@ -145,6 +155,7 @@ const confirmDelete = (id) => {
         })
     }
 }
+const status = ref(props.filters?.status || '')
 
 </script>
 
