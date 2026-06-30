@@ -174,6 +174,14 @@ console.log('CLICKED DELETE:', id)
                 placeholder="جستجو نام یا موبایل..."
                 class="border p-2 rounded w-full mb-4 focus:outline-none focus:ring"
             />
+            <select v-model="status" class="border p-2 rounded mb-4 ml-2">
+                <option value="">همه وضعیت‌ها</option>
+                <option value="new">جدید</option>
+                <option value="called">تماس گرفته شده</option>
+                <option value="customer">مشتری</option>
+                <option value="rejected">رد شده</option>
+                <option value="interested">علاقه‌مند</option>
+            </select>
 
             <!-- TABLE -->
             <div class="overflow-x-auto bg-white shadow rounded-lg">
