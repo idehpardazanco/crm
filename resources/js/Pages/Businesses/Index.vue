@@ -260,8 +260,6 @@ const changeStatus = (id, status) => {
                             </td>
 
                             <td class="p-3 flex gap-2">
-                                
-
                                 <button
                                     @click="openEdit(b)"
                                     class="text-blue-600"
