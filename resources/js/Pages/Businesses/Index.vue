@@ -6,10 +6,10 @@ import { ref, watch } from 'vue'
 /* =====================
    PROPS
 ===================== */
-const props = defineProps({
-    businesses: Object,
-    filters: Object
-})
+// const props = defineProps({
+//     businesses: Object,
+//     filters: Object
+// })
 
 /* =====================
    SEARCH
