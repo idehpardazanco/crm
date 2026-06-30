@@ -177,6 +177,14 @@ const confirmDelete = (id) => {
             
 
             <!-- TABLE -->
+             <select v-model="status" class="border p-2 rounded mb-4 ml-2">
+                <option value="">همه وضعیت‌ها</option>
+                <option value="new">جدید</option>
+                <option value="called">تماس گرفته شده</option>
+                <option value="customer">مشتری</option>
+                <option value="rejected">رد شده</option>
+                <option value="interested">علاقه‌مند</option>
+            </select>
             <div class="overflow-x-auto bg-white shadow rounded-lg">
                 <table class="w-full text-sm border-collapse">
 
