@@ -31,7 +31,7 @@ Route::middleware(['auth'])->group(function () {
     Route::put('/businesses/{business}', [BusinessController::class, 'update'])
         ->name('businesses.update');
 
-    Route::delete('/businesses/{business}', [BusinessController::class, 'destroy'])
+    Route::post('/businesses/{business}', [BusinessController::class, 'destroy'])
         ->name('businesses.destroy');
         
     Route::get('/delete-test/{id}', function ($id) {
