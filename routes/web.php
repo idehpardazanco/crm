@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
 Route::get('/', function () {
+    echo "32543%";
     return redirect('/businesses');
 });
 
@@ -33,9 +34,11 @@ Route::middleware(['auth'])->group(function () {
 
     Route::delete('/businesses/{business}', [BusinessController::class, 'destroy'])
         ->name('businesses.destroy');
-        Route::get('/delete-test/{id}', function ($id) {
-    return Business::find($id)->delete();
-});
+        
+    Route::get('/delete-test/{id}', function ($id) {
+        return Business::find($id)->delete();
+    });
+
 });
 
 require __DIR__.'/auth.php';
