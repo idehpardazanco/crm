@@ -129,7 +129,7 @@ const submit = () => {
 const confirmDelete = (id) => {
 console.log('CLICKED DELETE:', id)
 
-    router.delete(`/businesses/${id}`, {
+    router.post(`/businesses/${id}`, {
         onStart: () => console.log('START'),
         onSuccess: () => console.log('SUCCESS'),
         onError: (err) => console.log('ERROR', err),
