@@ -1,10 +1,15 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Modules\Users\Http\Controllers\UsersController;
 
-Route::prefix('api/v1/users')
+/**
+ * API routes (future mobile / external panel)
+ */
+Route::prefix('v1/users')
     ->middleware(['api', 'auth:sanctum'])
-    ->name('api.v1.users.')
-    ->group(function (): void {
-        //
+    ->group(function () {
+
+        Route::get('/', [UsersController::class, 'index']);
+        Route::get('/{id}', [UsersController::class, 'show']);
     });
