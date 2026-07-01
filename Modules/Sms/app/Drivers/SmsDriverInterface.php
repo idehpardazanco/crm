@@ -1,6 +1,6 @@
 <?php
 
-namespace Modules\Sms\Drivers;
+namespace Modules\Sms\app\Drivers;
 
 /**
  * Contract for all SMS providers
