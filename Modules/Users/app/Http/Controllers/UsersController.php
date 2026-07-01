@@ -2,55 +2,50 @@
 
 namespace Modules\Users\Http\Controllers;
 
-use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Modules\Users\Services\UserService;
 
-class UsersController extends Controller
+/**
+ * Users Controller (thin controller pattern)
+ */
+class UsersController
 {
-    /**
-     * Display a listing of the resource.
-     */
+    public function __construct(
+        private UserService $service
+    ) {}
+
     public function index()
     {
-        return view('users::index');
+        return $this->service->list();
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
-        return view('users::create');
+        return $this->service->createView();
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request) {}
-
-    /**
-     * Show the specified resource.
-     */
-    public function show($id)
+    public function store(Request $request)
     {
-        return view('users::show');
+        return $this->service->create($request->all());
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit($id)
+    public function edit(int $id)
     {
-        return view('users::edit');
+        return $this->service->editView($id);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, $id) {}
+    public function update(int $id, Request $request)
+    {
+        return $this->service->update($id, $request->all());
+    }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy($id) {}
+    public function destroy(int $id)
+    {
+        return $this->service->delete($id);
+    }
+
+    public function show(int $id)
+    {
+        return $this->service->find($id);
+    }
 }
