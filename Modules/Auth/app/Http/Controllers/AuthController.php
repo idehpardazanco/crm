@@ -2,55 +2,39 @@
 
 namespace Modules\Auth\Http\Controllers;
 
-use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
+use Modules\Auth\Http\Requests\LoginRequest;
+use Modules\Auth\Http\Requests\SendOtpRequest;
+use Modules\Auth\Http\Requests\VerifyOtpRequest;
+use Modules\Auth\Services\AuthService;
 
-class AuthController extends Controller
+class AuthController
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    public function __construct(
+        private AuthService $service
+    ) {}
+
+    public function loginPage()
     {
-        return view('auth::index');
+        return inertia('Auth/Login');
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+    public function login(LoginRequest $request)
     {
-        return view('auth::create');
+        return $this->service->loginWithPassword($request->validated());
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request) {}
-
-    /**
-     * Show the specified resource.
-     */
-    public function show($id)
+    public function sendOtp(SendOtpRequest $request)
     {
-        return view('auth::show');
+        return $this->service->sendOtp($request->validated());
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit($id)
+    public function verifyOtp(VerifyOtpRequest $request)
     {
-        return view('auth::edit');
+        return $this->service->verifyOtp($request->validated());
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, $id) {}
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy($id) {}
+    public function logout()
+    {
+        return $this->service->logout();
+    }
 }
