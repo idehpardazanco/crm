@@ -1,6 +1,6 @@
 <?php
 
-namespace Modules\Auth\Http\Controllers;
+namespace Modules\Auth\app\Http\Controllers;
 
 use Modules\Auth\Http\Requests\LoginRequest;
 use Modules\Auth\Http\Requests\SendOtpRequest;
