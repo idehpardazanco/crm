@@ -11,9 +11,16 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('activity_logs', function (Blueprint $table) {
+        Schema::create('activity_logs', function ($table) {
             $table->id();
-            
+
+            $table->foreignId('user_id')->nullable();
+
+            $table->string('action'); // login, create_user, send_sms
+            $table->string('module')->nullable(); // Auth, Sms, Users
+
+            $table->json('meta')->nullable();
+
             $table->timestamps();
         });
     }
