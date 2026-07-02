@@ -30,6 +30,15 @@ class AuthService
 
         AuthLogger::success($user);
 
+        app(MonitoringService::class)->activity(
+            'login_success',
+            'Auth',
+            [
+                'user_id' => $user->id,
+                'mobile' => $data['mobile']
+            ]
+        );
+
         return response()->json([
             'user' => $user
         ]);
@@ -98,6 +107,14 @@ class AuthService
     public function logout()
     {
         Auth::logout();
+        
+        app(MonitoringService::class)->activity(
+            'logout',
+            'Auth',
+            [
+                'user_id' => auth()->id()
+            ]
+        );
 
         return [
             'message' => 'Logged out'
