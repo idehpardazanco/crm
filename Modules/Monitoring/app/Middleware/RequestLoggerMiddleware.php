@@ -4,11 +4,8 @@ namespace Modules\Monitoring\app\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
-use Modules\Monitoring\Models\RequestLog;
+use Modules\Monitoring\Services\MonitoringService;
 
-/**
- * Logs every HTTP request in system
- */
 class RequestLoggerMiddleware
 {
     public function handle(Request $request, Closure $next)
@@ -19,17 +16,14 @@ class RequestLoggerMiddleware
 
         $duration = (microtime(true) - $start) * 1000;
 
-        RequestLog::create([
+        app(MonitoringService::class)->request([
             'method' => $request->method(),
             'url' => $request->fullUrl(),
             'ip' => $request->ip(),
-            'user_id' => auth()->id(),
-
             'headers' => $request->headers->all(),
             'payload' => $request->all(),
-
             'status_code' => $response->status(),
-            'duration' => (int) $duration,
+            'duration' => $duration,
         ]);
 
         return $response;
