@@ -21,6 +21,14 @@ class AuthService
         ])) {
             AuthLogger::failed($data['mobile']);
 
+            app(MonitoringService::class)->activity(
+                'login_failed',
+                'Auth',
+                [
+                    'mobile' => $data['mobile']
+                ]
+            );
+
             return response()->json([
                 'message' => 'Invalid credentials'
             ], 401);
@@ -107,7 +115,7 @@ class AuthService
     public function logout()
     {
         Auth::logout();
-        
+
         app(MonitoringService::class)->activity(
             'logout',
             'Auth',
