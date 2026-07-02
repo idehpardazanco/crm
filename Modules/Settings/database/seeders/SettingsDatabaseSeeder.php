@@ -3,14 +3,28 @@
 namespace Modules\Settings\Database\Seeders;
 
 use Illuminate\Database\Seeder;
+use Modules\Settings\Models\Setting;
 
-class SettingsDatabaseSeeder extends Seeder
+/**
+ * Default system settings
+ */
+class SettingsSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
     public function run(): void
     {
-        // $this->call([]);
+        Setting::updateOrCreate(
+            ['key' => 'sms.from'],
+            ['value' => '9982008568', 'type' => 'string']
+        );
+
+        Setting::updateOrCreate(
+            ['key' => 'sms.username'],
+            ['value' => 'zarinpayamak', 'type' => 'string']
+        );
+
+        Setting::updateOrCreate(
+            ['key' => 'sms.password'],
+            ['value' => 'esmaeil321', 'type' => 'string']
+        );
     }
 }
