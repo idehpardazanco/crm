@@ -55,6 +55,15 @@ class SmsService
             ]);
 
             SmsLogger::logSuccess($log);
+                app(\Modules\Monitoring\Services\MonitoringService::class)
+                ->activity(
+                    'sms_sent',
+                    'Sms',
+                    [
+                        'mobile' => $data['to'],
+                        'status' => 'success'
+                    ]
+    );
 
         } catch (Throwable $e) {
 
@@ -65,6 +74,15 @@ class SmsService
             ]);
 
             SmsLogger::logError($log, $e);
+                app(\Modules\Monitoring\Services\MonitoringService::class)
+                    ->activity(
+                        'sms_failed',
+                        'Sms',
+                        [
+                            'mobile' => $data['to'],
+                            'error' => $e->getMessage()
+                        ]
+    );
         }
 
         return $log;
