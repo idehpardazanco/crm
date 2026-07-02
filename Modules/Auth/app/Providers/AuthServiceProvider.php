@@ -1,6 +1,6 @@
 <?php
 
-namespace Modules\Auth\Providers;
+namespace Modules\Auth\app\Providers;
 
 use App\Support\BaseModuleServiceProvider;
 use Modules\Auth\Services\AuthService;
