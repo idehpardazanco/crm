@@ -5,7 +5,7 @@
     "keywords": [],
     "priority": 0,
     "providers": [
-        "Modules\\Settings\\Providers\\SettingsServiceProvider"
+        "Modules\\Settings\\app\\Providers\\SettingsServiceProvider"
     ],
     "files": []
 }
