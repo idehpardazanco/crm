@@ -1,46 +1,33 @@
 <?php
 
-namespace Modules\Settings\app\Providers;
+namespace Modules\Settings\Providers;
 
-use Nwidart\Modules\Support\ModuleServiceProvider;
-use Illuminate\Console\Scheduling\Schedule;
+use App\Support\BaseModuleServiceProvider;
+use Modules\Settings\Repositories\SettingRepository;
+use Modules\Settings\Services\SettingService;
 
-class SettingsServiceProvider extends ModuleServiceProvider
+/**
+ * Settings Module Provider
+ */
+class SettingsServiceProvider extends BaseModuleServiceProvider
 {
-    /**
-     * The name of the module.
-     */
-    protected string $name = 'Settings';
+    public function register(): void
+    {
+        // Bind Repository
+        $this->app->singleton(
+            SettingRepository::class,
+            SettingRepository::class
+        );
 
-    /**
-     * The lowercase version of the module name.
-     */
-    protected string $nameLower = 'settings';
+        // Bind Service
+        $this->app->singleton(
+            SettingService::class,
+            SettingService::class
+        );
+    }
 
-    /**
-     * Command classes to register.
-     *
-     * @var string[]
-     */
-    // protected array $commands = [];
-
-    /**
-     * Provider classes to register.
-     *
-     * @var string[]
-     */
-    protected array $providers = [
-        EventServiceProvider::class,
-        RouteServiceProvider::class,
-    ];
-
-    /**
-     * Define module schedules.
-     * 
-     * @param $schedule
-     */
-    // protected function configureSchedules(Schedule $schedule): void
-    // {
-    //     $schedule->command('inspire')->hourly();
-    // }
+    public function boot(): void
+    {
+        $this->loadModule(__DIR__ . '/..');
+    }
 }
