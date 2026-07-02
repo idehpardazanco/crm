@@ -2,36 +2,19 @@
 
 namespace Modules\Sms\app\Logs;
 
-use App\Models\SmsLog;
 use Illuminate\Support\Facades\Log;
-use Throwable;
 
 /**
- * Centralized SMS logging system
+ * Central SMS logging system
  */
 class SmsLogger
 {
-    /**
-     * Successful SMS log
-     */
-    public static function logSuccess(SmsLog $log): void
+    public static function log(string $to, string $message, bool $status): void
     {
-        Log::info('SMS_SENT_SUCCESS', [
-            'sms_log_id' => $log->id,
-            'mobile'     => $log->mobile,
-            'provider'   => $log->provider,
-        ]);
-    }
-
-    /**
-     * Failed SMS log
-     */
-    public static function logError(SmsLog $log, Throwable $e): void
-    {
-        Log::error('SMS_SENT_FAILED', [
-            'sms_log_id' => $log->id,
-            'mobile'     => $log->mobile,
-            'error'      => $e->getMessage(),
+        Log::info('SMS_SENT', [
+            'to' => $to,
+            'message' => $message,
+            'status' => $status,
         ]);
     }
 }
