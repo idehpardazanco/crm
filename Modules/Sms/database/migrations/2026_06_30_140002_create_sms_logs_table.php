@@ -27,6 +27,7 @@ return new class extends Migration
 
             $table->string('response_code')->nullable();
             $table->decimal('cost', 10, 2)->nullable();
+            
             $table->timestamp('sent_at')->nullable();
             $table->timestamps();
 
