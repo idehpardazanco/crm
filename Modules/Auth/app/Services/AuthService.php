@@ -70,6 +70,15 @@ class AuthService
 
         Auth::login($user);
 
+        app(MonitoringService::class)->activity(
+            'otp_success',
+            'Auth',
+            [
+                'user_id' => $user->id,
+                'mobile' => $data['mobile']
+            ]
+        );
+        
         Cache::forget("otp:{$data['mobile']}");
 
         return [
