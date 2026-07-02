@@ -8,7 +8,6 @@ class SystemLog extends Model
 {
     protected $fillable = [
         'level',
-        'channel',
         'message',
         'context',
     ];
