@@ -3,5 +3,6 @@
     "Users": true,
     "Auth": true,
     "Sms": true,
-    "Settings": true
+    "Settings": true,
+    "Monitoring": true
 }
