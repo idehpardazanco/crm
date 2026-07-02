@@ -75,7 +75,7 @@ class SmsService
             ]);
 
             // 7. Monitoring FAIL
-            app(\Modules\Monitoring\Services\MonitoringService::class)
+            app(\Modules\Monitoring\app\Services\MonitoringService::class)
                 ->activity(
                     'sms_failed',
                     'Sms',
