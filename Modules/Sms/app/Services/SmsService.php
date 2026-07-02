@@ -10,9 +10,6 @@ use Throwable;
 
 /**
  * Core SMS Service
- * - Driver based sending
- * - Full logging (DB + system log)
- * - Supports polymorphic sendable model
  */
 class SmsService
 {
@@ -21,11 +18,11 @@ class SmsService
     ) {}
 
     /**
-     * Send SMS with full tracking
+     * Send SMS
      */
     public function send(array $data): SmsLog
     {
-        // ساخت اولیه لاگ (queued state)
+        // 1. Create initial log
         $log = SmsLog::create([
             'sendable_type' => $data['sendable_type'] ?? null,
             'sendable_id'   => $data['sendable_id'] ?? null,
@@ -41,21 +38,22 @@ class SmsService
         ]);
 
         try {
-            // ارسال از طریق Driver
+
+            // 2. Send via driver
             $response = $this->driver->send(
                 $data['to'],
                 $data['message']
             );
 
-            // بروزرسانی لاگ در صورت موفقیت
+            // 3. Update log
             $log->update([
                 'status' => $response ? 'sent' : 'failed',
                 'provider_response' => $response,
                 'sent_at' => $response ? now() : null,
             ]);
 
-            SmsLogger::logSuccess($log);
-                app(\Modules\Monitoring\Services\MonitoringService::class)
+            // 4. Monitoring SUCCESS
+            app(\Modules\Monitoring\Services\MonitoringService::class)
                 ->activity(
                     'sms_sent',
                     'Sms',
@@ -63,33 +61,39 @@ class SmsService
                         'mobile' => $data['to'],
                         'status' => 'success'
                     ]
-    );
+                );
+
+            // 5. Local log success
+            SmsLogger::logSuccess($log);
 
         } catch (Throwable $e) {
 
-            // مدیریت خطا
+            // 6. Update failed log
             $log->update([
                 'status' => 'failed',
                 'error_message' => $e->getMessage(),
             ]);
 
+            // 7. Monitoring FAIL
+            app(\Modules\Monitoring\Services\MonitoringService::class)
+                ->activity(
+                    'sms_failed',
+                    'Sms',
+                    [
+                        'mobile' => $data['to'],
+                        'error' => $e->getMessage()
+                    ]
+                );
+
+            // 8. Local log error
             SmsLogger::logError($log, $e);
-                app(\Modules\Monitoring\Services\MonitoringService::class)
-                    ->activity(
-                        'sms_failed',
-                        'Sms',
-                        [
-                            'mobile' => $data['to'],
-                            'error' => $e->getMessage()
-                        ]
-    );
         }
 
         return $log;
     }
 
     /**
-     * Build structured payload for debugging / monitoring
+     * Build payload
      */
     private function buildPayload(array $data): array
     {
