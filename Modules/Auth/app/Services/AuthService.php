@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Cache;
 use Modules\Auth\Logs\AuthLogger;
 use Modules\Monitoring\app\Services\MonitoringService;
 use App\Models\User;
+use Modules\Monitoring\Services\MonitoringService;
 
 /**
  * Core authentication logic (password + OTP)
