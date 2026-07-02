@@ -11,9 +11,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('system_logs', function (Blueprint $table) {
+        Schema::create('system_logs', function ($table) {
             $table->id();
-            
+
+            $table->string('level'); // error, warning, info
+            $table->string('channel')->nullable();
+
+            $table->text('message');
+            $table->json('context')->nullable();
+
             $table->timestamps();
         });
     }
