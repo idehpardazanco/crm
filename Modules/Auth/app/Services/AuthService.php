@@ -5,7 +5,7 @@ namespace Modules\Auth\app\Services;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Modules\Auth\Logs\AuthLogger;
-use Modules\Monitoring\app\ Services\MonitoringService;
+use Modules\Monitoring\app\Services\MonitoringService;
 use App\Models\User;
 
 /**
