@@ -7,7 +7,6 @@ use Illuminate\Support\Facades\Cache;
 use Modules\Auth\Logs\AuthLogger;
 use Modules\Monitoring\app\Services\MonitoringService;
 use App\Models\User;
-use Modules\Monitoring\Services\MonitoringService;
 
 /**
  * Core authentication logic (password + OTP)
@@ -41,6 +40,14 @@ class AuthService
         $code = rand(100000, 999999);
 
         Cache::put("otp:{$data['mobile']}", $code, now()->addMinutes(2));
+
+        app(MonitoringService::class)->activity(
+            'otp_sent',
+            'Auth',
+            [
+                'mobile' => $data['mobile']
+            ]
+        );
 
         // بعداً اینجا SMS Service inject می‌کنیم
         return [
