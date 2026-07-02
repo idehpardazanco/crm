@@ -1,6 +1,6 @@
 <?php
 
-namespace Modules\Monitoring\Providers;
+namespace Modules\Monitoring\app\Providers;
 
 use Nwidart\Modules\Support\ModuleServiceProvider;
 use Illuminate\Console\Scheduling\Schedule;
