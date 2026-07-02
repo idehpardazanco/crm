@@ -61,6 +61,15 @@ class AuthService
         $cached = Cache::get("otp:{$data['mobile']}");
 
         if (!$cached || $cached != $data['code']) {
+            app(MonitoringService::class)->activity(
+                'otp_failed',
+                'Auth',
+                [
+                    'mobile' => $data['mobile'],
+                    'reason' => 'invalid_code'
+                ]
+            );
+
             return response()->json([
                 'message' => 'Invalid OTP'
             ], 422);
@@ -78,7 +87,7 @@ class AuthService
                 'mobile' => $data['mobile']
             ]
         );
-        
+
         Cache::forget("otp:{$data['mobile']}");
 
         return [
