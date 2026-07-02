@@ -2,55 +2,46 @@
 
 namespace Modules\Monitoring\Http\Controllers;
 
-use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Modules\Monitoring\Models\ActivityLog;
+use Modules\Monitoring\Models\SystemLog;
+use Modules\Monitoring\Models\RequestLog;
 
-class MonitoringController extends Controller
+class MonitoringController
 {
     /**
-     * Display a listing of the resource.
+     * Activity Logs
      */
-    public function index()
+    public function activities(Request $request)
     {
-        return view('monitoring::index');
+        $data = ActivityLog::query()
+            ->when($request->module, fn($q) => $q->where('module', $request->module))
+            ->latest()
+            ->paginate(15);
+
+        return response()->json($data);
     }
 
     /**
-     * Show the form for creating a new resource.
+     * System Logs
      */
-    public function create()
+    public function systemLogs(Request $request)
     {
-        return view('monitoring::create');
+        $data = SystemLog::query()
+            ->when($request->level, fn($q) => $q->where('level', $request->level))
+            ->latest()
+            ->paginate(15);
+
+        return response()->json($data);
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Request Logs
      */
-    public function store(Request $request) {}
-
-    /**
-     * Show the specified resource.
-     */
-    public function show($id)
+    public function requestLogs()
     {
-        return view('monitoring::show');
+        return response()->json(
+            RequestLog::latest()->paginate(15)
+        );
     }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit($id)
-    {
-        return view('monitoring::edit');
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, $id) {}
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy($id) {}
 }
