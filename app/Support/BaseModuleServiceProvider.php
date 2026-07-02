@@ -15,9 +15,18 @@ abstract class BaseModuleServiceProvider extends ServiceProvider
      */
     protected function loadModule(string $modulePath): void
     {
-        $this->loadRoutesFrom($modulePath . '/routes/web.php');
-        $this->loadRoutesFrom($modulePath . '/routes/api.php');
+        $routesPath = $modulePath . '/routes';
 
-        $this->loadMigrationsFrom($modulePath . '/database/migrations');
+        if (file_exists($routesPath . '/web.php')) {
+            $this->loadRoutesFrom($routesPath . '/web.php');
+        }
+
+        if (file_exists($routesPath . '/api.php')) {
+            $this->loadRoutesFrom($routesPath . '/api.php');
+        }
+
+        if (is_dir($modulePath . '/database/migrations')) {
+            $this->loadMigrationsFrom($modulePath . '/database/migrations');
+        }
     }
 }
