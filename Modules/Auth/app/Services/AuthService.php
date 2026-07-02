@@ -29,17 +29,6 @@ class AuthService
         $user = Auth::user();
 
         AuthLogger::success($user);
-        if ($userFound && $otpValid) {
-
-        app(\Modules\Monitoring\Services\MonitoringService::class)
-            ->activity(
-                'auth_success',
-                'Auth',
-                [
-                    'mobile' => $mobile
-                ]
-            );
-}
 
         return response()->json([
             'user' => $user
