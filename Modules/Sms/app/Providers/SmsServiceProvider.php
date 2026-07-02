@@ -2,54 +2,20 @@
 
 namespace Modules\Sms\app\Providers;
 
-use Nwidart\Modules\Support\ModuleServiceProvider;
-use Illuminate\Console\Scheduling\Schedule;
-use Illuminate\Support\ServiceProvider;
-use Modules\Sms\app\Contracts\SmsProviderInterface;
-use Modules\Sms\app\Providers\PayamMatniSmsProvider;
+use App\Support\BaseModuleServiceProvider;
+use Modules\Sms\Services\SmsService;
+use Modules\Sms\Repositories\SmsRepository;
 
-class SmsServiceProvider extends ModuleServiceProvider
+class SmsServiceProvider extends BaseModuleServiceProvider
 {
-    
     public function register(): void
     {
-        $this->app->bind(SmsProviderInterface::class, PayamMatniSmsProvider::class);
+        $this->app->singleton(SmsService::class);
+        $this->app->singleton(SmsRepository::class);
     }
-    
-    /**
-     * The name of the module.
-     */
-    protected string $name = 'Sms';
 
-    /**
-     * The lowercase version of the module name.
-     */
-    protected string $nameLower = 'sms';
-
-    /**
-     * Command classes to register.
-     *
-     * @var string[]
-     */
-    // protected array $commands = [];
-
-    /**
-     * Provider classes to register.
-     *
-     * @var string[]
-     */
-    protected array $providers = [
-        EventServiceProvider::class,
-        RouteServiceProvider::class,
-    ];
-
-    /**
-     * Define module schedules.
-     * 
-     * @param $schedule
-     */
-    // protected function configureSchedules(Schedule $schedule): void
-    // {
-    //     $schedule->command('inspire')->hourly();
-    // }
+    public function boot(): void
+    {
+        $this->loadModule(__DIR__ . '/..');
+    }
 }
