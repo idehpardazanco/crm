@@ -120,7 +120,7 @@ class AuthService
             'logout',
             'Auth',
             [
-                'user_id' => auth()->id()
+                'user_id' => auth()->check() ? auth()->id() : null
             ]
         );
 
