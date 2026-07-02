@@ -1,6 +1,6 @@
 <?php
 
-namespace Modules\Sms\Logs;
+namespace Modules\Sms\app\Logs;
 
 use App\Models\SmsLog;
 use Illuminate\Support\Facades\Log;
