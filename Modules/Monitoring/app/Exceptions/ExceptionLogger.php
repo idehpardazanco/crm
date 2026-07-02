@@ -1,6 +1,6 @@
 <?php
 
-namespace Modules\Monitoring\Exceptions;
+namespace Modules\Monitoring\app\Exceptions;
 
 use Throwable;
 use Modules\Monitoring\Models\SystemLog;
