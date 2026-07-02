@@ -1,6 +1,6 @@
 <?php
 
-namespace Modules\Settings\Providers;
+namespace Modules\Settings\app\Providers;
 
 use App\Support\BaseModuleServiceProvider;
 use Modules\Settings\Repositories\SettingRepository;
