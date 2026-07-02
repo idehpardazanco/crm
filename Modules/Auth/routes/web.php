@@ -8,7 +8,7 @@ Route::prefix('auth')
     ->group(function () {
 
         Route::get('/login', [AuthController::class, 'loginPage'])->name('auth.login');
-        Route::post('/login', [AuthController::class, 'login']);  
+        Route::post('/login', [AuthController::class, 'login']);
 
         Route::post('/otp/send', [AuthController::class, 'sendOtp']);
         Route::post('/otp/verify', [AuthController::class, 'verifyOtp']);
