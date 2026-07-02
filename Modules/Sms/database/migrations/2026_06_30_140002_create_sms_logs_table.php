@@ -25,6 +25,8 @@ return new class extends Migration
             $table->json('provider_response')->nullable();
             $table->text('error_message')->nullable();
 
+            $table->string('response_code')->nullable();
+            $table->decimal('cost', 10, 2)->nullable();
             $table->timestamp('sent_at')->nullable();
             $table->timestamps();
 
