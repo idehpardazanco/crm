@@ -2,45 +2,20 @@
 
 namespace Modules\Monitoring\app\Providers;
 
-use Nwidart\Modules\Support\ModuleServiceProvider;
-use Illuminate\Console\Scheduling\Schedule;
+use Illuminate\Support\ServiceProvider;
 
-class MonitoringServiceProvider extends ModuleServiceProvider
+class MonitoringServiceProvider extends ServiceProvider
 {
-    /**
-     * The name of the module.
-     */
-    protected string $name = 'Monitoring';
+    public function register(): void
+    {
+        //
+    }
 
-    /**
-     * The lowercase version of the module name.
-     */
-    protected string $nameLower = 'monitoring';
+    public function boot(): void
+    {
+        $this->loadRoutesFrom(__DIR__.'/../routes/web.php');
+        $this->loadRoutesFrom(__DIR__.'/../routes/api.php');
 
-    /**
-     * Command classes to register.
-     *
-     * @var string[]
-     */
-    // protected array $commands = [];
-
-    /**
-     * Provider classes to register.
-     *
-     * @var string[]
-     */
-    protected array $providers = [
-        EventServiceProvider::class,
-        RouteServiceProvider::class,
-    ];
-
-    /**
-     * Define module schedules.
-     * 
-     * @param $schedule
-     */
-    // protected function configureSchedules(Schedule $schedule): void
-    // {
-    //     $schedule->command('inspire')->hourly();
-    // }
+        $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
+    }
 }
