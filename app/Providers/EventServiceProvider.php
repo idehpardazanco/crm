@@ -13,7 +13,7 @@ class EventServiceProvider extends ServiceProvider
      */
     protected $listen = [
         // فعلاً خالی - چون ما از event() مستقیم استفاده می‌کنیم
-        \Modules\Monitoring\App\Events\ErrorOccurred::class => [],
+        \Modules\Monitoring\app\Events\ErrorOccurred::class => [],
     ];
 
     /**
