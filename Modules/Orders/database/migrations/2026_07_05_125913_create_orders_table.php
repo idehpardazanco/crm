@@ -11,9 +11,19 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('orders', function (Blueprint $table) {
+        Schema::create('orders', function ($table) {
             $table->id();
-            
+
+            $table->foreignId('contact_id')->constrained()->cascadeOnDelete();
+
+            $table->string('title');
+            $table->decimal('amount', 12, 2)->default(0);
+
+            $table->string('status')->default('pending'); 
+            // pending | paid | failed | shipped
+
+            $table->text('description')->nullable();
+
             $table->timestamps();
         });
     }
