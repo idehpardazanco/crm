@@ -86,7 +86,11 @@ onMounted(fetchData)
         <div class="mb-4">
             <h1 class="text-xl font-bold">Monitoring Dashboard</h1>
         </div>
-
+        <div class="flex gap-2 mb-4">
+            <input type="date" v-model="from" class="border p-2 rounded" />
+            <input type="date" v-model="to" class="border p-2 rounded" />
+        </div>
+        
         <!-- FILTERS -->
         <div class="flex gap-2 mb-4">
 
