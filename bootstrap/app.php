@@ -27,7 +27,7 @@ return Application::configure(basePath: dirname(__DIR__))
          * Monitoring must run on ALL requests
          */
         $middleware->append([
-            \Modules\Monitoring\Middleware\RequestLoggerMiddleware::class,
+            \Modules\Monitoring\app\Middleware\RequestLoggerMiddleware::class,
             \App\Http\Middleware\EnsureMonitoringAccess::class,
 
         ]);
@@ -46,7 +46,7 @@ return Application::configure(basePath: dirname(__DIR__))
          * 🚨 GLOBAL EXCEPTION MONITORING
          */
         $exceptions->report(function (Throwable $e) {
-            app(\Modules\Monitoring\Services\MonitoringService::class)
+            app(\Modules\Monitoring\app\Services\MonitoringService::class)
                 ->exception($e);
         });
 
