@@ -19,7 +19,7 @@ class SmsService
      */
     public function send(array $data): SmsLog
     {
-        // 🔥 Create log (queued state)
+        // 🔥 Create log (queued)
         $log = SmsLog::create([
             'sendable_type' => $data['sendable_type'] ?? null,
             'sendable_id'   => $data['sendable_id'] ?? null,
@@ -34,16 +34,27 @@ class SmsService
             'request_payload' => [
                 'to'      => $data['to'],
                 'message' => $data['message'],
-                'from'    => config('sms.from'),
             ],
         ]);
 
         try {
 
+            // 🔥 Get dynamic settings (from DB)
+            $settings = app(\Modules\Settings\app\Services\SettingsService::class);
+
+            $from     = $settings->get('sms_from');
+            $username = $settings->get('sms_username');
+            $password = $settings->get('sms_password');
+
             // 🔥 Send via driver
             $response = $this->driver->send(
                 $data['to'],
-                $data['message']
+                $data['message'],
+                [
+                    'from'     => $from,
+                    'username' => $username,
+                    'password' => $password,
+                ]
             );
 
             // 🔥 Update log success
@@ -53,7 +64,7 @@ class SmsService
                 'sent_at' => $response ? now() : null,
             ]);
 
-            // 🔥 System logging
+            // 🔥 System log
             SmsLogger::logSuccess($log);
 
             // 🔥 Monitoring integration
@@ -74,7 +85,7 @@ class SmsService
                 'error_message' => $e->getMessage(),
             ]);
 
-            // 🔥 System logging
+            // 🔥 System log
             SmsLogger::logError($log, $e);
 
             // 🔥 Monitoring integration
