@@ -37,12 +37,12 @@ class MonitoringService
     /**
      * Store info log
      */
-    // public function info(string $message, array $context = []): SystemLog
-    // {
-    //     return SystemLog::create([
-    //         'level'   => 'info',
-    //         'message' => $message,
-    //         'context' => json_encode($context),
-    //     ]);
-    // }
+    public function info(string $message, array $context = []): SystemLog
+    {
+        return SystemLog::create([
+            'level'   => 'info',
+            'message' => $message,
+            'context' => json_encode($context),
+        ]);
+    }
 }
