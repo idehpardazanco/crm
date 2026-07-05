@@ -4,30 +4,22 @@ namespace Modules\Auth\app\Services;
 
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
-use Modules\Auth\Logs\AuthLogger;
-use Modules\Monitoring\app\Services\MonitoringService;
 use App\Models\User;
+use Modules\Auth\Logs\AuthLogger;
 
-/**
- * Core authentication logic (password + OTP)
- */
 class AuthService
 {
+    /**
+     * Login with password
+     */
     public function loginWithPassword(array $data)
     {
         if (!Auth::attempt([
             'mobile' => $data['mobile'],
             'password' => $data['password']
         ])) {
-            AuthLogger::failed($data['mobile']);
 
-            app(MonitoringService::class)->activity(
-                'login_failed',
-                'Auth',
-                [
-                    'mobile' => $data['mobile']
-                ]
-            );
+            AuthLogger::failed($data['mobile']);
 
             return response()->json([
                 'message' => 'Invalid credentials'
@@ -38,7 +30,8 @@ class AuthService
 
         AuthLogger::success($user);
 
-        app(MonitoringService::class)->activity(
+        // 🔥 Monitoring integration
+        app(\Modules\Monitoring\app\Services\MonitoringService::class)->activity(
             'login_success',
             'Auth',
             [
@@ -52,13 +45,21 @@ class AuthService
         ]);
     }
 
+    /**
+     * Send OTP
+     */
     public function sendOtp(array $data)
     {
         $code = rand(100000, 999999);
 
-        Cache::put("otp:{$data['mobile']}", $code, now()->addMinutes(2));
+        Cache::put(
+            "otp:{$data['mobile']}",
+            $code,
+            now()->addMinutes(2)
+        );
 
-        app(MonitoringService::class)->activity(
+        // 🔥 Monitoring integration
+        app(\Modules\Monitoring\app\Services\MonitoringService::class)->activity(
             'otp_sent',
             'Auth',
             [
@@ -66,19 +67,22 @@ class AuthService
             ]
         );
 
-        // بعداً اینجا SMS Service inject می‌کنیم
         return [
             'message' => 'OTP sent',
-            'debug_code' => $code // فقط برای dev
+            'debug_code' => $code // فقط برای development
         ];
     }
 
+    /**
+     * Verify OTP
+     */
     public function verifyOtp(array $data)
     {
         $cached = Cache::get("otp:{$data['mobile']}");
 
         if (!$cached || $cached != $data['code']) {
-            app(MonitoringService::class)->activity(
+
+            app(\Modules\Monitoring\app\Services\MonitoringService::class)->activity(
                 'otp_failed',
                 'Auth',
                 [
@@ -96,7 +100,10 @@ class AuthService
 
         Auth::login($user);
 
-        app(MonitoringService::class)->activity(
+        Cache::forget("otp:{$data['mobile']}");
+
+        // 🔥 Monitoring integration
+        app(\Modules\Monitoring\app\Services\MonitoringService::class)->activity(
             'otp_success',
             'Auth',
             [
@@ -105,22 +112,26 @@ class AuthService
             ]
         );
 
-        Cache::forget("otp:{$data['mobile']}");
-
         return [
             'user' => $user
         ];
     }
 
+    /**
+     * Logout
+     */
     public function logout()
     {
+        $userId = auth()->id();
+
         Auth::logout();
 
-        app(MonitoringService::class)->activity(
+        // 🔥 Monitoring integration
+        app(\Modules\Monitoring\app\Services\MonitoringService::class)->activity(
             'logout',
             'Auth',
             [
-                'user_id' => auth()->check() ? auth()->id() : null
+                'user_id' => $userId
             ]
         );
 
