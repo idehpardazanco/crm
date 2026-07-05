@@ -38,7 +38,6 @@ const meta = ref({})
 /**
  * Fetch Data
  */
-
 const res = await axios.get(url, {
     params: {
         search: search.value,
@@ -47,22 +46,17 @@ const res = await axios.get(url, {
         page: page.value,
         from: from.value,
         to: to.value
-}
+    }
 })
 
-if (tab.value === 'activities') {
-    activities.value = res.data.data
-}
+const payload = res.data
 
-if (tab.value === 'system') {
-    systemLogs.value = res.data.data
-}
+if (tab.value === 'activities') activities.value = payload.data
+if (tab.value === 'system') systemLogs.value = payload.data
+if (tab.value === 'requests') requestLogs.value = payload.data
 
-if (tab.value === 'requests') {
-    requestLogs.value = res.data.data
-}
+meta.value = payload.meta
 
-meta.value = res.data.meta ?? res.data
 /**
  * Tab Change
  */
@@ -90,7 +84,7 @@ onMounted(fetchData)
             <input type="date" v-model="from" class="border p-2 rounded" />
             <input type="date" v-model="to" class="border p-2 rounded" />
         </div>
-        
+
         <!-- FILTERS -->
         <div class="flex gap-2 mb-4">
 
