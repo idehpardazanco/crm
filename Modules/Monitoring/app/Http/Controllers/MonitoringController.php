@@ -1,6 +1,6 @@
 <?php
 
-namespace Modules\Monitoring\app\Http\Controllers;
+namespace Modules\Monitoring\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Modules\Monitoring\Models\ActivityLog;
@@ -9,9 +9,6 @@ use Modules\Monitoring\Models\RequestLog;
 
 class MonitoringController
 {
-    /**
-     * Activity Logs (filter + search)
-     */
     public function activities(Request $request)
     {
         $data = ActivityLog::query()
@@ -29,9 +26,7 @@ class MonitoringController
             ]
         ];
     }
-    /**
-     * System Logs (filter + search)
-     */
+
     public function systemLogs(Request $request)
     {
         $data = SystemLog::query()
@@ -50,9 +45,6 @@ class MonitoringController
         ];
     }
 
-    /**
-     * Request Logs (filter + search)
-     */
     public function requestLogs(Request $request)
     {
         $data = RequestLog::query()
