@@ -8,6 +8,9 @@ const loading = ref(false)
 const selectedLog = ref(null)
 const showModal = ref(false)
 
+const from = ref('')
+const to = ref('')
+
 const openModal = (item) => {
     selectedLog.value = item
     showModal.value = true
