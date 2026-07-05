@@ -45,10 +45,10 @@ return Application::configure(basePath: dirname(__DIR__))
         /**
          * 🚨 GLOBAL EXCEPTION MONITORING
          */
-        // $exceptions->report(function (Throwable $e) {
-        //     app(\Modules\Monitoring\app\Services\MonitoringService::class)
-        //         ->exception($e);
-        // });
+        $exceptions->report(function (Throwable $e) {
+            app(\Modules\Monitoring\app\Services\MonitoringService::class)
+                ->exception($e);
+        });
 
     })
     ->create();
