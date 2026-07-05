@@ -2,29 +2,22 @@
 
 namespace Modules\Settings\app\Services;
 
-use Modules\Settings\Repositories\SettingRepository;
+use Modules\Settings\app\Models\Setting;
 
-/**
- * Central settings service
- */
-class SettingService
+class SettingsService
 {
-    public function __construct(
-        private SettingRepository $repo
-    ) {}
-
     public function get(string $key, $default = null)
     {
-        return $this->repo->get($key, $default);
+        $setting = Setting::where('key', $key)->first();
+
+        return $setting?->value ?? $default;
     }
 
-    public function set(string $key, $value, string $type = 'string'): void
+    public function set(string $key, $value): void
     {
-        $this->repo->set($key, $value, $type);
-    }
-
-    public function all(): array
-    {
-        return $this->repo->all();
+        Setting::updateOrCreate(
+            ['key' => $key],
+            ['value' => $value]
+        );
     }
 }
