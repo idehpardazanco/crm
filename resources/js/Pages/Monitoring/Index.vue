@@ -130,7 +130,7 @@ onMounted(fetchData)
         <table v-if="!loading" class="w-full bg-white shadow rounded">
 
             <tbody v-if="tab === 'activities'">
-                <tr v-for="i in activities" :key="i.id">
+                <tr v-for="i in activities" :key="i.id" @click="openModal(i)" class="cursor-pointer">
                     <td>{{ i.action }}</td>
                     <td>{{ i.module }}</td>
                 </tr>
