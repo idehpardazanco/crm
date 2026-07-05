@@ -122,8 +122,9 @@ onMounted(fetchData)
         </div>
 
         <!-- LOADING -->
-        <div v-if="loading" class="p-6 text-center">
-            در حال بارگذاری...
+        <div v-if="loading" class="text-center py-10 text-gray-500">
+            <div class="animate-spin mb-2">⏳</div>
+            در حال دریافت اطلاعات...
         </div>
 
         <!-- TABLE -->
