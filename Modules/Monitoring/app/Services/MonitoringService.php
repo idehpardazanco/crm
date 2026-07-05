@@ -2,75 +2,47 @@
 
 namespace Modules\Monitoring\app\Services;
 
-use Modules\Monitoring\Models\SystemLog;
 use Modules\Monitoring\Models\ActivityLog;
-use Modules\Monitoring\Models\RequestLog;
-use Modules\Monitoring\Events\ErrorOccurred;
+use Modules\Monitoring\Models\SystemLog;
 use Throwable;
 
 class MonitoringService
 {
     /**
-     * ثبت رفتار کاربر
+     * Store general activity log
      */
-    public function activity(string $action, string $module, array $meta = []): void
+    public function activity(string $action, string $module, array $meta = []): ActivityLog
     {
-        ActivityLog::create([
-            'user_id' => auth()->id(),
-            'action'  => $action,
-            'module'  => $module,
-            'meta'    => $meta,
+        return ActivityLog::create([
+            'action' => $action,
+            'module' => $module,
+            'meta'   => json_encode($meta),
         ]);
     }
 
     /**
-     * ثبت لاگ سیستم
+     * Store system error log
      */
-    public function system(string $level, string $message, array $context = []): void
+    public function error(Throwable $exception, string $context = null): SystemLog
     {
-        SystemLog::create([
-            'level'   => $level,
-            'message' => $message,
+        return SystemLog::create([
+            'level'   => 'error',
+            'message' => $exception->getMessage(),
             'context' => $context,
+            'file'    => $exception->getFile(),
+            'line'    => $exception->getLine(),
         ]);
     }
 
     /**
-     * ثبت خطاها
+     * Store info log
      */
-    public function exception($e)
+    public function info(string $message, array $context = []): SystemLog
     {
-        $error = [
-            'message' => $e->getMessage(),
-            'file' => $e->getFile(),
-            'line' => $e->getLine(),
-            'time' => now()->toDateTimeString(),
-        ];
-
-        // ذخیره در DB
-        \Modules\Monitoring\APP\Models\SystemLog::create([
-            'level' => 'error',
-            'message' => $e->getMessage(),
-        ]);
-
-        // 🔥 ارسال real-time event
-        event(new ErrorOccurred($error));
-    }
-
-    /**
-     * ثبت request ها
-     */
-    public function request(array $data): void
-    {
-        RequestLog::create([
-            'method'      => $data['method'],
-            'url'         => $data['url'],
-            'ip'          => $data['ip'] ?? null,
-            'user_id'     => auth()->id(),
-            'headers'     => $data['headers'] ?? [],
-            'payload'     => $data['payload'] ?? [],
-            'status_code' => $data['status_code'] ?? null,
-            'duration'    => $data['duration'] ?? null,
+        return SystemLog::create([
+            'level'   => 'info',
+            'message' => $message,
+            'context' => json_encode($context),
         ]);
     }
 }
