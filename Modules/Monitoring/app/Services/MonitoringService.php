@@ -2,8 +2,8 @@
 
 namespace Modules\Monitoring\app\Services;
 
-use Modules\Monitoring\Models\ActivityLog;
-use Modules\Monitoring\Models\SystemLog;
+use Modules\Monitoring\app\Models\ActivityLog;
+use Modules\Monitoring\app\Models\SystemLog;
 use Throwable;
 
 class MonitoringService
