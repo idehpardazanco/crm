@@ -48,7 +48,7 @@ class MonitoringService
         ];
 
         // ذخیره در DB
-        \Modules\Monitoring\Models\SystemLog::create([
+        \Modules\Monitoring\APP\Models\SystemLog::create([
             'level' => 'error',
             'message' => $e->getMessage(),
         ]);
