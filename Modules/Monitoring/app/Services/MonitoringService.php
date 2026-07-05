@@ -45,4 +45,10 @@ class MonitoringService
             'context' => json_encode($context),
         ]);
     }
+
+    public function exception($e)
+    {
+        // log or send to monitoring system
+        logger()->error($e);
+    }
 }
