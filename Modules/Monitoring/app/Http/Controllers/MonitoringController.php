@@ -1,6 +1,6 @@
 <?php
 
-namespace Modules\Monitoring\Http\Controllers;
+namespace Modules\Monitoring\app\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Modules\Monitoring\Models\ActivityLog;
