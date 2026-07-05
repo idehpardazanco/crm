@@ -1,16 +1,20 @@
 <?php
 
-namespace Modules\Sms\Database\Seeders;
+namespace Modules\Settings\database\seeders;
 
 use Illuminate\Database\Seeder;
+use Modules\Settings\app\Models\Setting;
 
-class SmsDatabaseSeeder extends Seeder
+class SettingsSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
     public function run(): void
     {
-        // $this->call([]);
+        Setting::updateOrCreate(['key' => 'sms_from'], ['value' => '9982008568']);
+
+        Setting::updateOrCreate(['key' => 'sms_username'], ['value' => 'zarinpayamak']);
+
+        Setting::updateOrCreate(['key' => 'sms_password'], ['value' => 'esmaeil321']);
+
+        Setting::updateOrCreate(['key' => 'sms_driver'], ['value' => 'payam_matni']);
     }
 }
