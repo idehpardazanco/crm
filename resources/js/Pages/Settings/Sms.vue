@@ -1,6 +1,12 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import axios from 'axios'
+import AdminLayout from '@/Layouts/AdminLayout.vue'
+
+defineOptions({
+    layout: AdminLayout
+})
+
 
 const form = ref({
     sms_from: '',
