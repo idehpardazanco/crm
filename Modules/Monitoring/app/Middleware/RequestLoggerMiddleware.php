@@ -4,7 +4,7 @@ namespace Modules\Monitoring\app\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
-use Modules\Monitoring\Services\MonitoringService;
+use Modules\Monitoring\app\Services\MonitoringService;
 
 class RequestLoggerMiddleware
 {
