@@ -1,6 +1,7 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import axios from 'axios'
+import AdminLayout from '@/Layouts/AdminLayout.vue'
 
 /**
  * Tabs
