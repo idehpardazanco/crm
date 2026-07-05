@@ -1,18 +1,18 @@
 <?php
 
-namespace Modules\Contact\app\Http\Controllers;
+namespace Modules\Contacts\app\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
-class ContactController extends Controller
+class ContactsController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        return view('contact::index');
+        return view('contacts::index');
     }
 
     /**
@@ -20,7 +20,7 @@ class ContactController extends Controller
      */
     public function create()
     {
-        return view('contact::create');
+        return view('contacts::create');
     }
 
     /**
@@ -33,7 +33,7 @@ class ContactController extends Controller
      */
     public function show($id)
     {
-        return view('contact::show');
+        return view('contacts::show');
     }
 
     /**
@@ -41,7 +41,7 @@ class ContactController extends Controller
      */
     public function edit($id)
     {
-        return view('contact::edit');
+        return view('contacts::edit');
     }
 
     /**

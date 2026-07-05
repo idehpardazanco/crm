@@ -1,21 +1,21 @@
 <?php
 
-namespace Modules\Contact\app\Providers;
+namespace Modules\Contacts\Providers;
 
 use Nwidart\Modules\Support\ModuleServiceProvider;
 use Illuminate\Console\Scheduling\Schedule;
 
-class ContactServiceProvider extends ModuleServiceProvider
+class ContactsServiceProvider extends ModuleServiceProvider
 {
     /**
      * The name of the module.
      */
-    protected string $name = 'Contact';
+    protected string $name = 'Contacts';
 
     /**
      * The lowercase version of the module name.
      */
-    protected string $nameLower = 'contact';
+    protected string $nameLower = 'contacts';
 
     /**
      * Command classes to register.

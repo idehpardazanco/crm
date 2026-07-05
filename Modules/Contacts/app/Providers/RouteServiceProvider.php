@@ -1,13 +1,13 @@
 <?php
 
-namespace Modules\Contact\app\Providers;
+namespace Modules\Contacts\Providers;
 
 use Illuminate\Foundation\Support\Providers\RouteServiceProvider as ServiceProvider;
 use Illuminate\Support\Facades\Route;
 
 class RouteServiceProvider extends ServiceProvider
 {
-    protected string $name = 'Contact';
+    protected string $name = 'Contacts';
 
     /**
      * Called before routes are registered.

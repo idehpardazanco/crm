@@ -1,5 +1,5 @@
 {
-    "name": "nwidart/contact",
+    "name": "nwidart/contacts",
     "description": "",
     "authors": [
         {
@@ -17,14 +17,14 @@
     },
     "autoload": {
         "psr-4": {
-            "Modules\\Contact\\": "app/",
-            "Modules\\Contact\\Database\\Factories\\": "database/factories/",
-            "Modules\\Contact\\Database\\Seeders\\": "database/seeders/"
+            "Modules\\Contacts\\": "app/",
+            "Modules\\Contacts\\Database\\Factories\\": "database/factories/",
+            "Modules\\Contacts\\Database\\Seeders\\": "database/seeders/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Modules\\Contact\\Tests\\": "tests/"
+            "Modules\\Contacts\\Tests\\": "tests/"
         }
     }
 }
