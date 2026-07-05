@@ -2,15 +2,12 @@
 
 namespace Modules\Sms\app\Services;
 
+use Illuminate\Support\Facades\Auth;
+use Throwable;
 use Modules\Sms\Drivers\SmsDriverInterface;
 use Modules\Sms\Logs\SmsLogger;
 use App\Models\SmsLog;
-use Illuminate\Support\Facades\Auth;
-use Throwable;
 
-/**
- * Core SMS Service
- */
 class SmsService
 {
     public function __construct(
@@ -22,7 +19,7 @@ class SmsService
      */
     public function send(array $data): SmsLog
     {
-        // 1. Create initial log
+        // 🔥 Create log (queued state)
         $log = SmsLog::create([
             'sendable_type' => $data['sendable_type'] ?? null,
             'sendable_id'   => $data['sendable_id'] ?? null,
@@ -34,74 +31,63 @@ class SmsService
             'message'       => $data['message'],
 
             'status'        => 'queued',
-            'request_payload' => $this->buildPayload($data),
+            'request_payload' => [
+                'to'      => $data['to'],
+                'message' => $data['message'],
+                'from'    => config('sms.from'),
+            ],
         ]);
 
         try {
 
-            // 2. Send via driver
+            // 🔥 Send via driver
             $response = $this->driver->send(
                 $data['to'],
                 $data['message']
             );
 
-            // 3. Update log
+            // 🔥 Update log success
             $log->update([
                 'status' => $response ? 'sent' : 'failed',
                 'provider_response' => $response,
                 'sent_at' => $response ? now() : null,
             ]);
 
-            // 4. Monitoring SUCCESS
-            app(\Modules\Monitoring\Services\MonitoringService::class)
-                ->activity(
-                    'sms_sent',
-                    'Sms',
-                    [
-                        'mobile' => $data['to'],
-                        'status' => 'success'
-                    ]
-                );
-
-            // 5. Local log success
+            // 🔥 System logging
             SmsLogger::logSuccess($log);
+
+            // 🔥 Monitoring integration
+            app(\Modules\Monitoring\app\Services\MonitoringService::class)->activity(
+                'sms_sent',
+                'Sms',
+                [
+                    'mobile' => $data['to'],
+                    'status' => 'success'
+                ]
+            );
 
         } catch (Throwable $e) {
 
-            // 6. Update failed log
+            // ❌ Update log failed
             $log->update([
                 'status' => 'failed',
                 'error_message' => $e->getMessage(),
             ]);
 
-            // 7. Monitoring FAIL
-            app(\Modules\Monitoring\app\Services\MonitoringService::class)
-                ->activity(
-                    'sms_failed',
-                    'Sms',
-                    [
-                        'mobile' => $data['to'],
-                        'error' => $e->getMessage()
-                    ]
-                );
-
-            // 8. Local log error
+            // 🔥 System logging
             SmsLogger::logError($log, $e);
+
+            // 🔥 Monitoring integration
+            app(\Modules\Monitoring\app\Services\MonitoringService::class)->activity(
+                'sms_failed',
+                'Sms',
+                [
+                    'mobile' => $data['to'],
+                    'error' => $e->getMessage()
+                ]
+            );
         }
 
         return $log;
-    }
-
-    /**
-     * Build payload
-     */
-    private function buildPayload(array $data): array
-    {
-        return [
-            'driver' => config('sms.driver'),
-            'to'     => $data['to'],
-            'message'=> $data['message'],
-            'from'   => config('sms.from'),
-        ];
     }
 }
