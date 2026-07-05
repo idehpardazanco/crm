@@ -1,6 +1,6 @@
 <?php
 
-namespace Modules\Contact\app\Providers;
+namespace Modules\Contacts\app\Providers;
 
 use Nwidart\Modules\Support\ModuleServiceProvider;
 use Illuminate\Console\Scheduling\Schedule;
