@@ -35,4 +35,11 @@ Route::middleware(['auth', \App\Http\Middleware\EnsureMonitoringAccess::class])
         return Inertia::render('Monitoring/Index');
 });
 
+Route::middleware(['auth'])->group(function () {
+    Route::get('/settings/sms', function () {
+        return Inertia::render('Settings/Sms');
+    });
+
+});
+
 require __DIR__.'/auth.php';
