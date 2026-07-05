@@ -8,14 +8,12 @@ class MonitoringServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
-        //
+        $this->app->singleton(AuthService::class);
+        $this->app->singleton(OtpService::class);
     }
 
     public function boot(): void
     {
-        $this->loadRoutesFrom(__DIR__.'/../routes/web.php');
-        $this->loadRoutesFrom(__DIR__.'/../routes/api.php');
-
-        $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
+        $this->loadModule(__DIR__ . '/..');
     }
 }
