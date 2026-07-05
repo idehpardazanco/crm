@@ -8,14 +8,12 @@ return new class extends Migration {
 
     public function up(): void
     {
-        Schema::create('settings', function (Blueprint $table) {
+      
+        Schema::create('settings', function ($table) {
             $table->id();
 
             $table->string('key')->unique();
-            $table->longText('value')->nullable();
-
-            $table->string('type')->default('string'); 
-            // string | json | boolean | number
+            $table->text('value')->nullable();
 
             $table->timestamps();
         });
