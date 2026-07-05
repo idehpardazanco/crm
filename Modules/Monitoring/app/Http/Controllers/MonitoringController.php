@@ -10,38 +10,50 @@ use Modules\Monitoring\Models\RequestLog;
 class MonitoringController
 {
     /**
-     * Activity Logs
+     * Activity Logs (filter + search)
      */
     public function activities(Request $request)
     {
-        $data = ActivityLog::query()
-            ->when($request->module, fn($q) => $q->where('module', $request->module))
+        return ActivityLog::query()
+            ->when($request->module, function ($q) {
+                $q->where('module', request('module'));
+            })
+            ->when($request->search, function ($q) {
+                $q->where('action', 'like', '%'.request('search').'%');
+            })
             ->latest()
-            ->paginate(15);
-
-        return response()->json($data);
+            ->paginate($request->per_page ?? 15);
     }
 
     /**
-     * System Logs
+     * System Logs (filter + search)
      */
     public function systemLogs(Request $request)
     {
-        $data = SystemLog::query()
-            ->when($request->level, fn($q) => $q->where('level', $request->level))
+        return SystemLog::query()
+            ->when($request->level, function ($q) {
+                $q->where('level', request('level'));
+            })
+            ->when($request->search, function ($q) {
+                $q->where('message', 'like', '%'.request('search').'%');
+            })
             ->latest()
-            ->paginate(15);
-
-        return response()->json($data);
+            ->paginate($request->per_page ?? 15);
     }
 
     /**
-     * Request Logs
+     * Request Logs (filter + search)
      */
-    public function requestLogs()
+    public function requestLogs(Request $request)
     {
-        return response()->json(
-            RequestLog::latest()->paginate(15)
-        );
+        return RequestLog::query()
+            ->when($request->status, function ($q) {
+                $q->where('status_code', request('status'));
+            })
+            ->when($request->search, function ($q) {
+                $q->where('url', 'like', '%'.request('search').'%');
+            })
+            ->latest()
+            ->paginate($request->per_page ?? 15);
     }
 }
