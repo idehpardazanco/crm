@@ -1,6 +1,6 @@
 <?php
 
-namespace Modules\Contacts\Providers;
+namespace Modules\Contacts\app\Providers;
 
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
 
