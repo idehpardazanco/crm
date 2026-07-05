@@ -2,55 +2,30 @@
 
 namespace Modules\Orders\app\Http\Controllers;
 
-use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Modules\Orders\app\Services\OrderService;
 
-class OrdersController extends Controller
+class OrderController
 {
-    /**
-     * Display a listing of the resource.
-     */
+    public function __construct(
+        private OrderService $service
+    ) {}
+
     public function index()
     {
-        return view('orders::index');
+        return $this->service->list();
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+    public function store(Request $request)
     {
-        return view('orders::create');
+        return $this->service->create($request->all());
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request) {}
-
-    /**
-     * Show the specified resource.
-     */
-    public function show($id)
+    public function updateStatus(Request $request, $id)
     {
-        return view('orders::show');
+        return $this->service->updateStatus(
+            $id,
+            $request->status
+        );
     }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit($id)
-    {
-        return view('orders::edit');
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, $id) {}
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy($id) {}
 }
