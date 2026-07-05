@@ -43,6 +43,12 @@ class MonitoringController
             ->when($request->search, function ($q) {
                 $q->where('message', 'like', '%'.request('search').'%');
             })
+            ->when($request->from, function ($q) {
+                $q->whereDate('created_at', '>=', request('from'));
+            })
+            ->when($request->to, function ($q) {
+                $q->whereDate('created_at', '<=', request('to'));
+            })
             ->latest()
             ->paginate($request->per_page ?? 15);
     }
