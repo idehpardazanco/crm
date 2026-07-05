@@ -3,6 +3,10 @@ import { ref, onMounted } from 'vue'
 import axios from 'axios'
 import AdminLayout from '@/Layouts/AdminLayout.vue'
 
+defineOptions({
+    layout: AdminLayout
+})
+
 /**
  * Tabs
  */
