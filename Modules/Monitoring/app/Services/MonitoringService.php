@@ -5,6 +5,7 @@ namespace Modules\Monitoring\app\Services;
 use Modules\Monitoring\Models\SystemLog;
 use Modules\Monitoring\Models\ActivityLog;
 use Modules\Monitoring\Models\RequestLog;
+use Modules\Monitoring\Events\ErrorOccurred;
 use Throwable;
 
 class MonitoringService
@@ -37,16 +38,23 @@ class MonitoringService
     /**
      * ثبت خطاها
      */
-    public function exception(Throwable $e): void
+    public function exception($e)
     {
-        SystemLog::create([
-            'level'   => 'error',
+        $error = [
             'message' => $e->getMessage(),
-            'context' => [
-                'file' => $e->getFile(),
-                'line' => $e->getLine(),
-            ],
+            'file' => $e->getFile(),
+            'line' => $e->getLine(),
+            'time' => now()->toDateTimeString(),
+        ];
+
+        // ذخیره در DB
+        \Modules\Monitoring\Models\SystemLog::create([
+            'level' => 'error',
+            'message' => $e->getMessage(),
         ]);
+
+        // 🔥 ارسال real-time event
+        event(new ErrorOccurred($error));
     }
 
     /**
