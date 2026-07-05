@@ -6,5 +6,6 @@
     "Settings": true,
     "Monitoring": true,
     "Contact": true,
-    "Contacts": true
+    "Contacts": true,
+    "Orders": true
 }
