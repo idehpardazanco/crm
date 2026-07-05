@@ -4,5 +4,6 @@
     "Auth": true,
     "Sms": true,
     "Settings": true,
-    "Monitoring": true
+    "Monitoring": true,
+    "Contact": true
 }
