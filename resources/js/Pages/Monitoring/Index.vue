@@ -154,4 +154,24 @@ onMounted(fetchData)
         </table>
 
     </div>
+    <div v-if="showModal" class="fixed inset-0 bg-black/50 flex items-center justify-center">
+
+    <div class="bg-white w-1/2 p-6 rounded">
+
+        <h2 class="text-lg font-bold mb-4">جزئیات لاگ</h2>
+
+        <pre class="text-sm bg-gray-100 p-3 rounded overflow-auto">
+            {{ selectedLog }}
+        </pre>
+
+        <button
+            class="mt-4 px-4 py-2 bg-red-600 text-white rounded"
+            @click="showModal = false"
+        >
+            بستن
+        </button>
+
+    </div>
+
+</div>
 </template>
