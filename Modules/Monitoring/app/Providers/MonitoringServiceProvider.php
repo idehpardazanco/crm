@@ -1,23 +1,38 @@
+
 <?php
 
 namespace Modules\Monitoring\app\Providers;
 
-use Illuminate\Support\ServiceProvider;
-use App\Support\BaseModuleServiceProvider;
-use Modules\Auth\Services\AuthService;
-use Modules\Auth\Services\OtpService;
+use Nwidart\Modules\Support\ModuleServiceProvider;
+use Illuminate\Console\Scheduling\Schedule;
 
-class AuthServiceProvider extends BaseModuleServiceProvider
-class MonitoringServiceProvider extends ServiceProvider
+class MonitoringServiceProvider extends ModuleServiceProvider
 {
-    public function register(): void
-    {
-        $this->app->singleton(AuthService::class);
-        $this->app->singleton(OtpService::class);
-    }
+    //
+     * The name of the module.
+     *//
+    protected string $name = 'Monitoring';
 
-    public function boot(): void
-    {
-        $this->loadModule(__DIR__ . '/..');
-    }
+    /
+     * The lowercase version of the module name.
+     */
+    protected string $nameLower = 'monitoring';
+
+    /
+     * Command classes to register.
+     *
+     * @var string[]
+     */
+    // protected array $commands = [];
+
+    /
+     * Provider classes to register.
+     *
+     * @var string[]
+     */
+    protected array $providers = [
+        EventServiceProvider::class,
+        RouteServiceProvider::class,
+    ];
+
 }
