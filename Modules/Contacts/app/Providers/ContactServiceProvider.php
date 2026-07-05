@@ -10,12 +10,12 @@ class ContactServiceProvider extends ModuleServiceProvider
     /**
      * The name of the module.
      */
-    protected string $name = 'Contact';
+    protected string $name = 'Contacts';
 
     /**
      * The lowercase version of the module name.
      */
-    protected string $nameLower = 'contact';
+    protected string $nameLower = 'contacts';
 
     /**
      * Command classes to register.
