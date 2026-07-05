@@ -275,7 +275,7 @@ onMounted(fetchData)
                 <h2 class="font-bold mb-4">جزئیات لاگ</h2>
 
                 <pre class="text-xs bg-gray-100 p-3 rounded overflow-auto">
-{{ selectedLog }}
+                    {{ selectedLog }}
                 </pre>
 
                 <button @click="showModal = false"
