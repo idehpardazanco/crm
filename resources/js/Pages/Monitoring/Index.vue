@@ -38,21 +38,16 @@ const meta = ref({})
 /**
  * Fetch Data
  */
-params: {
-    search: search.value,
-    module: moduleFilter.value,
-    level: levelFilter.value,
-    page: page.value,
-    from: from.value,
-    to: to.value
-}
+
 const res = await axios.get(url, {
     params: {
         search: search.value,
         module: moduleFilter.value,
         level: levelFilter.value,
-        page: page.value
-    }
+        page: page.value,
+        from: from.value,
+        to: to.value
+}
 })
 
 if (tab.value === 'activities') {
