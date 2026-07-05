@@ -2,55 +2,30 @@
 
 namespace Modules\Settings\app\Http\Controllers;
 
-use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Modules\Settings\app\Models\Setting;
 
-class SettingsController extends Controller
+class SettingsController
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    public function sms()
     {
-        return view('settings::index');
+        return [
+            'sms_from' => Setting::where('key', 'sms_from')->value('value'),
+            'sms_username' => Setting::where('key', 'sms_username')->value('value'),
+            'sms_password' => Setting::where('key', 'sms_password')->value('value'),
+            'sms_driver' => Setting::where('key', 'sms_driver')->value('value'),
+        ];
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+    public function updateSms(Request $request)
     {
-        return view('settings::create');
+        foreach ($request->all() as $key => $value) {
+            Setting::updateOrCreate(
+                ['key' => $key],
+                ['value' => $value]
+            );
+        }
+
+        return ['status' => 'ok'];
     }
-
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request) {}
-
-    /**
-     * Show the specified resource.
-     */
-    public function show($id)
-    {
-        return view('settings::show');
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit($id)
-    {
-        return view('settings::edit');
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, $id) {}
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy($id) {}
 }
