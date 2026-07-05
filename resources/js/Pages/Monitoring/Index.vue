@@ -23,43 +23,32 @@ const levelFilter = ref('')
  * Pagination
  */
 const page = ref(1)
-
+const meta = ref({})
 /**
  * Fetch Data
  */
-const fetchData = async () => {
-    loading.value = true
-
-    let url = ''
-
-    if (tab.value === 'activities') {
-        url = '/api/v1/monitoring/activities'
+const res = await axios.get(url, {
+    params: {
+        search: search.value,
+        module: moduleFilter.value,
+        level: levelFilter.value,
+        page: page.value
     }
+})
 
-    if (tab.value === 'system') {
-        url = '/api/v1/monitoring/system-logs'
-    }
-
-    if (tab.value === 'requests') {
-        url = '/api/v1/monitoring/request-logs'
-    }
-
-    const res = await axios.get(url, {
-        params: {
-            search: search.value,
-            module: moduleFilter.value,
-            level: levelFilter.value,
-            page: page.value
-        }
-    })
-
-    if (tab.value === 'activities') activities.value = res.data.data
-    if (tab.value === 'system') systemLogs.value = res.data.data
-    if (tab.value === 'requests') requestLogs.value = res.data.data
-
-    loading.value = false
+if (tab.value === 'activities') {
+    activities.value = res.data.data
 }
 
+if (tab.value === 'system') {
+    systemLogs.value = res.data.data
+}
+
+if (tab.value === 'requests') {
+    requestLogs.value = res.data.data
+}
+
+meta.value = res.data.meta ?? res.data
 /**
  * Tab Change
  */
