@@ -92,5 +92,10 @@ class ContactService
 
     }
 
+    public function find(int $id)
+    {
+        return Contact::findOrFail($id);
+    }
+
 
 }
