@@ -5,7 +5,7 @@ namespace Modules\Contacts\app\Http\Controllers;
 use Illuminate\Http\Request;
 use Modules\Contacts\app\Services\ContactService;
 
-class ContactController
+class ContactsController
 {
     public function __construct(
         private ContactService $service
