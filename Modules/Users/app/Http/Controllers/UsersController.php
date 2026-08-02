@@ -47,6 +47,7 @@ class UsersController extends Controller
     ]);
     }
 
+
     public function store(StoreUserRequest $request)
     {
         return $this->service->create(
@@ -54,7 +55,18 @@ class UsersController extends Controller
         );
     }
 
+    
+    public function edit(int $id)
+    {
+        return Inertia::render('Users/Edit', [
 
+            'user' => \App\Models\User::with('roles')
+                ->findOrFail($id),
+
+            'roles' => \Spatie\Permission\Models\Role::pluck('name')
+
+        ]);
+    }
 
 
     public function update(
