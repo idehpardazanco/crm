@@ -28,7 +28,7 @@ return Application::configure(basePath: dirname(__DIR__))
          */
         $middleware->append([
             \Modules\Monitoring\app\Middleware\RequestLoggerMiddleware::class,
-            \App\Http\Middleware\EnsureMonitoringAccess::class,
+            // \App\Http\Middleware\EnsureMonitoringAccess::class,
 
         ]);
 
