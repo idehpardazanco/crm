@@ -25,12 +25,18 @@ class UsersController extends Controller
     }
 
 
-
     public function index(Request $request)
     {
-        return $this->service->paginate(
-            $request->get('search')
-        );
+        return Inertia::render('Users/Index', [
+
+            'users' => $this->service->paginate(
+                $request->get('search')
+            ),
+
+            'roles' => Role::query()
+                ->pluck('name'),
+
+        ]);
     }
 
 
