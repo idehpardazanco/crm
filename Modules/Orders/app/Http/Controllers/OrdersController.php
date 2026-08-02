@@ -5,7 +5,7 @@ namespace Modules\Orders\app\Http\Controllers;
 use Illuminate\Http\Request;
 use Modules\Orders\app\Services\OrderService;
 
-class OrderController
+class OrdersController
 {
     public function __construct(
         private OrderService $service
