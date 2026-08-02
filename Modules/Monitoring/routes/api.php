@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use Modules\Monitoring\Http\Controllers\MonitoringController;
+use Modules\Monitoring\app\Http\Controllers\MonitoringController;
 
 Route::prefix('v1/monitoring')->group(function () {
 
