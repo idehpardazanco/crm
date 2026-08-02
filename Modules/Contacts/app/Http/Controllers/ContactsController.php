@@ -39,6 +39,31 @@ class ContactsController extends Controller
     }
 
 
+    public function create()
+    {
+        return Inertia::render('Contacts/Create',[
+            'users'=>User::where('status','active')
+                ->select('id','name')
+                ->get()
+        ]);
+    }
+
+
+
+    public function edit(int $id)
+    {
+        return Inertia::render('Contacts/Edit',[
+
+            'contact'=>$this->service->find($id),
+
+            'users'=>User::where('status','active')
+                ->select('id','name')
+                ->get()
+
+        ]);
+    }
+
+
 
     public function store(StoreContactRequest $request)
     {
