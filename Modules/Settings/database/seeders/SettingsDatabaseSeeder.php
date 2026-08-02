@@ -3,7 +3,7 @@
 namespace Modules\Settings\Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use Modules\Settings\Models\Setting;
+use Modules\Settings\app\Models\Setting;
 
 /**
  * Default system settings
