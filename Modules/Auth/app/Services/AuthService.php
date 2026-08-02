@@ -5,7 +5,7 @@ namespace Modules\Auth\app\Services;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use App\Models\User;
-use Modules\Auth\Logs\AuthLogger;
+use Modules\Auth\app\Logs\AuthLogger;
 
 class AuthService
 {
