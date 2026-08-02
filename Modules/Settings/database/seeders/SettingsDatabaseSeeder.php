@@ -8,7 +8,7 @@ use Modules\Settings\Models\Setting;
 /**
  * Default system settings
  */
-class SettingsSeeder extends Seeder
+class SettingsDatabaseSeeder extends Seeder
 {
     public function run(): void
     {
