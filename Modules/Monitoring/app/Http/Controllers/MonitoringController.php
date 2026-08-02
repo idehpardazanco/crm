@@ -3,9 +3,9 @@
 namespace Modules\Monitoring\app\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Modules\Monitoring\Models\ActivityLog;
-use Modules\Monitoring\Models\SystemLog;
-use Modules\Monitoring\Models\RequestLog;
+use Modules\Monitoring\app\Models\ActivityLog;
+use Modules\Monitoring\app\Models\SystemLog;
+use Modules\Monitoring\app\Models\RequestLog;
 
 class MonitoringController
 {
