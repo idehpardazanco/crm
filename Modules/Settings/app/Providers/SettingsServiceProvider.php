@@ -3,8 +3,8 @@
 namespace Modules\Settings\app\Providers;
 
 use App\Support\BaseModuleServiceProvider;
-use Modules\Settings\app\Repositories\SettingRepository;
-use Modules\Settings\app\Services\SettingService;
+use Modules\Settings\app\Repositories\SettingsRepository;
+use Modules\Settings\app\Services\SettingsService;
 
 /**
  * Settings Module Provider
