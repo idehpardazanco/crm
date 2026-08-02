@@ -2,50 +2,67 @@
 
 namespace Modules\Users\app\Http\Controllers;
 
+
 use Illuminate\Http\Request;
+use Illuminate\Routing\Controller;
+
+use Modules\Users\app\Http\Requests\StoreUserRequest;
+use Modules\Users\app\Http\Requests\UpdateUserRequest;
 use Modules\Users\app\Services\UserService;
 
-/**
- * Users Controller (thin controller pattern)
- */
-class UsersController
+
+class UsersController extends Controller
 {
+
     public function __construct(
-        private UserService $service
-    ) {}
-
-    public function index()
+        protected UserService $service
+    )
     {
-        return $this->service->list();
+
     }
 
-    public function create()
+
+
+    public function index(Request $request)
     {
-        return $this->service->createView();
+        return $this->service->paginate(
+            $request->get('search')
+        );
     }
 
-    public function store(Request $request)
+
+
+    public function store(StoreUserRequest $request)
     {
-        return $this->service->create($request->all());
+        return $this->service->create(
+            $request->validated()
+        );
     }
 
-    public function edit(int $id)
+
+
+
+    public function update(
+        UpdateUserRequest $request,
+        int $id
+    )
     {
-        return $this->service->editView($id);
+
+        return $this->service->update(
+            $id,
+            $request->validated()
+        );
+
     }
 
-    public function update(int $id, Request $request)
-    {
-        return $this->service->update($id, $request->all());
-    }
+
 
     public function destroy(int $id)
     {
+
         return $this->service->delete($id);
+
     }
 
-    public function show(int $id)
-    {
-        return $this->service->find($id);
-    }
+
 }
