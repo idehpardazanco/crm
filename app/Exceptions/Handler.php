@@ -4,7 +4,7 @@ namespace App\Exceptions;
 
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Throwable;
-use Modules\Monitoring\Services\MonitoringService;
+use Modules\Monitoring\app\Services\MonitoringService;
 
 class Handler extends ExceptionHandler
 {
