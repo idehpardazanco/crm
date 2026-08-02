@@ -15,6 +15,17 @@ Route::middleware('auth')
             'index'
         ])->name('index');
 
+        Route::get('/create',[
+            ContactsController::class,
+            'create'
+        ])->name('create');
+
+
+        Route::get('/{id}/edit',[
+            ContactsController::class,
+            'edit'
+        ])->name('edit');
+
 
         Route::post('/',[
             ContactsController::class,
