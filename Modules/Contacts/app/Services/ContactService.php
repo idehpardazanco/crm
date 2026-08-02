@@ -2,87 +2,95 @@
 
 namespace Modules\Contacts\app\Services;
 
+
 use Modules\Contacts\app\Models\Contact;
+
 
 class ContactService
 {
-    /**
-     * Create contact
-     */
+
+
+    public function paginate(?string $search = null)
+    {
+
+        return Contact::query()
+
+            ->with('assignedUser')
+
+            ->when(
+                $search,
+                function($query) use ($search){
+
+                    $query->where(function($q) use ($search){
+
+                        $q->where(
+                            'name',
+                            'like',
+                            "%{$search}%"
+                        )
+
+                        ->orWhere(
+                            'mobile',
+                            'like',
+                            "%{$search}%"
+                        )
+
+                        ->orWhere(
+                            'business_name',
+                            'like',
+                            "%{$search}%"
+                        );
+
+                    });
+
+                }
+            )
+
+            ->latest()
+            ->paginate(15);
+
+    }
+
+
+
+
+
     public function create(array $data)
     {
-        $contact = Contact::create([
-            'name'    => $data['name'],
-            'mobile'  => $data['mobile'],
-            'email'   => $data['email'] ?? null,
-            'address' => $data['address'] ?? null,
-        ]);
 
-        // 🔥 Monitoring log
-        app(\Modules\Monitoring\app\Services\MonitoringService::class)->activity(
-            'contact_created',
-            'Contacts',
-            [
-                'contact_id' => $contact->id,
-                'mobile'     => $contact->mobile
-            ]
-        );
+        return Contact::create($data);
 
-        return $contact;
     }
 
-    /**
-     * Get contacts list
-     */
-    public function list()
-    {
-        return Contact::latest()->paginate(15);
-    }
 
-    /**
-     * Update contact
-     */
-    public function update(int $id, array $data)
+
+
+
+    public function update(
+        int $id,
+        array $data
+    )
     {
+
         $contact = Contact::findOrFail($id);
 
-        $contact->update([
-            'name'    => $data['name'] ?? $contact->name,
-            'mobile'  => $data['mobile'] ?? $contact->mobile,
-            'email'   => $data['email'] ?? $contact->email,
-            'address' => $data['address'] ?? $contact->address,
-        ]);
-
-        // 🔥 Monitoring log
-        app(\Modules\Monitoring\app\Services\MonitoringService::class)->activity(
-            'contact_updated',
-            'Contacts',
-            [
-                'contact_id' => $contact->id
-            ]
-        );
+        $contact->update($data);
 
         return $contact;
+
     }
 
-    /**
-     * Delete contact
-     */
+
+
+
+
     public function delete(int $id)
     {
-        $contact = Contact::findOrFail($id);
 
-        $contact->delete();
+        return Contact::findOrFail($id)
+            ->delete();
 
-        // 🔥 Monitoring log
-        app(\Modules\Monitoring\app\Services\MonitoringService::class)->activity(
-            'contact_deleted',
-            'Contacts',
-            [
-                'contact_id' => $id
-            ]
-        );
-
-        return true;
     }
+
+
 }
