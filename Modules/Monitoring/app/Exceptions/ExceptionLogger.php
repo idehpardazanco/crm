@@ -3,7 +3,7 @@
 namespace Modules\Monitoring\app\Exceptions;
 
 use Throwable;
-use Modules\Monitoring\Models\SystemLog;
+use Modules\Monitoring\app\Models\SystemLog;
 
 /**
  * Global exception logger
