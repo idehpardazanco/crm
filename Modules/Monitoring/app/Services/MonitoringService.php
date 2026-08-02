@@ -4,6 +4,7 @@ namespace Modules\Monitoring\app\Services;
 
 use Modules\Monitoring\app\Models\ActivityLog;
 use Modules\Monitoring\app\Models\SystemLog;
+use Modules\Monitoring\app\Models\RequestLog;
 use Throwable;
 
 class MonitoringService
