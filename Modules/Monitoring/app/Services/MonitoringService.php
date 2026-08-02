@@ -11,6 +11,12 @@ class MonitoringService
     /**
      * Store general activity log
      */
+    public function request(array $data): RequestLog
+    {
+        return RequestLog::create($data);
+    }
+
+
     public function activity(string $action, string $module, array $meta = []): ActivityLog
     {
         return ActivityLog::create([
