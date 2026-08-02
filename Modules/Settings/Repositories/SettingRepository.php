@@ -2,7 +2,7 @@
 
 namespace Modules\Settings\app\Repositories;
 
-use Modules\Settings\Models\Setting;
+use Modules\Settings\app\Models\Setting;
 
 /**
  * Data access layer for settings
