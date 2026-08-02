@@ -27,7 +27,7 @@ class RequestLoggerMiddleware
                             'sms_password',
                             'token',
                             'code',
-                        ],
+                        ]),
             'status_code' => $response->status(),
             'duration' => $duration,
         ]);
