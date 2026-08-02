@@ -9,6 +9,9 @@ use Illuminate\Routing\Controller;
 use Modules\Users\app\Http\Requests\StoreUserRequest;
 use Modules\Users\app\Http\Requests\UpdateUserRequest;
 use Modules\Users\app\Services\UserService;
+use Inertia\Inertia;
+use App\Models\User;
+use Spatie\Permission\Models\Role;
 
 
 class UsersController extends Controller
