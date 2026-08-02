@@ -1,6 +1,6 @@
 <?php
 
-namespace Modules\Users\database\seeders;
+namespace Modules\Users\Database\seeders;
 
 use Illuminate\Database\Seeder;
 use Spatie\Permission\Models\Permission;
