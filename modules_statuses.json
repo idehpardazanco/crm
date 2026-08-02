@@ -5,7 +5,6 @@
     "Sms": true,
     "Settings": true,
     "Monitoring": true,
-    "Contact": true,
     "Contacts": true,
     "Orders": true
 }
