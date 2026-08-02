@@ -4,7 +4,7 @@ namespace Modules\Users\app\Services;
 
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
-use Modules\Users\Repositories\UserRepository;
+use Modules\Users\app\Repositories\UserRepository;
 
 /**
  * Business logic layer for Users
