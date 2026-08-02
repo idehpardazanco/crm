@@ -2,10 +2,10 @@
 
 namespace Modules\Auth\app\Http\Controllers;
 
-use Modules\Auth\Http\Requests\LoginRequest;
-use Modules\Auth\Http\Requests\SendOtpRequest;
-use Modules\Auth\Http\Requests\VerifyOtpRequest;
-use Modules\Auth\Services\AuthService;
+use Modules\Auth\app\Http\Requests\LoginRequest;
+use Modules\Auth\app\Http\Requests\SendOtpRequest;
+use Modules\Auth\app\Http\Requests\VerifyOtpRequest;
+use Modules\Auth\app\Services\AuthService;
 
 class AuthController
 {
