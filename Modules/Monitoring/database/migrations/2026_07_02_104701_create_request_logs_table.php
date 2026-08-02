@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('url');
             $table->string('ip')->nullable();
 
-            $table->foreignId('user_id')->nullable();
+            $table->foreignId('user_id')->nullable()->constrained()->nullOnDelete();
 
             $table->json('headers')->nullable();
             $table->json('payload')->nullable();
