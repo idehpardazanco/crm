@@ -3,8 +3,8 @@
 namespace Modules\Sms\app\Providers;
 
 use App\Support\BaseModuleServiceProvider;
-use Modules\Sms\Services\SmsService;
-use Modules\Sms\Repositories\SmsRepository;
+use Modules\Sms\app\Services\SmsService;
+use Modules\Sms\app\Repositories\SmsRepository;
 
 class SmsServiceProvider extends BaseModuleServiceProvider
 {
