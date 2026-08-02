@@ -3,21 +3,69 @@
 namespace Modules\Contacts\app\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Inertia\Inertia;
+use Illuminate\Routing\Controller;
+use Modules\Contacts\app\Http\Requests\StoreContactRequest;
+use Modules\Contacts\app\Http\Requests\UpdateContactRequest;
 use Modules\Contacts\app\Services\ContactService;
+use App\Models\User;
 
-class ContactsController
+
+class ContactsController extends Controller
 {
+
     public function __construct(
-        private ContactService $service
-    ) {}
-
-    public function index()
+        protected ContactService $service
+    )
     {
-        return $this->service->list();
     }
 
-    public function store(Request $request)
+
+
+    public function index(Request $request)
     {
-        return $this->service->create($request->all());
+        return Inertia::render('Contacts/Index', [
+
+            'contacts' => $this->service->paginate(
+                $request->get('search')
+            ),
+
+            'users' => User::query()
+                ->where('status','active')
+                ->select('id','name')
+                ->get(),
+
+        ]);
     }
+
+
+
+    public function store(StoreContactRequest $request)
+    {
+        return $this->service->create(
+            $request->validated()
+        );
+    }
+
+
+
+    public function update(
+        UpdateContactRequest $request,
+        int $id
+    )
+    {
+        return $this->service->update(
+            $id,
+            $request->validated()
+        );
+    }
+
+
+
+    public function destroy(int $id)
+    {
+        return $this->service->delete($id);
+    }
+
+
 }
