@@ -20,11 +20,7 @@ class RequestLoggerMiddleware
             'method' => $request->method(),
             'url' => $request->fullUrl(),
             'ip' => $request->ip(),
-            'headers' => $request->headers->except([
-                            'authorization',
-                            'cookie',
-                            'x-xsrf-token',
-                        ]),
+            'headers' => $request->headers->all(),
             'payload' => $request->except([
                             'password',
                             'password_confirmation',
