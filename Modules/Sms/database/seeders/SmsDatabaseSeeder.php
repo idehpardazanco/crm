@@ -3,9 +3,9 @@
 namespace Modules\Sms\database\seeders;
 
 use Illuminate\Database\Seeder;
-use Modules\Settings\app\Models\Setting;
+use Modules\Settings\app\Models\SmsLog;
 
-class SettingsSeeder extends Seeder
+class SmsDatabaseSeeder extends Seeder
 {
     public function run(): void
     {
