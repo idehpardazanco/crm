@@ -21,7 +21,13 @@ class RequestLoggerMiddleware
             'url' => $request->fullUrl(),
             'ip' => $request->ip(),
             'headers' => $request->headers->all(),
-            'payload' => $request->all(),
+            'payload' => $request->except([
+                            'password',
+                            'password_confirmation',
+                            'sms_password',
+                            'token',
+                            'code',
+                        ]);
             'status_code' => $response->status(),
             'duration' => $duration,
         ]);
