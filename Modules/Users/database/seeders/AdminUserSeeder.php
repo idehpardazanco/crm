@@ -4,7 +4,7 @@ namespace Modules\Users\Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use App\Models\User;
-use Modules\Users\Enums\UserStatus;
+use Modules\Users\app\Enums\UserStatus;
 
 class AdminUserSeeder extends Seeder
 {
