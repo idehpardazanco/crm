@@ -3,7 +3,7 @@
 namespace Modules\Users\app\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Modules\Users\Services\UserService;
+use Modules\Users\app\Services\UserService;
 
 /**
  * Users Controller (thin controller pattern)
