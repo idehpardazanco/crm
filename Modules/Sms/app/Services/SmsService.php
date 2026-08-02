@@ -5,7 +5,7 @@ namespace Modules\Sms\app\Services;
 use Illuminate\Support\Facades\Auth;
 use Throwable;
 use Modules\Sms\app\Drivers\SmsDriverInterface;
-use Modules\Sms\Logs\SmsLogger;
+use Modules\Sms\app\Logs\SmsLogger;
 use App\Models\SmsLog;
 
 class SmsService
