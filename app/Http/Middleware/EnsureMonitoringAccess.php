@@ -13,7 +13,7 @@ class EnsureMonitoringAccess
             abort(403);
         }
 
-        if (!auth()->user()->can('view monitoring')) {
+        if (!auth()->user()->can('monitoring.view')) {
             abort(403, 'Unauthorized');
         }
 
