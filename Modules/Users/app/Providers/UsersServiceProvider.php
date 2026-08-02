@@ -3,8 +3,8 @@
 namespace Modules\Users\app\Providers;
 
 use App\Support\BaseModuleServiceProvider;
-use Modules\Users\Services\UserService;
-use Modules\Users\Repositories\UserRepository;
+use Modules\Users\app\Services\UserService;
+use Modules\Users\app\Repositories\UserRepository;
 
 class UsersServiceProvider extends BaseModuleServiceProvider
 {
