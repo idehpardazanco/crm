@@ -15,14 +15,14 @@ class SettingsServiceProvider extends BaseModuleServiceProvider
     {
         // Bind Repository
         $this->app->singleton(
-            SettingRepository::class,
-            SettingRepository::class
+            SettingsRepository::class,
+            SettingsRepository::class
         );
 
         // Bind Service
         $this->app->singleton(
-            SettingService::class,
-            SettingService::class
+            SettingsService::class,
+            SettingsService::class
         );
     }
 
