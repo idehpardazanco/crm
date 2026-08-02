@@ -12,12 +12,7 @@ class MonitoringService
     /**
      * Store general activity log
      */
-    public function request(array $data): RequestLog
-    {
-        return RequestLog::create($data);
-    }
-
-
+   
     public function activity(string $action, string $module, array $meta = []): ActivityLog
     {
         return ActivityLog::create([
@@ -51,6 +46,14 @@ class MonitoringService
             'message' => $message,
             'context' => json_encode($context),
         ]);
+    }
+
+    /**
+ * Store HTTP request log
+ */
+    public function request(array $data): RequestLog
+    {
+        return RequestLog::create($data);
     }
 
     public function exception($e)
