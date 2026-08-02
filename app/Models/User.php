@@ -10,24 +10,25 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
 
-#[Fillable([
-    'name',
-    'mobile',
-    'email',
-    'password',
-    'status',
-    'two_factor_enabled',
-    'last_login_at',
-    'last_login_ip',
-])]
-
-#[Hidden([
-    'password',
-    'remember_token',
-])]
 class User extends Authenticatable
 {
     use HasFactory, Notifiable, HasRoles;
+
+    protected $fillable = [
+        'name',
+        'mobile',
+        'email',
+        'password',
+        'status',
+        'two_factor_enabled',
+        'last_login_at',
+        'last_login_ip',
+    ];
+
+    protected $hidden = [
+        'password',
+        'remember_token',
+    ];
 
     protected function casts(): array
     {
