@@ -1,56 +1,60 @@
 <?php
 
-namespace Modules\FollowUps\Http\Controllers;
+namespace Modules\FollowUps\app\Http\Controllers;
 
-use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Controller;
+use Inertia\Inertia;
+use Modules\Contacts\app\Models\Contact;
+use Modules\FollowUps\app\Http\Requests\StoreFollowUpRequest;
+use Modules\FollowUps\app\Services\FollowUpService;
 
 class FollowUpsController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
-    {
-        return view('followups::index');
+    public function __construct(
+        protected FollowUpService $service
+    ) {
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
+
+    public function index(Request $request)
+    {
+        return Inertia::render('FollowUps/Index', [
+            'followUps' => $this->service->paginate(
+                $request->get('search')
+            ),
+        ]);
+    }
+
+
     public function create()
     {
-        return view('followups::create');
+        return Inertia::render('FollowUps/Create', [
+            'contacts' => Contact::select(
+                'id',
+                'name',
+                'mobile'
+            )->get(),
+        ]);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request) {}
 
-    /**
-     * Show the specified resource.
-     */
-    public function show($id)
+    public function store(StoreFollowUpRequest $request)
     {
-        return view('followups::show');
+        $this->service->create([
+            ...$request->validated(),
+            'user_id' => auth()->id(),
+        ]);
+
+        return redirect()
+            ->route('followups.index');
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit($id)
+
+    public function destroy(int $id)
     {
-        return view('followups::edit');
+        $this->service->delete($id);
+
+        return back();
     }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, $id) {}
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy($id) {}
 }
