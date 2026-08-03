@@ -75,13 +75,9 @@ function remove(id){
 
         </div>
 
-
-
         <h2 class="text-xl mb-3">
         ثبت ارتباط جدید
         </h2>
-
-
 
         <form
         @submit.prevent="submit"
@@ -160,102 +156,97 @@ function remove(id){
 
         </form>
 
-
-
-
         <h2 class="text-xl mb-3">
         تاریخچه ارتباطات
         </h2>
 
+        <table class="w-full border">
 
 
-            <table class="w-full border">
+                <thead>
+
+                <tr>
+
+                <th class="border p-2">
+                نوع
+                </th>
 
 
-                    <thead>
-
-                    <tr>
-
-                    <th class="border p-2">
-                    نوع
-                    </th>
+                <th class="border p-2">
+                عنوان
+                </th>
 
 
-                    <th class="border p-2">
-                    عنوان
-                    </th>
+                <th class="border p-2">
+                کاربر
+                </th>
 
 
-                    <th class="border p-2">
-                    کاربر
-                    </th>
+                <th class="border p-2">
+                تاریخ
+                </th>
 
 
-                    <th class="border p-2">
-                    تاریخ
-                    </th>
+                <th>
+                عملیات
+                </th>
 
 
-                    <th>
-                    عملیات
-                    </th>
+                </tr>
 
-
-                    </tr>
-
-                    </thead>
+                </thead>
 
 
 
-                    <tbody>
+                <tbody>
 
 
-                    <tr
-                    v-for="item in contact.interactions"
-                    :key="item.id"
-                    >
+                <tr
+                v-for="item in contact.interactions"
+                :key="item.id"
+                >
 
 
-                    <td class="border p-2">
-                    {{item.type}}
-                    </td>
+                <td class="border p-2">
+                {{item.type}}
+                </td>
 
 
-                    <td class="border p-2">
-                    {{item.subject}}
-                    </td>
+                <td class="border p-2">
+                {{item.subject}}
+                </td>
 
 
-                    <td class="border p-2">
-                    {{item.user?.name ?? '-'}}
-                    </td>
+                <td class="border p-2">
+                {{item.user?.name ?? '-'}}
+                </td>
 
 
-                    <td class="border p-2">
-                    {{item.created_at}}
-                    </td>
+                <td class="border p-2">
+                {{item.created_at}}
+                </td>
 
 
-                    <td>
+                <td>
 
-                    <button
-                    @click="remove(item.id)"
-                    class="text-red-600"
-                    >
-                    حذف
-                    </button>
-
-
-                    </td>
+                <button
+                @click="remove(item.id)"
+                class="text-red-600"
+                >
+                حذف
+                </button>
 
 
-                    </tr>
+                </td>
 
 
-                    </tbody>
+                </tr>
 
 
-            </table>
+                </tbody>
+
+
+        </table>
 
     </div>
 
