@@ -2,55 +2,49 @@
 
 namespace Modules\Sms\app\Http\Controllers;
 
-use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
+
+use Illuminate\Routing\Controller;
+
+use Modules\Sms\app\Http\Requests\SendSmsRequest;
+use Modules\Sms\app\Services\SmsService;
+
+
 
 class SmsController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+
+
+    public function __construct(
+
+        protected SmsService $service
+
+    )
     {
-        return view('sms::index');
+
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+
+
+
+
+    public function send(
+        SendSmsRequest $request
+    )
     {
-        return view('sms::create');
+
+
+        return $this->service->send(
+
+            $request->to,
+
+            $request->message,
+
+            $request->contact_id
+
+        );
+
+
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request) {}
 
-    /**
-     * Show the specified resource.
-     */
-    public function show($id)
-    {
-        return view('sms::show');
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit($id)
-    {
-        return view('sms::edit');
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, $id) {}
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy($id) {}
 }
