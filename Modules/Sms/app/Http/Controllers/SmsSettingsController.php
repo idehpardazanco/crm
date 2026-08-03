@@ -8,12 +8,8 @@ use Inertia\Inertia;
 use Illuminate\Routing\Controller;
 use Modules\Settings\app\Models\Setting;
 
-
-
 class SmsSettingsController extends Controller
 {
-
-
     public function index()
     {
 
@@ -47,13 +43,8 @@ class SmsSettingsController extends Controller
 
     }
 
-
-
-
-
     public function update(Request $request)
     {
-
 
         $data = $request->validate([
 
@@ -64,8 +55,6 @@ class SmsSettingsController extends Controller
             'sms_password'=>'required|string',
 
         ]);
-
-
 
         foreach($data as $key=>$value){
 
@@ -83,11 +72,8 @@ class SmsSettingsController extends Controller
 
         }
 
-
-
         return back();
 
     }
-
 
 }
