@@ -6,5 +6,7 @@
     "Settings": true,
     "Monitoring": true,
     "Contacts": true,
-    "Orders": true
+    "Orders": true,
+    "Intractions": true,
+    "Interactions": true
 }
