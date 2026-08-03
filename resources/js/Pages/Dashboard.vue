@@ -2,9 +2,9 @@
 defineProps({
     stats: Object,
     latestInteractions: Array,
+    latestFollowUps: Array,
 })
 </script>
-
 
 <template>
     <div class="p-6">
@@ -13,121 +13,133 @@ defineProps({
             داشبورد مدیریت
         </h1>
 
-
         <div class="grid grid-cols-4 gap-4 mb-8">
 
             <div class="border rounded p-5">
-                <h3>
+                <p>
                     مخاطبین
-                </h3>
+                </p>
 
-                <p class="text-2xl font-bold">
+                <strong class="text-2xl">
                     {{ stats.contacts }}
-                </p>
+                </strong>
             </div>
 
-
             <div class="border rounded p-5">
-                <h3>
+                <p>
                     مشتریان
-                </h3>
+                </p>
 
-                <p class="text-2xl font-bold">
+                <strong class="text-2xl">
                     {{ stats.customers }}
-                </p>
+                </strong>
             </div>
 
-
             <div class="border rounded p-5">
-                <h3>
+                <p>
                     پیامک‌ها
-                </h3>
-
-                <p class="text-2xl font-bold">
-                    {{ stats.sms }}
                 </p>
+
+                <strong class="text-2xl">
+                    {{ stats.sms }}
+                </strong>
             </div>
 
-
             <div class="border rounded p-5">
-                <h3>
+                <p>
                     تعاملات
-                </h3>
-
-                <p class="text-2xl font-bold">
-                    {{ stats.interactions }}
                 </p>
+
+                <strong class="text-2xl">
+                    {{ stats.interactions }}
+                </strong>
             </div>
 
         </div>
 
+        <div class="grid grid-cols-3 gap-4 mb-8">
 
+            <div class="border rounded p-5">
+                <p>
+                    پیگیری‌های باز
+                </p>
 
-        <div class="border rounded p-5">
+                <strong class="text-2xl">
+                    {{ stats.pendingFollowUps }}
+                </strong>
+            </div>
 
-            <h2 class="text-lg font-bold mb-4">
-                آخرین فعالیت‌ها
+            <div class="border rounded p-5">
+                <p>
+                    پیگیری امروز
+                </p>
+
+                <strong class="text-2xl">
+                    {{ stats.todayFollowUps }}
+                </strong>
+            </div>
+
+            <div class="border rounded p-5">
+                <p>
+                    پیگیری عقب افتاده
+                </p>
+
+                <strong class="text-2xl">
+                    {{ stats.overdueFollowUps }}
+                </strong>
+            </div>
+
+        </div>
+
+        <div class="border rounded p-5 mb-8">
+
+            <h2 class="font-bold mb-4">
+                آخرین پیگیری‌ها
             </h2>
-
 
             <table class="w-full border-collapse border">
 
                 <thead>
-
                     <tr>
-
                         <th class="border p-2">
                             مشتری
                         </th>
 
-
                         <th class="border p-2">
-                            نوع
+                            عنوان
                         </th>
-
-
-                        <th class="border p-2">
-                            کاربر
-                        </th>
-
 
                         <th class="border p-2">
                             تاریخ
                         </th>
 
+                        <th class="border p-2">
+                            وضعیت
+                        </th>
                     </tr>
-
                 </thead>
 
-
                 <tbody>
-
                     <tr
-                        v-for="item in latestInteractions"
+                        v-for="item in latestFollowUps"
                         :key="item.id"
                     >
-
                         <td class="border p-2">
                             {{ item.contact?.name ?? '-' }}
                         </td>
 
-
                         <td class="border p-2">
-                            {{ item.type }}
+                            {{ item.title }}
                         </td>
 
-
                         <td class="border p-2">
-                            {{ item.user?.name ?? '-' }}
+                            {{ item.follow_up_at }}
                         </td>
 
-
                         <td class="border p-2">
-                            {{ item.created_at }}
+                            {{ item.status }}
                         </td>
-
                     </tr>
-
                 </tbody>
 
             </table>
