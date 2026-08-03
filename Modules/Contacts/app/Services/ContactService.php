@@ -51,9 +51,15 @@ class ContactService
 
     }
 
-
-
-
+    public function find(int $id)
+    {
+        return Contact::query()
+            ->with([
+                'assignedUser',
+                'interactions.user'
+            ])
+            ->findOrFail($id);
+    }
 
     public function create(array $data)
     {
@@ -62,14 +68,7 @@ class ContactService
 
     }
 
-
-
-
-
-    public function update(
-        int $id,
-        array $data
-    )
+    public function update(int $id,array $data)
     {
 
         $contact = Contact::findOrFail($id);
@@ -79,9 +78,6 @@ class ContactService
         return $contact;
 
     }
-
-
-
 
 
     public function delete(int $id)
