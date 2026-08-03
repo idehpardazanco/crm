@@ -40,13 +40,18 @@ class Contact extends Model
 
     ];
 
-
-
     public function assignedUser()
     {
         return $this->belongsTo(
             User::class,
             'assigned_user_id'
+        );
+    }
+
+    public function interactions()
+    {
+        return $this->hasMany(
+            \Modules\Interactions\app\Models\Interaction::class
         );
     }
 
