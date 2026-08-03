@@ -1,8 +1,40 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use Modules\Interactions\Http\Controllers\InteractionsController;
+use Modules\Interactions\app\Http\Controllers\InteractionsController;
 
-Route::middleware(['auth', 'verified'])->group(function () {
-    Route::resource('interactions', InteractionsController::class)->names('interactions');
-});
+
+
+Route::middleware('auth')
+    ->prefix('interactions')
+    ->name('interactions.')
+    ->group(function(){
+
+        Route::get(
+            '/contact/{contactId}',
+            [
+                InteractionsController::class,
+                'index'
+            ]
+        )
+        ->name('index');
+
+        Route::post(
+            '/',
+            [
+                InteractionsController::class,
+                'store'
+            ]
+        )
+        ->name('store');
+
+        Route::delete(
+            '/{id}',
+            [
+                InteractionsController::class,
+                'destroy'
+            ]
+        )
+        ->name('destroy');
+
+    });
