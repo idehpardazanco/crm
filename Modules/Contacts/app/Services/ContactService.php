@@ -56,7 +56,8 @@ class ContactService
         return Contact::query()
             ->with([
                 'assignedUser',
-                'interactions.user'
+                'interactions.user',
+                'followUps.user',
             ])
             ->findOrFail($id);
     }
