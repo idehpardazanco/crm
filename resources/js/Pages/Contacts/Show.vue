@@ -1,45 +1,52 @@
 <script setup>
-
-import {useForm, router} from '@inertiajs/vue3'
+import { useForm, router } from '@inertiajs/vue3'
 
 const props = defineProps({
-
-    contact:Object
-
+    contact: Object
 })
 
-const form = useForm({
-
+const smsForm = useForm({
     contact_id: props.contact.id,
-
-    type:'call',
-
-    subject:'',
-
-    description:'',
-
-    result:'',
-
-    next_follow_up:''
-
+    to: props.contact.mobile,
+    message: ''
 })
 
-function submit(){
+const interactionForm = useForm({
+    contact_id: props.contact.id,
+    type: 'call',
+    subject: '',
+    description: '',
+    result: '',
+    next_follow_up: ''
+})
 
-    form.post('/interactions')
-
+const sendSms = () => {
+    smsForm.post('/sms/send', {
+        onSuccess: () => {
+            smsForm.reset('message')
+            router.reload()
+        }
+    })
 }
 
-function remove(id){
+const submitInteraction = () => {
+    interactionForm.post('/interactions', {
+        onSuccess: () => {
+            interactionForm.reset()
+            router.reload()
+        }
+    })
+}
 
-    if(confirm('حذف شود؟')){
-
-        router.delete(`/interactions/${id}`)
-
+const removeInteraction = (id) => {
+    if (confirm('حذف شود؟')) {
+        router.delete(`/interactions/${id}`, {
+            onSuccess: () => {
+                router.reload()
+            }
+        })
     }
-
 }
-
 </script>
 
 <template>
