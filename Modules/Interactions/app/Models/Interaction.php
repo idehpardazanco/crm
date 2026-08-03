@@ -2,44 +2,55 @@
 
 namespace Modules\Interactions\app\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Modules\Contacts\Models\Contact;
-use Modules\Users\Models\User;
+use App\Models\User;
+use Modules\Contacts\app\Models\Contact;
+
+
 
 class Interaction extends Model
 {
-    use HasFactory;
-
     protected $fillable = [
+
         'contact_id',
+
         'user_id',
+
         'type',
+
         'subject',
+
         'description',
-        'interaction_at',
-        'follow_up_at',
-        'status',
-        'metadata',
+
+        'result',
+
+        'next_follow_up',
+
     ];
 
-    protected function casts(): array
+    protected $casts = [
+
+        'next_follow_up'=>'datetime'
+
+    ];
+
+    public function contact()
     {
-        return [
-            'interaction_at' => 'datetime',
-            'follow_up_at'   => 'datetime',
-            'metadata'       => 'array',
-        ];
+
+        return $this->belongsTo(
+            Contact::class
+        );
+
     }
 
-    public function contact(): BelongsTo
+    public function user()
     {
-        return $this->belongsTo(Contact::class);
+
+        return $this->belongsTo(
+            User::class
+        );
+
     }
 
-    public function user(): BelongsTo
-    {
-        return $this->belongsTo(User::class);
-    }
 }
