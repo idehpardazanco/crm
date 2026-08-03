@@ -1,0 +1,11 @@
+{
+    "name": "FollowUps",
+    "alias": "followups",
+    "description": "",
+    "keywords": [],
+    "priority": 0,
+    "providers": [
+        "Modules\\FollowUps\\app\\Providers\\FollowUpsServiceProvider"
+    ],
+    "files": []
+}

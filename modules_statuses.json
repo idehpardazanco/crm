@@ -8,5 +8,6 @@
     "Contacts": true,
     "Orders": true,
     "Intractions": true,
-    "Interactions": true
+    "Interactions": true,
+    "FollowUps": true
 }
