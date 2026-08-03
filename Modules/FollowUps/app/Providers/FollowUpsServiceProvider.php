@@ -1,6 +1,6 @@
 <?php
 
-namespace Modules\FollowUps\Providers;
+namespace Modules\FollowUps\app\Providers;
 
 use Nwidart\Modules\Support\ModuleServiceProvider;
 use Illuminate\Console\Scheduling\Schedule;
