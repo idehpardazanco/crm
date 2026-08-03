@@ -1,56 +1,56 @@
 <?php
 
-namespace Modules\Interactions\Http\Controllers;
+namespace Modules\Interactions\app\Http\Controllers;
 
-use App\Http\Controllers\Controller;
+
 use Illuminate\Http\Request;
+use Illuminate\Routing\Controller;
+
+use Modules\Interactions\app\Http\Requests\StoreInteractionRequest;
+use Modules\Interactions\app\Services\InteractionService;
+
+
 
 class InteractionsController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+
+
+    public function __construct(protected InteractionService $service)
     {
-        return view('interactions::index');
+
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+    public function index(int $contactId)
     {
-        return view('interactions::create');
+
+        return $this->service->list(
+            $contactId
+        );
+
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request) {}
-
-    /**
-     * Show the specified resource.
-     */
-    public function show($id)
+    public function store(StoreInteractionRequest $request)
     {
-        return view('interactions::show');
+        return $this->service->create(
+            array_merge(
+
+                $request->validated(),
+
+                [
+                    'user_id'=>auth()->id()
+                ]
+
+            )
+        );
+
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit($id)
+    public function destroy(int $id)
     {
-        return view('interactions::edit');
+
+        return $this->service->delete($id);
+
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, $id) {}
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy($id) {}
 }
