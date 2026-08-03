@@ -4,6 +4,8 @@ namespace Modules\Sms\app\Providers;
 
 use App\Support\BaseModuleServiceProvider;
 use Modules\Sms\app\Services\SmsService;
+use Modules\Sms\Contracts\SmsProviderInterface;
+use Modules\Sms\app\Providers\PayamMatniSmsProvider;
 // use Modules\Sms\app\Repositories\SmsRepository;
 
 class SmsServiceProvider extends BaseModuleServiceProvider
