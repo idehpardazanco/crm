@@ -44,5 +44,9 @@ Route::middleware('auth')
             'destroy'
         ])->name('destroy');
 
-
+        Route::get('/{id}',[
+            ContactsController::class,
+            'show'
+        ])
+        ->name('show');
     });
