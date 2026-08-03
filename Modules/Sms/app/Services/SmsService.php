@@ -16,8 +16,8 @@ class SmsService
     /**
      * Send SMS
      */
-   public function send(string $to,string $message,?int $contactId = null): SmsLog{
-
+   public function send(string $to,string $message,?int $contactId = null): SmsLog
+   {
         $provider = app(
             \Modules\Sms\Contracts\SmsProviderInterface::class
         );
