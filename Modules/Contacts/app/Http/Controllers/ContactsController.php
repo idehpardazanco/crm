@@ -14,13 +14,9 @@ use App\Models\User;
 class ContactsController extends Controller
 {
 
-    public function __construct(
-        protected ContactService $service
-    )
+    public function __construct(protected ContactService $service)
     {
     }
-
-
 
     public function index(Request $request)
     {
@@ -38,6 +34,19 @@ class ContactsController extends Controller
         ]);
     }
 
+    public function show(int $id)
+    {
+        return Inertia::render('Contacts/Show', [
+
+            'contact' => $this->service->find($id),
+
+            'users' => User::query()
+                ->where('status','active')
+                ->select('id','name')
+                ->get(),
+
+        ]);
+    }
 
     public function create()
     {
