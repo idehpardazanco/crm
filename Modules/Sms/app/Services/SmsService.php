@@ -6,8 +6,7 @@ use Illuminate\Support\Facades\Auth;
 use Throwable;
 use Modules\Sms\app\Drivers\SmsDriverInterface;
 use Modules\Sms\app\Logs\SmsLogger;
-use Modules\Sms\app\Models\SmsLog.php;
-
+use Modules\Sms\app\Models\SmsLog;
 class SmsService
 {
     public function __construct(
