@@ -1,56 +1,28 @@
 <?php
 
-namespace Modules\Sms\Http\Controllers;
+namespace Modules\Sms\app\Http\Controllers;
 
-use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Controller;
+use Inertia\Inertia;
+use Modules\Sms\app\Services\SmsLogService;
 
 class SmsLogsController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
-    {
-        return view('sms::index');
+    public function __construct(
+        protected SmsLogService $service
+    ) {
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+
+    public function index(Request $request)
     {
-        return view('sms::create');
+        return Inertia::render('Sms/Index', [
+
+            'logs' => $this->service->paginate(
+                $request->get('search')
+            )
+
+        ]);
     }
-
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request) {}
-
-    /**
-     * Show the specified resource.
-     */
-    public function show($id)
-    {
-        return view('sms::show');
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit($id)
-    {
-        return view('sms::edit');
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, $id) {}
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy($id) {}
 }
