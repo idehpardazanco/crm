@@ -13,7 +13,7 @@ class SmsServiceProvider extends BaseModuleServiceProvider
     public function register(): void
     {
         $this->app->bind(
-            \Modules\Sms\Contracts\SmsProviderInterface::class,
+            \Modules\Sms\app\Contracts\SmsProviderInterface::class,
             \Modules\Sms\app\Providers\PayamMatniSmsProvider::class
         );
     }
