@@ -3,7 +3,7 @@
 namespace Modules\Sms\database\seeders;
 
 use Illuminate\Database\Seeder;
-use Modules\Settings\app\Models\ُSetting;
+use Modules\Settings\app\Models\Setting;
 
 class SmsDatabaseSeeder extends Seeder
 {
