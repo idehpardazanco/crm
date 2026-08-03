@@ -29,4 +29,13 @@ Route::middleware('auth')
     )
     ->name('settings.update');
 
+    Route::post(
+    '/send',
+    [
+        SmsController::class,
+        'send'
+    ]
+    )
+    ->name('send');
+
 });
