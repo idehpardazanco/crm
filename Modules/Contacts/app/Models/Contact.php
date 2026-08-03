@@ -57,4 +57,9 @@ class Contact extends Model
         );
     }
 
+    public function followUps()
+    {
+        return $this->hasMany(FollowUp::class);
+    }
+
 }
