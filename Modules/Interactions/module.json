@@ -5,7 +5,7 @@
     "keywords": [],
     "priority": 0,
     "providers": [
-        "Modules\\Interactions\\Providers\\InteractionsServiceProvider"
+        "Modules\\Interactions\\app\\Providers\\InteractionsServiceProvider"
     ],
     "files": []
 }
