@@ -43,22 +43,11 @@ class SmsService
             Interaction::create([
 
                 'contact_id' => $contactId,
-
-
                 'user_id' => auth()->id(),
-
-
                 'type' => 'sms',
-
-
                 'subject' => 'ارسال پیامک',
-
-
                 'description' => $message,
-
-
                 'result' => $log->status,
-
             ]);
         }
 
