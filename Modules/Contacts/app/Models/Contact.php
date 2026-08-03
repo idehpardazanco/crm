@@ -5,6 +5,7 @@ namespace Modules\Contacts\app\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Modules\Interactions\app\Models\Interaction;
+use Modules\FollowUps\app\Models\FollowUp;
 use App\Models\User;
 
 
