@@ -2,43 +2,67 @@
 
 namespace Modules\Sms\app\Services;
 
-use Illuminate\Support\Facades\Auth;
-use Throwable;
-use Modules\Sms\app\Drivers\SmsDriverInterface;
-use Modules\Sms\app\Logs\SmsLogger;
+
 use Modules\Sms\app\Models\SmsLog;
+use Modules\Sms\Contracts\SmsProviderInterface;
+use Modules\Interactions\app\Models\Interaction;
+
+
+
 class SmsService
 {
+
+
     public function __construct(
-        private SmsDriverInterface $driver
-    ) {}
+        protected SmsProviderInterface $provider
+    )
+    {
 
-    /**
-     * Send SMS
-     */
-   public function send(string $to,string $message,?int $contactId = null): SmsLog
-   {
-        $provider = app(
-            \Modules\Sms\Contracts\SmsProviderInterface::class
-        );
-
-        $result = $provider->send(
-            $to,
-            $message
-        );
-
-        return SmsLog::create([
-
-            'contact_id' => $contactId,
-
-            'to' => $to,
-
-            'message' => $message,
-
-            'status' => $result['status'] ?? 'failed',
-
-            'response' => json_encode($result),
-
-        ]);
     }
+
+
+
+
+    public function send(string $to,string $message,?int $contactId = null): SmsLog
+    {
+
+        $response = $this->provider->send($to,$message);
+
+        $log = SmsLog::create([
+            'user_id' => auth()->id(),
+            'contact_id' => $contactId,
+            'from' => config('sms.from'),
+            'to' => $to,
+            'message' => $message,
+            'status' => $response['status'] ?? 'failed',
+            'response' => json_encode($response),
+        ]);
+
+        if($contactId)
+        {
+            Interaction::create([
+
+                'contact_id' => $contactId,
+
+
+                'user_id' => auth()->id(),
+
+
+                'type' => 'sms',
+
+
+                'subject' => 'ارسال پیامک',
+
+
+                'description' => $message,
+
+
+                'result' => $log->status,
+
+            ]);
+        }
+
+        return $log;
+    }
+
 }
