@@ -1,8 +1,31 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use Modules\Sms\app\Http\Controllers\SmsController;
+use Modules\Sms\app\Http\Controllers\SmsSettingsController;
 
-Route::middleware(['auth', 'verified'])->group(function () {
-    Route::resource('sms', SmsController::class)->names('sms');
+
+
+Route::middleware('auth')
+    ->prefix('sms')
+    ->name('sms.')
+    ->group(function(){
+
+    Route::get(
+        '/settings',
+        [
+            SmsSettingsController::class,
+            'index'
+        ]
+    )
+    ->name('settings');
+
+    Route::post(
+        '/settings',
+        [
+            SmsSettingsController::class,
+            'update'
+        ]
+    )
+    ->name('settings.update');
+
 });
