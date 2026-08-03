@@ -6,8 +6,6 @@ use Modules\Sms\app\Http\Controllers\SmsController;
 use Modules\Sms\app\Http\Controllers\SmsLogsController;
 
 
-
-
 Route::middleware('auth')
     ->prefix('sms')
     ->name('sms.')
@@ -39,5 +37,14 @@ Route::middleware('auth')
     ]
     )
     ->name('send');
+
+    Route::get(
+    '/logs',
+    [
+        SmsLogsController::class,
+        'index'
+    ]
+    )
+    ->name('logs');
 
 });
