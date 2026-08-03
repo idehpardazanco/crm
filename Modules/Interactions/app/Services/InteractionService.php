@@ -2,10 +2,7 @@
 
 namespace Modules\Interactions\app\Services;
 
-
 use Modules\Interactions\app\Models\Interaction;
-
-
 
 class InteractionService
 {
