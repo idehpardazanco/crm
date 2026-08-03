@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use Modules\Sms\app\Http\Controllers\SmsSettingsController;
+use Modules\Sms\app\Http\Controllers\SmsController;
 
 
 
