@@ -2,28 +2,41 @@
 
 namespace Modules\Sms\app\Services;
 
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Modules\Sms\app\Models\SmsLog;
 
 class SmsLogService
 {
-    public function paginate(?string $search = null)
-    {
+    public function paginate(
+        ?string $search = null
+    ): LengthAwarePaginator {
         return SmsLog::query()
             ->with([
-                'contact',
-                'user'
+                'sendable',
+                'user:id,name',
             ])
-            ->when($search, function ($query) use ($search) {
-
-                $query->where(function ($q) use ($search) {
-
-                    $q->where('to', 'like', "%{$search}%")
-                        ->orWhere('message', 'like', "%{$search}%");
-
-                });
-
-            })
+            ->when(
+                $search,
+                function ($query) use ($search) {
+                    $query->where(
+                        function ($query) use ($search) {
+                            $query
+                                ->where(
+                                    'mobile',
+                                    'like',
+                                    "%{$search}%"
+                                )
+                                ->orWhere(
+                                    'message',
+                                    'like',
+                                    "%{$search}%"
+                                );
+                        }
+                    );
+                }
+            )
             ->latest()
-            ->paginate(20);
+            ->paginate(20)
+            ->withQueryString();
     }
 }
