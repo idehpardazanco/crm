@@ -12,58 +12,54 @@ class UpdateUserRequest extends FormRequest
         return true;
     }
 
-
     public function rules(): array
     {
-
-        $userId = $this->route('user');
-
+        $userId = (int) $this->route('id');
 
         return [
-
             'name' => [
                 'required',
                 'string',
-                'max:255'
+                'max:255',
             ],
-
 
             'mobile' => [
                 'required',
                 'string',
                 'max:20',
-                Rule::unique('users','mobile')
-                    ->ignore($userId)
-            ],
 
+                Rule::unique(
+                    'users',
+                    'mobile'
+                )->ignore($userId),
+            ],
 
             'email' => [
                 'nullable',
                 'email',
                 'max:255',
-                Rule::unique('users','email')
-                    ->ignore($userId)
-            ],
 
+                Rule::unique(
+                    'users',
+                    'email'
+                )->ignore($userId),
+            ],
 
             'password' => [
                 'nullable',
                 'string',
-                'min:8'
+                'min:8',
             ],
-
 
             'status' => [
                 'required',
-                'in:active,inactive'
+                'in:active,inactive',
             ],
-
 
             'role' => [
                 'required',
-                'exists:roles,name'
+                'exists:roles,name',
             ],
-
         ];
     }
 }
