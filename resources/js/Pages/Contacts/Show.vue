@@ -23,6 +23,7 @@ const interactionForm = useForm({
     subject: '',
     description: '',
     result: '',
+    status_after_call: '',
     next_follow_up: '',
 })
 
