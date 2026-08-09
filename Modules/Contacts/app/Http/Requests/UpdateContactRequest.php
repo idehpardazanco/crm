@@ -4,6 +4,7 @@ namespace Modules\Contacts\app\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
+use Modules\Contacts\app\Enums\ContactStatus;
 
 class UpdateContactRequest extends FormRequest
 {
@@ -65,12 +66,9 @@ class UpdateContactRequest extends FormRequest
 
             'status' => [
                 'required',
-                Rule::in([
-                    'new',
-                    'active',
-                    'inactive',
-                    'customer',
-                ]),
+                Rule::in(
+                    ContactStatus::values()
+                ),
             ],
 
             'assigned_user_id' => [
