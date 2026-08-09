@@ -7,9 +7,11 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
+use Modules\Contacts\app\Enums\ContactStatus;
 use Modules\Contacts\app\Http\Requests\StoreContactRequest;
 use Modules\Contacts\app\Http\Requests\UpdateContactRequest;
 use Modules\Contacts\app\Services\ContactService;
+use Modules\Interactions\app\Enums\CallResult;
 use Modules\Sms\app\Services\SmsTemplateRenderer;
 use Modules\Sms\app\Services\SmsTemplateService;
 
@@ -22,28 +24,44 @@ class ContactsController
     ) {
     }
 
-    public function index(Request $request): Response
-    {
-        return Inertia::render('Contacts/Index', [
-            'contacts' => $this->service->list(
-                $request->string('search')->toString()
-            ),
+    public function index(
+        Request $request
+    ): Response {
+        return Inertia::render(
+            'Contacts/Index',
+            [
+                'contacts' =>
+                    $this->service->list(
+                        $request
+                            ->string('search')
+                            ->toString()
+                    ),
 
-            'users' => $this->users(),
+                'users' =>
+                    $this->users(),
 
-            'filters' => [
-                'search' => $request
-                    ->string('search')
-                    ->toString(),
-            ],
-        ]);
+                'filters' => [
+                    'search' =>
+                        $request
+                            ->string('search')
+                            ->toString(),
+                ],
+            ]
+        );
     }
 
     public function create(): Response
     {
-        return Inertia::render('Contacts/Create', [
-            'users' => $this->users(),
-        ]);
+        return Inertia::render(
+            'Contacts/Create',
+            [
+                'users' =>
+                    $this->users(),
+
+                'contactStatuses' =>
+                    ContactStatus::crmOptions(),
+            ]
+        );
     }
 
     public function store(
@@ -68,45 +86,78 @@ class ContactsController
         Request $request,
         int $contact
     ): Response {
-        $contactModel = $this->service->find(
-            $contact
+        $contactModel =
+            $this->service->find(
+                $contact
+            );
+
+        return Inertia::render(
+            'Contacts/Show',
+            [
+                'contact' =>
+                    $contactModel,
+
+                'contactStatuses' =>
+                    ContactStatus::crmOptions(),
+
+                'callResults' =>
+                    CallResult::options(),
+
+                'smsTemplates' =>
+                    $this
+                        ->smsTemplateService
+                        ->active()
+                        ->map(
+                            fn ($template) => [
+                                'id' =>
+                                    $template->id,
+
+                                'title' =>
+                                    $template->title,
+
+                                'body' =>
+                                    $template->body,
+
+                                'type' =>
+                                    $template->type,
+                            ]
+                        )
+                        ->values(),
+
+                'smsVariables' =>
+                    $this
+                        ->smsTemplateRenderer
+                        ->variables(
+                            $contactModel,
+                            $request->user()
+                        ),
+            ]
         );
-
-        return Inertia::render('Contacts/Show', [
-            'contact' => $contactModel,
-
-            'smsTemplates' =>
-                $this->smsTemplateService
-                    ->active()
-                    ->map(
-                        fn ($template) => [
-                            'id' => $template->id,
-                            'title' => $template->title,
-                            'body' => $template->body,
-                            'type' => $template->type,
-                        ]
-                    )
-                    ->values(),
-
-            'smsVariables' =>
-                $this->smsTemplateRenderer
-                    ->variables(
-                        $contactModel,
-                        $request->user()
-                    ),
-        ]);
     }
 
     public function edit(
         int $contact
     ): Response {
-        return Inertia::render('Contacts/Edit', [
-            'contact' => $this->service->find(
+        $contactModel =
+            $this->service->find(
                 $contact
-            ),
+            );
 
-            'users' => $this->users(),
-        ]);
+        return Inertia::render(
+            'Contacts/Edit',
+            [
+                'contact' =>
+                    $contactModel,
+
+                'users' =>
+                    $this->users(),
+
+                'contactStatuses' =>
+                    ContactStatus::optionsForCurrent(
+                        $contactModel->status
+                    ),
+            ]
+        );
     }
 
     public function update(
@@ -147,7 +198,10 @@ class ContactsController
     private function users()
     {
         return User::query()
-            ->where('status', 'active')
+            ->where(
+                'status',
+                'active'
+            )
             ->orderBy('name')
             ->get([
                 'id',
