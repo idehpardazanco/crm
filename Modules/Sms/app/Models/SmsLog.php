@@ -4,6 +4,7 @@ namespace Modules\Sms\app\Models;
 
 use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Modules\Sms\app\Enums\SmsStatus;
 
@@ -13,6 +14,7 @@ class SmsLog extends Model
         'sendable_type',
         'sendable_id',
         'user_id',
+        'sms_template_id',
         'provider',
         'from_number',
         'mobile',
@@ -37,9 +39,19 @@ class SmsLog extends Model
         ];
     }
 
-    public function user()
+    public function user(): BelongsTo
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(
+            User::class
+        );
+    }
+
+    public function template(): BelongsTo
+    {
+        return $this->belongsTo(
+            SmsTemplate::class,
+            'sms_template_id'
+        );
     }
 
     public function sendable(): MorphTo
