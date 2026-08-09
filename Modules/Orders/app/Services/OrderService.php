@@ -5,6 +5,7 @@ namespace Modules\Orders\app\Services;
 use App\Models\User;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
 use Modules\Contacts\app\Models\Contact;
 use Modules\Monitoring\app\Services\MonitoringService;
 use Modules\Orders\app\Models\Order;
@@ -27,11 +28,10 @@ class OrderService
             ])
             ->when(
                 ! $this->isAdmin($user),
-                fn ($query) =>
-                    $query->where(
-                        'user_id',
-                        $user->id
-                    )
+                fn ($query) => $query->where(
+                    'user_id',
+                    $user->id
+                )
             )
             ->when(
                 $search,
@@ -85,11 +85,10 @@ class OrderService
             ])
             ->when(
                 ! $this->isAdmin($user),
-                fn ($query) =>
-                    $query->where(
-                        'user_id',
-                        $user->id
-                    )
+                fn ($query) => $query->where(
+                    'user_id',
+                    $user->id
+                )
             )
             ->findOrFail($id);
     }
@@ -106,6 +105,10 @@ class OrderService
                         (int) $data['contact_id'],
                         $user
                     );
+
+                $this->ensureCustomer(
+                    $contact
+                );
 
                 $order = Order::query()
                     ->create([
@@ -167,7 +170,6 @@ class OrderService
                 $data,
                 $user
             ) {
-
                 $order = $this->find(
                     $id,
                     $user
@@ -178,6 +180,10 @@ class OrderService
                         (int) $data['contact_id'],
                         $user
                     );
+
+                $this->ensureCustomer(
+                    $contact
+                );
 
                 $oldStatus =
                     $order->status->value;
@@ -200,6 +206,8 @@ class OrderService
                         ?? null,
                 ]);
 
+                $order->refresh();
+
                 $this->monitoringService
                     ->activity(
                         'order_updated',
@@ -216,13 +224,12 @@ class OrderService
 
                             'new_status' =>
                                 $order
-                                    ->refresh()
                                     ->status
                                     ->value,
                         ]
                     );
 
-                return $order->refresh();
+                return $order;
             }
         );
     }
@@ -261,13 +268,16 @@ class OrderService
         User $user
     ) {
         return Contact::query()
+            ->where(
+                'status',
+                'customer'
+            )
             ->when(
                 ! $this->isAdmin($user),
-                fn ($query) =>
-                    $query->where(
-                        'assigned_user_id',
-                        $user->id
-                    )
+                fn ($query) => $query->where(
+                    'assigned_user_id',
+                    $user->id
+                )
             )
             ->orderBy('name')
             ->get([
@@ -285,13 +295,30 @@ class OrderService
         return Contact::query()
             ->when(
                 ! $this->isAdmin($user),
-                fn ($query) =>
-                    $query->where(
-                        'assigned_user_id',
-                        $user->id
-                    )
+                fn ($query) => $query->where(
+                    'assigned_user_id',
+                    $user->id
+                )
             )
-            ->findOrFail($contactId);
+            ->findOrFail(
+                $contactId
+            );
+    }
+
+    private function ensureCustomer(
+        Contact $contact
+    ): void {
+        if (
+            $contact->status ===
+            'customer'
+        ) {
+            return;
+        }
+
+        throw ValidationException::withMessages([
+            'contact_id' =>
+                'ثبت سفارش فقط برای مخاطبی که وضعیت مشتری دارد امکان‌پذیر است.',
+        ]);
     }
 
     private function isAdmin(
