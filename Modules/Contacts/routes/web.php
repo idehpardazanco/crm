@@ -1,52 +1,47 @@
 <?php
 
+<?php
+
 use Illuminate\Support\Facades\Route;
 use Modules\Contacts\app\Http\Controllers\ContactsController;
-
 
 Route::middleware('auth')
     ->prefix('contacts')
     ->name('contacts.')
-    ->group(function(){
+    ->group(function () {
 
-
-        Route::get('/',[
+        Route::get('/', [
             ContactsController::class,
-            'index'
+            'index',
         ])->name('index');
 
-        Route::get('/create',[
+        Route::get('/create', [
             ContactsController::class,
-            'create'
+            'create',
         ])->name('create');
 
-
-        Route::get('/{id}/edit',[
+        Route::post('/', [
             ContactsController::class,
-            'edit'
-        ])->name('edit');
-
-
-        Route::post('/',[
-            ContactsController::class,
-            'store'
+            'store',
         ])->name('store');
 
-
-        Route::put('/{id}',[
+        Route::get('/{contact}/edit', [
             ContactsController::class,
-            'update'
+            'edit',
+        ])->name('edit');
+
+        Route::put('/{contact}', [
+            ContactsController::class,
+            'update',
         ])->name('update');
 
-
-        Route::delete('/{id}',[
+        Route::delete('/{contact}', [
             ContactsController::class,
-            'destroy'
+            'destroy',
         ])->name('destroy');
 
-        Route::get('/{id}',[
+        Route::get('/{contact}', [
             ContactsController::class,
-            'show'
-        ])
-        ->name('show');
+            'show',
+        ])->name('show');
     });
