@@ -4,13 +4,15 @@ namespace Modules\Contacts\app\Models;
 
 use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Modules\FollowUps\app\Models\FollowUp;
 use Modules\Interactions\app\Models\Interaction;
+use Modules\Orders\app\Models\Order;
 
 class Contact extends Model
 {
+    use SoftDeletes;
+
     protected $fillable = [
         'business_name',
         'name',
@@ -26,7 +28,7 @@ class Contact extends Model
         'description',
     ];
 
-    public function assignedUser(): BelongsTo
+    public function assignedUser()
     {
         return $this->belongsTo(
             User::class,
@@ -34,17 +36,24 @@ class Contact extends Model
         );
     }
 
-    public function interactions(): HasMany
+    public function interactions()
     {
         return $this->hasMany(
             Interaction::class
         );
     }
 
-    public function followUps(): HasMany
+    public function followUps()
     {
         return $this->hasMany(
             FollowUp::class
+        );
+    }
+
+    public function orders()
+    {
+        return $this->hasMany(
+            Order::class
         );
     }
 }
