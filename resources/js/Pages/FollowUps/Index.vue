@@ -1,12 +1,22 @@
 <script setup>
-import { router } from '@inertiajs/vue3'
+import { Link, router } from '@inertiajs/vue3'
 import { ref } from 'vue'
 
 const props = defineProps({
     followUps: Object,
+    filters: Object,
+    isAdmin: Boolean,
 })
 
-const search = ref('')
+const search = ref(
+    props.filters?.search ?? ''
+)
+
+const statusLabels = {
+    pending: 'در انتظار',
+    done: 'انجام شده',
+    cancelled: 'لغو شده',
+}
 
 const doSearch = () => {
     router.get(
@@ -16,32 +26,77 @@ const doSearch = () => {
         },
         {
             preserveState: true,
+            replace: true,
+        }
+    )
+}
+
+const updateStatus = (
+    id,
+    status
+) => {
+    router.patch(
+        `/followups/${id}/status`,
+        {
+            status,
+        },
+        {
+            preserveScroll: true,
         }
     )
 }
 
 const remove = (id) => {
-    if (confirm('حذف شود؟')) {
-        router.delete(`/followups/${id}`)
+    if (!confirm('پیگیری حذف شود؟')) {
+        return
     }
+
+    router.delete(
+        `/followups/${id}`,
+        {
+            preserveScroll: true,
+        }
+    )
+}
+
+const isOverdue = (item) => {
+    if (item.status !== 'pending') {
+        return false
+    }
+
+    return new Date(item.follow_up_at) <
+        new Date()
 }
 </script>
 
 <template>
     <div class="p-6">
 
-        <div class="flex justify-between items-center mb-6">
+        <div
+            class="
+                flex
+                justify-between
+                items-center
+                mb-6
+            "
+        >
 
             <h1 class="text-xl font-bold">
                 پیگیری‌ها
             </h1>
 
-            <a
+            <Link
                 href="/followups/create"
-                class="bg-blue-600 text-white px-4 py-2 rounded"
+                class="
+                    bg-blue-600
+                    text-white
+                    px-4
+                    py-2
+                    rounded
+                "
             >
                 پیگیری جدید
-            </a>
+            </Link>
 
         </div>
 
@@ -52,108 +107,271 @@ const remove = (id) => {
                 v-model="search"
                 @keyup.enter="doSearch"
                 type="text"
-                class="border p-2 rounded w-64"
-                placeholder="جستجو مشتری"
+                class="
+                    border
+                    p-2
+                    rounded
+                    w-full
+                    max-w-md
+                "
+                placeholder="جستجو نام، موبایل یا کسب‌وکار"
             >
 
         </div>
 
 
-        <table class="w-full border-collapse border">
+        <div class="overflow-x-auto">
 
-            <thead>
+            <table
+                class="
+                    w-full
+                    border-collapse
+                    border
+                "
+            >
 
-                <tr>
+                <thead>
 
-                    <th class="border p-2">
-                        مشتری
-                    </th>
+                    <tr>
 
-                    <th class="border p-2">
-                        موبایل
-                    </th>
+                        <th class="border p-2">
+                            مخاطب
+                        </th>
 
-                    <th class="border p-2">
-                        عنوان
-                    </th>
+                        <th class="border p-2">
+                            کسب‌وکار
+                        </th>
 
-                    <th class="border p-2">
-                        تاریخ پیگیری
-                    </th>
+                        <th class="border p-2">
+                            موبایل
+                        </th>
 
-                    <th class="border p-2">
-                        وضعیت
-                    </th>
+                        <th class="border p-2">
+                            عنوان
+                        </th>
 
-                    <th class="border p-2">
-                        عملیات
-                    </th>
+                        <th class="border p-2">
+                            تاریخ پیگیری
+                        </th>
 
-                </tr>
+                        <th class="border p-2">
+                            وضعیت
+                        </th>
 
-            </thead>
-
-
-            <tbody>
-
-                <tr
-                    v-for="item in followUps.data"
-                    :key="item.id"
-                >
-
-                    <td class="border p-2">
-                        {{ item.contact?.name ?? '-' }}
-                    </td>
-
-
-                    <td class="border p-2">
-                        {{ item.contact?.mobile ?? '-' }}
-                    </td>
-
-
-                    <td class="border p-2">
-                        {{ item.title }}
-                    </td>
-
-
-                    <td class="border p-2">
-                        {{ item.follow_up_at }}
-                    </td>
-
-
-                    <td class="border p-2">
-                        {{ item.status }}
-                    </td>
-
-
-                    <td class="border p-2">
-
-                        <button
-                            @click="remove(item.id)"
-                            class="text-red-600"
+                        <th
+                            v-if="isAdmin"
+                            class="border p-2"
                         >
-                            حذف
-                        </button>
+                            کارمند
+                        </th>
 
-                    </td>
+                        <th class="border p-2">
+                            عملیات
+                        </th>
 
-                </tr>
+                    </tr>
+
+                </thead>
 
 
-                <tr v-if="!followUps.data.length">
+                <tbody>
 
-                    <td
-                        colspan="6"
-                        class="border p-4 text-center"
+                    <tr
+                        v-for="item in followUps.data"
+                        :key="item.id"
+                        :class="{
+                            'bg-red-50':
+                                isOverdue(item),
+                        }"
                     >
-                        موردی یافت نشد
-                    </td>
 
-                </tr>
+                        <td class="border p-2">
 
-            </tbody>
+                            <Link
+                                v-if="item.contact"
+                                :href="
+                                    `/contacts/${item.contact.id}`
+                                "
+                                class="text-blue-600"
+                            >
+                                {{ item.contact.name }}
+                            </Link>
 
-        </table>
+                            <span v-else>
+                                -
+                            </span>
+
+                        </td>
+
+
+                        <td class="border p-2">
+                            {{
+                                item.contact
+                                    ?.business_name
+                                    ?? '-'
+                            }}
+                        </td>
+
+
+                        <td class="border p-2">
+                            {{
+                                item.contact?.mobile
+                                    ?? '-'
+                            }}
+                        </td>
+
+
+                        <td class="border p-2">
+                            {{ item.title }}
+                        </td>
+
+
+                        <td
+                            class="border p-2"
+                            :class="{
+                                'text-red-600 font-bold':
+                                    isOverdue(item),
+                            }"
+                        >
+                            {{ item.follow_up_at }}
+                        </td>
+
+
+                        <td class="border p-2">
+
+                            {{
+                                statusLabels[
+                                    item.status
+                                ] ?? item.status
+                            }}
+
+                        </td>
+
+
+                        <td
+                            v-if="isAdmin"
+                            class="border p-2"
+                        >
+                            {{
+                                item.user?.name
+                                    ?? '-'
+                            }}
+                        </td>
+
+
+                        <td class="border p-2">
+
+                            <div
+                                class="
+                                    flex
+                                    flex-wrap
+                                    gap-3
+                                "
+                            >
+
+                                <button
+                                    v-if="
+                                        item.status !==
+                                        'done'
+                                    "
+                                    type="button"
+                                    @click="
+                                        updateStatus(
+                                            item.id,
+                                            'done'
+                                        )
+                                    "
+                                    class="
+                                        text-green-600
+                                    "
+                                >
+                                    انجام شد
+                                </button>
+
+
+                                <button
+                                    v-if="
+                                        item.status !==
+                                        'cancelled'
+                                    "
+                                    type="button"
+                                    @click="
+                                        updateStatus(
+                                            item.id,
+                                            'cancelled'
+                                        )
+                                    "
+                                    class="
+                                        text-orange-600
+                                    "
+                                >
+                                    لغو
+                                </button>
+
+
+                                <button
+                                    v-if="
+                                        item.status !==
+                                        'pending'
+                                    "
+                                    type="button"
+                                    @click="
+                                        updateStatus(
+                                            item.id,
+                                            'pending'
+                                        )
+                                    "
+                                    class="
+                                        text-blue-600
+                                    "
+                                >
+                                    بازگردانی
+                                </button>
+
+
+                                <button
+                                    type="button"
+                                    @click="
+                                        remove(item.id)
+                                    "
+                                    class="text-red-600"
+                                >
+                                    حذف
+                                </button>
+
+                            </div>
+
+                        </td>
+
+                    </tr>
+
+
+                    <tr
+                        v-if="
+                            !followUps.data.length
+                        "
+                    >
+
+                        <td
+                            :colspan="
+                                isAdmin ? 8 : 7
+                            "
+                            class="
+                                border
+                                p-4
+                                text-center
+                            "
+                        >
+                            موردی یافت نشد
+                        </td>
+
+                    </tr>
+
+                </tbody>
+
+            </table>
+
+        </div>
 
     </div>
 </template>
