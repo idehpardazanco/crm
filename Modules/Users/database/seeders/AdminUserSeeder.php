@@ -2,9 +2,8 @@
 
 namespace Modules\Users\Database\Seeders;
 
-use Illuminate\Database\Seeder;
 use App\Models\User;
-use Modules\Users\app\Enums\UserStatus;
+use Illuminate\Database\Seeder;
 
 class AdminUserSeeder extends Seeder
 {
@@ -12,19 +11,21 @@ class AdminUserSeeder extends Seeder
     {
         $admin = User::query()->firstOrCreate(
             [
-                'mobile' => '09120000000'
+                'mobile' => '09120000000',
             ],
             [
                 'name' => 'مدیر سیستم',
                 'email' => 'admin@example.com',
                 'password' => 'password',
-                'status' => UserStatus::ACTIVE,
+                'status' => 'active',
                 'two_factor_enabled' => false,
             ]
         );
 
         if (! $admin->hasRole('super_admin')) {
-            $admin->assignRole('super_admin');
+            $admin->assignRole(
+                'super_admin'
+            );
         }
     }
 }
