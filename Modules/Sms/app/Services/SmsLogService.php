@@ -2,13 +2,15 @@
 
 namespace Modules\Sms\app\Services;
 
+use App\Models\User;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Modules\Sms\app\Models\SmsLog;
 
 class SmsLogService
 {
     public function paginate(
-        ?string $search = null
+        ?string $search,
+        User $user
     ): LengthAwarePaginator {
         return SmsLog::query()
             ->with([
@@ -16,6 +18,16 @@ class SmsLogService
                 'user:id,name',
                 'template:id,title',
             ])
+            ->when(
+                ! $user->hasRole(
+                    'super_admin'
+                ),
+                fn ($query) =>
+                    $query->where(
+                        'user_id',
+                        $user->id
+                    )
+            )
             ->when(
                 $search,
                 function ($query) use ($search) {
