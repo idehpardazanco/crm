@@ -3,23 +3,22 @@
 namespace Modules\Sms\app\Providers;
 
 use App\Support\BaseModuleServiceProvider;
-use Modules\Sms\app\Services\SmsService;
-use Modules\Sms\Contracts\SmsProviderInterface;
-use Modules\Sms\app\Providers\PayamMatniSmsProvider;
-// use Modules\Sms\app\Repositories\SmsRepository;
+use Modules\Sms\app\Contracts\SmsProviderInterface;
 
 class SmsServiceProvider extends BaseModuleServiceProvider
 {
     public function register(): void
     {
         $this->app->bind(
-            \Modules\Sms\app\Contracts\SmsProviderInterface::class,
-            \Modules\Sms\app\Providers\PayamMatniSmsProvider::class
+            SmsProviderInterface::class,
+            PayamMatniSmsProvider::class
         );
     }
 
     public function boot(): void
     {
-        $this->loadModule(__DIR__ . '/..');
+        $this->loadModule(
+            dirname(__DIR__, 2)
+        );
     }
 }
