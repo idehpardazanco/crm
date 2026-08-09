@@ -1,195 +1,290 @@
 <script setup>
+import {
+    Link,
+    router,
+} from '@inertiajs/vue3'
 
-import { router } from '@inertiajs/vue3'
 import { ref } from 'vue'
 
-
 const props = defineProps({
-
-    contacts:Object,
-    users:Array
-
+    contacts: Object,
+    filters: Object,
+    isAdmin: Boolean,
 })
 
+const search = ref(
+    props.filters?.search ?? ''
+)
 
-const search = ref('')
+const statusLabels = {
+    new: 'جدید',
+    contacted: 'تماس گرفته شد',
+    interested: 'علاقه‌مند',
+    follow_up: 'نیاز به پیگیری',
+    demo_sent: 'دمو ارسال شد',
+    customer: 'مشتری شد',
+    rejected: 'رد شد',
+    no_answer: 'پاسخ نداد',
+    active: 'فعال',
+    inactive: 'غیرفعال',
+}
 
-
-
-function doSearch(){
-
+const doSearch = () => {
     router.get(
         '/contacts',
         {
-            search: search.value
+            search: search.value,
         },
         {
-            preserveState:true
+            preserveState: true,
+            replace: true,
         }
     )
-
 }
 
-
-
-function remove(id){
-
-    if(confirm('حذف شود؟')){
-
-        router.delete(
-            `/contacts/${id}`
+const remove = (id) => {
+    if (
+        !confirm(
+            'مخاطب حذف شود؟'
         )
-
+    ) {
+        return
     }
 
+    router.delete(
+        `/contacts/${id}`
+    )
 }
-
 </script>
 
-
 <template>
+    <div class="p-6">
+
+        <div
+            class="
+                flex
+                justify-between
+                items-center
+                mb-6
+            "
+        >
+
+            <h1 class="text-xl font-bold">
+                مخاطبین
+            </h1>
+
+            <Link
+                href="/contacts/create"
+                class="
+                    bg-blue-600
+                    text-white
+                    px-4
+                    py-2
+                    rounded
+                "
+            >
+                مخاطب جدید
+            </Link>
 
-<div class="p-6">
+        </div>
 
 
-<h1 class="text-xl font-bold mb-5">
-مخاطبین
-</h1>
+        <div class="mb-5">
 
+            <input
+                v-model="search"
+                @keyup.enter="doSearch"
+                type="text"
+                class="
+                    border
+                    p-2
+                    rounded
+                    w-full
+                    max-w-md
+                "
+                placeholder="جستجو نام، موبایل یا کسب‌وکار"
+            >
 
+        </div>
 
-<div class="mb-5">
 
-<input
-v-model="search"
-@keyup.enter="doSearch"
-class="border p-2"
-placeholder="جستجو نام یا موبایل"
-/>
+        <div class="overflow-x-auto">
 
+            <table
+                class="
+                    w-full
+                    border-collapse
+                    border
+                "
+            >
 
-<a
-href="/contacts/create"
-class="bg-blue-600 text-white px-4 py-2 rounded mr-3"
->
-مخاطب جدید
-</a>
+                <thead>
 
-</div>
+                    <tr>
 
+                        <th class="border p-2">
+                            نام
+                        </th>
 
+                        <th class="border p-2">
+                            موبایل
+                        </th>
 
+                        <th class="border p-2">
+                            کسب‌وکار
+                        </th>
 
-<table class="w-full border">
+                        <th class="border p-2">
+                            شهر
+                        </th>
 
+                        <th class="border p-2">
+                            وضعیت
+                        </th>
 
-<thead>
+                        <th class="border p-2">
+                            مسئول
+                        </th>
 
-<tr>
+                        <th class="border p-2">
+                            عملیات
+                        </th>
 
-<th class="border p-2">
-نام
-</th>
+                    </tr>
 
+                </thead>
 
-<th class="border p-2">
-موبایل
-</th>
 
+                <tbody>
 
-<th class="border p-2">
-کسب و کار
-</th>
+                    <tr
+                        v-for="contact in contacts.data"
+                        :key="contact.id"
+                    >
 
+                        <td class="border p-2">
 
-<th class="border p-2">
-وضعیت
-</th>
+                            <Link
+                                :href="
+                                    `/contacts/${contact.id}`
+                                "
+                                class="text-blue-600"
+                            >
+                                {{ contact.name }}
+                            </Link>
 
+                        </td>
 
-<th class="border p-2">
-مسئول
-</th>
 
+                        <td class="border p-2">
+                            {{ contact.mobile }}
+                        </td>
 
-<th class="border p-2">
-عملیات
-</th>
 
-</tr>
+                        <td class="border p-2">
 
-</thead>
+                            {{
+                                contact.business_name
+                                    ?? '-'
+                            }}
 
+                        </td>
 
 
-<tbody>
+                        <td class="border p-2">
+                            {{ contact.city ?? '-' }}
+                        </td>
 
 
-<tr
-v-for="contact in contacts.data"
-:key="contact.id"
->
+                        <td class="border p-2">
 
+                            {{
+                                statusLabels[
+                                    contact.status
+                                ]
+                                    ?? contact.status
+                            }}
 
-<td class="border p-2">
-{{contact.name}}
-</td>
+                        </td>
 
 
-<td class="border p-2">
-{{contact.mobile}}
-</td>
+                        <td class="border p-2">
 
+                            {{
+                                contact.assigned_user
+                                    ?.name
+                                    ?? '-'
+                            }}
 
-<td class="border p-2">
-{{contact.business_name}}
-</td>
+                        </td>
 
 
-<td class="border p-2">
-{{contact.status}}
-</td>
+                        <td class="border p-2">
 
+                            <div class="flex gap-3">
 
-<td class="border p-2">
+                                <Link
+                                    :href="
+                                        `/contacts/${contact.id}`
+                                    "
+                                    class="text-green-600"
+                                >
+                                    مشاهده
+                                </Link>
 
-{{contact.assigned_user?.name ?? '-'}}
+                                <Link
+                                    :href="
+                                        `/contacts/${contact.id}/edit`
+                                    "
+                                    class="text-blue-600"
+                                >
+                                    ویرایش
+                                </Link>
 
-</td>
+                                <button
+                                    v-if="isAdmin"
+                                    type="button"
+                                    @click="
+                                        remove(
+                                            contact.id
+                                        )
+                                    "
+                                    class="text-red-600"
+                                >
+                                    حذف
+                                </button>
 
+                            </div>
 
-<td class="border p-2">
+                        </td>
 
+                    </tr>
 
-<a
-:href="`/contacts/${contact.id}/edit`"
-class="text-blue-600"
->
-ویرایش
-</a>
 
+                    <tr
+                        v-if="
+                            !contacts.data.length
+                        "
+                    >
 
-<button
-@click="remove(contact.id)"
-class="text-red-600 mr-3"
->
-حذف
-</button>
+                        <td
+                            colspan="7"
+                            class="
+                                border
+                                p-4
+                                text-center
+                            "
+                        >
+                            مخاطبی یافت نشد
+                        </td>
 
+                    </tr>
 
-</td>
+                </tbody>
 
+            </table>
 
-</tr>
+        </div>
 
-
-</tbody>
-
-
-</table>
-
-
-
-</div>
-
+    </div>
 </template>
