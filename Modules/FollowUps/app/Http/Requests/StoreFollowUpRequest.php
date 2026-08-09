@@ -11,34 +11,34 @@ class StoreFollowUpRequest extends FormRequest
         return true;
     }
 
-
     public function rules(): array
     {
         return [
             'contact_id' => [
                 'required',
-                'exists:contacts,id'
+                'integer',
+                'exists:contacts,id',
             ],
 
             'title' => [
                 'required',
                 'string',
-                'max:255'
+                'max:255',
             ],
 
             'description' => [
                 'nullable',
-                'string'
+                'string',
             ],
 
             'follow_up_at' => [
                 'required',
-                'date'
+                'date',
             ],
 
             'status' => [
                 'required',
-                'in:pending,done,cancelled'
+                'in:pending,done,cancelled',
             ],
         ];
     }
