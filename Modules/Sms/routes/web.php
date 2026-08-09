@@ -1,50 +1,47 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use Modules\Sms\app\Http\Controllers\SmsSettingsController;
 use Modules\Sms\app\Http\Controllers\SmsController;
 use Modules\Sms\app\Http\Controllers\SmsLogsController;
+use Modules\Sms\app\Http\Controllers\SmsSettingsController;
 
-
-Route::middleware('auth')
+Route::middleware([
+    'web',
+    'auth',
+])
     ->prefix('sms')
     ->name('sms.')
-    ->group(function(){
+    ->group(function () {
 
-    Route::get(
-        '/settings',
-        [
-            SmsSettingsController::class,
-            'index'
-        ]
-    )
-    ->name('settings');
+        Route::get(
+            '/settings',
+            [
+                SmsSettingsController::class,
+                'index',
+            ]
+        )->name('settings');
 
-    Route::post(
-        '/settings',
-        [
-            SmsSettingsController::class,
-            'update'
-        ]
-    )
-    ->name('settings.update');
+        Route::post(
+            '/settings',
+            [
+                SmsSettingsController::class,
+                'update',
+            ]
+        )->name('settings.update');
 
-    Route::post(
-    '/send',
-    [
-        SmsController::class,
-        'send'
-    ]
-    )
-    ->name('send');
+        Route::post(
+            '/send',
+            [
+                SmsController::class,
+                'send',
+            ]
+        )->name('send');
 
-    Route::get(
-    '/logs',
-    [
-        SmsLogsController::class,
-        'index'
-    ]
-    )
-    ->name('logs');
-
-});
+        Route::get(
+            '/logs',
+            [
+                SmsLogsController::class,
+                'index',
+            ]
+        )->name('logs');
+    });
