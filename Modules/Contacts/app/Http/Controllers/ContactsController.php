@@ -2,104 +2,101 @@
 
 namespace Modules\Contacts\app\Http\Controllers;
 
+use App\Models\User;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
-use Illuminate\Routing\Controller;
+use Inertia\Response;
 use Modules\Contacts\app\Http\Requests\StoreContactRequest;
 use Modules\Contacts\app\Http\Requests\UpdateContactRequest;
 use Modules\Contacts\app\Services\ContactService;
-use App\Models\User;
 
-
-class ContactsController extends Controller
+class ContactsController
 {
-
-    public function __construct(protected ContactService $service)
-    {
+    public function __construct(
+        private readonly ContactService $service
+    ) {
     }
 
-    public function index(Request $request)
+    public function index(Request $request): Response
     {
         return Inertia::render('Contacts/Index', [
-
-            'contacts' => $this->service->paginate(
-                $request->get('search')
+            'contacts' => $this->service->list(
+                $request->string('search')->toString()
             ),
 
-            'users' => User::query()
-                ->where('status','active')
-                ->select('id','name')
-                ->get(),
+            'users' => $this->users(),
 
+            'filters' => [
+                'search' => $request->string('search')->toString(),
+            ],
         ]);
     }
 
-    public function show(int $id)
+    public function create(): Response
     {
-        return Inertia::render('Contacts/Show', [
-
-            'contact' => $this->service->find($id),
-
-            'users' => User::query()
-                ->where('status','active')
-                ->select('id','name')
-                ->get(),
-
+        return Inertia::render('Contacts/Create', [
+            'users' => $this->users(),
         ]);
     }
 
-    public function create()
+    public function store(StoreContactRequest $request): RedirectResponse
     {
-        return Inertia::render('Contacts/Create',[
-            'users'=>User::where('status','active')
-                ->select('id','name')
-                ->get()
-        ]);
-    }
-
-
-
-    public function edit(int $id)
-    {
-        return Inertia::render('Contacts/Edit',[
-
-            'contact'=>$this->service->find($id),
-
-            'users'=>User::where('status','active')
-                ->select('id','name')
-                ->get()
-
-        ]);
-    }
-
-
-
-    public function store(StoreContactRequest $request)
-    {
-        return $this->service->create(
+        $contact = $this->service->create(
             $request->validated()
         );
+
+        return redirect()
+            ->route('contacts.show', $contact->id)
+            ->with('success', 'مخاطب با موفقیت ایجاد شد.');
     }
 
+    public function show(int $contact): Response
+    {
+        return Inertia::render('Contacts/Show', [
+            'contact' => $this->service->find($contact),
+        ]);
+    }
 
+    public function edit(int $contact): Response
+    {
+        return Inertia::render('Contacts/Edit', [
+            'contact' => $this->service->find($contact),
+            'users' => $this->users(),
+        ]);
+    }
 
     public function update(
         UpdateContactRequest $request,
-        int $id
-    )
-    {
-        return $this->service->update(
-            $id,
+        int $contact
+    ): RedirectResponse {
+        $this->service->update(
+            $contact,
             $request->validated()
         );
+
+        return redirect()
+            ->route('contacts.show', $contact)
+            ->with('success', 'مخاطب با موفقیت ویرایش شد.');
     }
 
-
-
-    public function destroy(int $id)
+    public function destroy(int $contact): RedirectResponse
     {
-        return $this->service->delete($id);
+        $this->service->delete($contact);
+
+        return redirect()
+            ->route('contacts.index')
+            ->with('success', 'مخاطب با موفقیت حذف شد.');
     }
 
-
+    private function users()
+    {
+        return User::query()
+            ->where('status', 'active')
+            ->orderBy('name')
+            ->get([
+                'id',
+                'name',
+            ]);
+    }
 }
