@@ -23,32 +23,74 @@ class SmsController extends Controller
     ): RedirectResponse {
         $data = $request->validated();
 
-        $contact = ! empty($data['contact_id'])
-            ? Contact::query()->findOrFail(
-                $data['contact_id']
-            )
-            : null;
+        $user = $request->user();
 
-        $message = $data['message'] ?? '';
+        $contact = null;
 
-        if (! empty($data['template_id'])) {
-            $template = SmsTemplate::query()
-                ->where('status', 'active')
+        if (! empty($data['contact_id'])) {
+
+            $contact = Contact::query()
+                ->when(
+                    ! $user->hasRole(
+                        'super_admin'
+                    ),
+                    fn ($query) =>
+                        $query->where(
+                            'assigned_user_id',
+                            $user->id
+                        )
+                )
                 ->findOrFail(
-                    $data['template_id']
+                    $data['contact_id']
                 );
+        }
 
-            $message = $this->renderer->render(
-                $template,
-                $contact,
-                $request->user()
-            );
+        /*
+         * کارمند اجازه ارسال SMS بدون مخاطب ندارد.
+         */
+        if (
+            ! $user->hasRole('super_admin')
+            && ! $contact
+        ) {
+            abort(403);
+        }
+
+        /*
+         * اگر مخاطب انتخاب شده، شماره مقصد
+         * فقط از دیتابیس خوانده می‌شود.
+         */
+        $to = $contact
+            ? $contact->mobile
+            : $data['to'];
+
+        $message =
+            $data['message'] ?? '';
+
+        if (
+            ! empty($data['template_id'])
+        ) {
+            $template =
+                SmsTemplate::query()
+                    ->where(
+                        'status',
+                        'active'
+                    )
+                    ->findOrFail(
+                        $data['template_id']
+                    );
+
+            $message =
+                $this->renderer->render(
+                    $template,
+                    $contact,
+                    $user
+                );
         }
 
         $this->service->send(
-            $data['to'],
+            $to,
             $message,
-            $data['contact_id'] ?? null,
+            $contact?->id,
             $data['template_id'] ?? null
         );
 
