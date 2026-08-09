@@ -13,6 +13,7 @@ use Modules\Contacts\app\Http\Requests\StoreContactRequest;
 use Modules\Contacts\app\Http\Requests\UpdateContactRequest;
 use Modules\Contacts\app\Services\ContactService;
 use Modules\Interactions\app\Enums\CallResult;
+use Modules\Orders\app\Enums\OrderStatus;
 use Modules\Sms\app\Services\SmsTemplateRenderer;
 use Modules\Sms\app\Services\SmsTemplateService;
 
@@ -33,17 +34,19 @@ class ContactsController extends Controller
         return Inertia::render(
             'Contacts/Index',
             [
-                'contacts' => $this->service->list(
-                    $request
-                        ->string('search')
-                        ->toString(),
-                    $user
-                ),
+                'contacts' =>
+                    $this->service->list(
+                        $request
+                            ->string('search')
+                            ->toString(),
+                        $user
+                    ),
 
                 'filters' => [
-                    'search' => $request
-                        ->string('search')
-                        ->toString(),
+                    'search' =>
+                        $request
+                            ->string('search')
+                            ->toString(),
                 ],
 
                 'isAdmin' =>
@@ -79,10 +82,11 @@ class ContactsController extends Controller
     public function store(
         StoreContactRequest $request
     ): RedirectResponse {
-        $contact = $this->service->create(
-            $request->validated(),
-            $request->user()
-        );
+        $contact =
+            $this->service->create(
+                $request->validated(),
+                $request->user()
+            );
 
         return redirect()
             ->route(
@@ -116,6 +120,9 @@ class ContactsController extends Controller
 
                 'callResults' =>
                     CallResult::options(),
+
+                'orderStatuses' =>
+                    OrderStatus::options(),
 
                 'smsTemplates' =>
                     $this
