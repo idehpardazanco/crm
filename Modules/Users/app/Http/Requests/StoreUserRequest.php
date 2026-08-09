@@ -11,47 +11,44 @@ class StoreUserRequest extends FormRequest
         return true;
     }
 
-
     public function rules(): array
     {
         return [
-
             'name' => [
                 'required',
                 'string',
-                'max:255'
+                'max:255',
             ],
 
             'mobile' => [
                 'required',
                 'string',
                 'max:20',
-                'unique:users,mobile'
+                'unique:users,mobile',
             ],
 
             'email' => [
                 'nullable',
                 'email',
                 'max:255',
-                'unique:users,email'
+                'unique:users,email',
             ],
 
             'password' => [
                 'required',
                 'string',
-                'min:8'
+                'min:8',
             ],
 
             'status' => [
                 'required',
-                'in:active,inactive'
+                'in:active,inactive',
             ],
 
             'role' => [
                 'required',
-                'exists:roles,name'
+                'exists:roles,name',
             ],
-
         ];
     }
 }
