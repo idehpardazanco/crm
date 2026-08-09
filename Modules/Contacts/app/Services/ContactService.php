@@ -79,6 +79,11 @@ class ContactService
                     $query
                         ->with('user:id,name')
                         ->latest('follow_up_at'),
+
+                'orders' => fn ($query) =>
+                    $query
+                        ->with('user:id,name')
+                        ->latest(),
             ])
             ->when(
                 ! $this->isAdmin($actor),
@@ -95,7 +100,8 @@ class ContactService
         User $actor
     ): Contact {
         if (! $this->isAdmin($actor)) {
-            $data['assigned_user_id'] = $actor->id;
+            $data['assigned_user_id'] =
+                $actor->id;
         }
 
         $contact = Contact::query()
@@ -125,7 +131,8 @@ class ContactService
         );
 
         if (! $this->isAdmin($actor)) {
-            $data['assigned_user_id'] = $actor->id;
+            $data['assigned_user_id'] =
+                $actor->id;
         }
 
         $contact->update($data);
