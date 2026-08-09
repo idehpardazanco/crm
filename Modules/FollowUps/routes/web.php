@@ -10,25 +10,26 @@ Route::middleware('auth')
 
         Route::get('/', [
             FollowUpsController::class,
-            'index'
+            'index',
         ])->name('index');
-
 
         Route::get('/create', [
             FollowUpsController::class,
-            'create'
+            'create',
         ])->name('create');
-
 
         Route::post('/', [
             FollowUpsController::class,
-            'store'
+            'store',
         ])->name('store');
 
+        Route::patch('/{id}/status', [
+            FollowUpsController::class,
+            'updateStatus',
+        ])->name('status.update');
 
         Route::delete('/{id}', [
             FollowUpsController::class,
-            'destroy'
+            'destroy',
         ])->name('destroy');
-
     });
