@@ -2,94 +2,85 @@
 
 namespace Modules\Users\app\Http\Controllers;
 
-
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
-
+use Inertia\Inertia;
+use Inertia\Response;
 use Modules\Users\app\Http\Requests\StoreUserRequest;
 use Modules\Users\app\Http\Requests\UpdateUserRequest;
 use Modules\Users\app\Services\UserService;
-use Inertia\Inertia;
-use App\Models\User;
 use Spatie\Permission\Models\Role;
-
 
 class UsersController extends Controller
 {
-
     public function __construct(
-        protected UserService $service
-    )
-    {
-
+        private readonly UserService $service
+    ) {
     }
 
-
-    public function index(Request $request)
+    public function index(Request $request): Response
     {
         return Inertia::render('Users/Index', [
-
             'users' => $this->service->paginate(
                 $request->get('search')
             ),
-
-            'roles' => Role::query()
-                ->pluck('name'),
-
         ]);
     }
 
-
-    public function create()
+    public function create(): Response
     {
         return Inertia::render('Users/Create', [
-        'roles' => \Spatie\Permission\Models\Role::pluck('name')
-    ]);
-    }
-
-
-    public function store(StoreUserRequest $request)
-    {
-        return $this->service->create(
-            $request->validated()
-        );
-    }
-
-    
-    public function edit(int $id)
-    {
-        return Inertia::render('Users/Edit', [
-
-            'user' => \App\Models\User::with('roles')
-                ->findOrFail($id),
-
-            'roles' => \Spatie\Permission\Models\Role::pluck('name')
-
+            'roles' => Role::query()
+                ->orderBy('name')
+                ->pluck('name')
+                ->values(),
         ]);
     }
 
+    public function store(StoreUserRequest $request): RedirectResponse
+    {
+        $this->service->create(
+            $request->validated()
+        );
+
+        return redirect()
+            ->route('users.index')
+            ->with('success', 'کاربر با موفقیت ایجاد شد.');
+    }
+
+    public function edit(int $id): Response
+    {
+        return Inertia::render('Users/Edit', [
+            'user' => $this->service->find($id),
+
+            'roles' => Role::query()
+                ->orderBy('name')
+                ->pluck('name')
+                ->values(),
+        ]);
+    }
 
     public function update(
         UpdateUserRequest $request,
         int $id
-    )
-    {
-
-        return $this->service->update(
+    ): RedirectResponse {
+        $this->service->update(
             $id,
             $request->validated()
         );
 
+        return redirect()
+            ->route('users.index')
+            ->with('success', 'کاربر با موفقیت ویرایش شد.');
     }
 
-
-
-    public function destroy(int $id)
+    public function destroy(int $id): RedirectResponse
     {
+        $this->service->delete($id);
 
-        return $this->service->delete($id);
-
+        return redirect()
+            ->route('users.index')
+            ->with('success', 'کاربر با موفقیت حذف شد.');
     }
-
-
 }
