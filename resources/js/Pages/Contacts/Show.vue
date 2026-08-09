@@ -8,6 +8,7 @@ const props = defineProps({
     smsVariables: Object,
     contactStatuses: Array,
     callResults: Array,
+    orderStatuses: Array,
 })
 
 const smsForm = useForm({
@@ -35,6 +36,54 @@ const followUpForm = useForm({
     status: 'pending',
 })
 
+const orderForm = useForm({
+    contact_id: props.contact.id,
+    product_name: '',
+    amount: '',
+    status: 'new',
+    description: '',
+    return_to_contact: true,
+})
+
+const statusLabels = {
+    new: 'جدید',
+    contacted: 'تماس گرفته شد',
+    interested: 'علاقه‌مند',
+    follow_up: 'نیاز به پیگیری',
+    demo_sent: 'دمو ارسال شد',
+    customer: 'مشتری شد',
+    rejected: 'رد شد',
+    no_answer: 'پاسخ نداد',
+    active: 'فعال',
+    inactive: 'غیرفعال',
+}
+
+const orderStatusLabels = {
+    new: 'جدید',
+    reviewing: 'در حال بررسی',
+    awaiting_payment: 'در انتظار پرداخت',
+    paid: 'پرداخت شده',
+    completed: 'انجام شده',
+    cancelled: 'لغو شده',
+}
+
+const callResultLabels = {
+    no_answer: 'پاسخ نداد',
+    unavailable: 'در دسترس نبود',
+    interested: 'علاقه‌مند بود',
+    demo_requested: 'درخواست دمو داشت',
+    price_requested: 'قیمت خواست',
+    call_later: 'بعداً تماس بگیریم',
+    customer: 'مشتری شد',
+    not_interested: 'تمایل نداشت',
+}
+
+const formatAmount = (amount) => {
+    return Number(
+        amount ?? 0
+    ).toLocaleString('fa-IR')
+}
+
 const renderTemplate = (body) => {
     let message = body ?? ''
 
@@ -59,19 +108,25 @@ watch(
             return
         }
 
-        const template = props.smsTemplates.find(
-            (item) =>
-                String(item.id) === String(templateId)
-        )
+        const template =
+            props.smsTemplates.find(
+                (item) =>
+                    String(item.id) ===
+                    String(templateId)
+            )
 
-        smsForm.message = template
-            ? renderTemplate(template.body)
-            : ''
+        smsForm.message =
+            template
+                ? renderTemplate(
+                    template.body
+                )
+                : ''
     }
 )
 
 watch(
-    () => interactionForm.status_after_call,
+    () =>
+        interactionForm.status_after_call,
     (status) => {
         if (status !== 'follow_up') {
             interactionForm.next_follow_up = ''
@@ -99,51 +154,91 @@ const sendSms = () => {
 }
 
 const submitInteraction = () => {
-    interactionForm.post('/interactions', {
-        preserveScroll: true,
+    interactionForm.post(
+        '/interactions',
+        {
+            preserveScroll: true,
 
-        onSuccess: () => {
-            interactionForm.reset()
+            onSuccess: () => {
+                interactionForm.reset()
 
-            interactionForm.contact_id =
-                props.contact.id
+                interactionForm.contact_id =
+                    props.contact.id
 
-            interactionForm.type =
-                'call'
+                interactionForm.type =
+                    'call'
 
-            router.reload({
-                only: [
-                    'contact',
-                    'contactStatuses',
-                    'callResults',
-                ],
-            })
-        },
-    })
+                router.reload({
+                    only: [
+                        'contact',
+                        'contactStatuses',
+                        'callResults',
+                    ],
+                })
+            },
+        }
+    )
 }
 
 const submitFollowUp = () => {
-    followUpForm.post('/followups', {
-        preserveScroll: true,
+    followUpForm.post(
+        '/followups',
+        {
+            preserveScroll: true,
 
-        onSuccess: () => {
-            followUpForm.reset()
+            onSuccess: () => {
+                followUpForm.reset()
 
-            followUpForm.contact_id =
-                props.contact.id
+                followUpForm.contact_id =
+                    props.contact.id
 
-            followUpForm.status =
-                'pending'
+                followUpForm.status =
+                    'pending'
 
-            router.reload({
-                only: ['contact'],
-            })
-        },
-    })
+                router.reload({
+                    only: ['contact'],
+                })
+            },
+        }
+    )
+}
+
+const submitOrder = () => {
+    orderForm.post(
+        '/orders',
+        {
+            preserveScroll: true,
+
+            onSuccess: () => {
+                orderForm.reset(
+                    'product_name',
+                    'amount',
+                    'description'
+                )
+
+                orderForm.contact_id =
+                    props.contact.id
+
+                orderForm.status =
+                    'new'
+
+                orderForm.return_to_contact =
+                    true
+
+                router.reload({
+                    only: ['contact'],
+                })
+            },
+        }
+    )
 }
 
 const removeInteraction = (id) => {
-    if (!confirm('گزارش ارتباط حذف شود؟')) {
+    if (
+        !confirm(
+            'گزارش ارتباط حذف شود؟'
+        )
+    ) {
         return
     }
 
@@ -157,7 +252,10 @@ const removeInteraction = (id) => {
 </script>
 
 <template>
-    <div class="p-6">
+    <div
+        class="p-6"
+        dir="rtl"
+    >
 
         <!-- اطلاعات مخاطب -->
         <div class="mb-6">
@@ -168,70 +266,63 @@ const removeInteraction = (id) => {
 
             <div class="border rounded p-5">
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div
+                    class="
+                        grid
+                        grid-cols-1
+                        md:grid-cols-2
+                        gap-3
+                    "
+                >
 
                     <p>
-                        <strong>
-                            موبایل:
-                        </strong>
-
+                        <strong>موبایل:</strong>
                         {{ contact.mobile }}
                     </p>
 
                     <p>
-                        <strong>
-                            تلفن:
-                        </strong>
-
+                        <strong>تلفن:</strong>
                         {{ contact.phone ?? '-' }}
                     </p>
 
                     <p>
-                        <strong>
-                            کسب و کار:
-                        </strong>
-
+                        <strong>کسب‌وکار:</strong>
                         {{ contact.business_name ?? '-' }}
                     </p>
 
                     <p>
-                        <strong>
-                            شهر:
-                        </strong>
-
+                        <strong>شهر:</strong>
                         {{ contact.city ?? '-' }}
                     </p>
 
                     <p>
-                        <strong>
-                            دسته‌بندی:
-                        </strong>
-
+                        <strong>دسته‌بندی:</strong>
                         {{ contact.category ?? '-' }}
                     </p>
 
                     <p>
-                        <strong>
-                            منبع:
-                        </strong>
-
+                        <strong>منبع:</strong>
                         {{ contact.source ?? '-' }}
                     </p>
 
                     <p>
-                        <strong>
-                            وضعیت:
-                        </strong>
+                        <strong>وضعیت:</strong>
 
-                        {{ contact.status }}
+                        {{
+                            statusLabels[
+                                contact.status
+                            ] ?? contact.status
+                        }}
                     </p>
 
                     <p>
-                        <strong>
-                            مسئول:
-                        </strong>
+                        <strong>مسئول:</strong>
 
-                        {{ contact.assigned_user?.name ?? '-' }}
+                        {{
+                            contact.assigned_user
+                                ?.name
+                                ?? '-'
+                        }}
                     </p>
 
                 </div>
@@ -261,143 +352,177 @@ const removeInteraction = (id) => {
                 ثبت تماس
             </h2>
 
-            <form @submit.prevent="submitInteraction">
+            <form
+                @submit.prevent="
+                    submitInteraction
+                "
+            >
 
-                <div class="mb-3">
+                <input
+                    v-model="
+                        interactionForm.subject
+                    "
+                    type="text"
+                    class="
+                        border
+                        p-2
+                        w-full
+                        rounded
+                        mb-3
+                    "
+                    placeholder="عنوان تماس"
+                >
 
-                    <label class="block mb-2">
-                        عنوان تماس
-                    </label>
 
-                    <input
-                        v-model="interactionForm.subject"
-                        type="text"
-                        class="border p-2 w-full rounded"
-                        placeholder="عنوان تماس"
+                <select
+                    v-model="
+                        interactionForm.result
+                    "
+                    class="
+                        border
+                        p-2
+                        w-full
+                        rounded
+                        mb-3
+                    "
+                >
+
+                    <option value="">
+                        نتیجه تماس را انتخاب کنید
+                    </option>
+
+                    <option
+                        v-for="
+                            result in callResults
+                        "
+                        :key="result.value"
+                        :value="result.value"
                     >
+                        {{ result.label }}
+                    </option>
 
-                    <div
-                        v-if="interactionForm.errors.subject"
-                        class="text-red-600 mt-1"
-                    >
-                        {{ interactionForm.errors.subject }}
-                    </div>
+                </select>
 
+                <div
+                    v-if="
+                        interactionForm
+                            .errors
+                            .result
+                    "
+                    class="text-red-600 mb-3"
+                >
+                    {{
+                        interactionForm
+                            .errors
+                            .result
+                    }}
                 </div>
 
 
-                <div class="mb-3">
+                <select
+                    v-model="
+                        interactionForm
+                            .status_after_call
+                    "
+                    class="
+                        border
+                        p-2
+                        w-full
+                        rounded
+                        mb-3
+                    "
+                >
 
-                    <label class="block mb-2">
-                        نتیجه تماس
-                    </label>
-
-                    <select
-                        v-model="interactionForm.result"
-                        class="border p-2 w-full rounded"
-                    >
-                        <option value="">
-                            نتیجه تماس را انتخاب کنید
-                        </option>
-
-                        <option
-                            v-for="result in callResults"
-                            :key="result.value"
-                            :value="result.value"
-                        >
-                            {{ result.label }}
-                        </option>
-                    </select>
-
-                    <div
-                        v-if="interactionForm.errors.result"
-                        class="text-red-600 mt-1"
-                    >
-                        {{ interactionForm.errors.result }}
-                    </div>
-
-                </div>
-
-
-                <div class="mb-3">
-
-                    <label class="block mb-2">
+                    <option value="">
                         وضعیت مخاطب بعد از تماس
-                    </label>
+                    </option>
 
-                    <select
-                        v-model="interactionForm.status_after_call"
-                        class="border p-2 w-full rounded"
+                    <option
+                        v-for="
+                            status in
+                            contactStatuses
+                        "
+                        :key="status.value"
+                        :value="status.value"
                     >
-                        <option value="">
-                            وضعیت مخاطب را انتخاب کنید
-                        </option>
+                        {{ status.label }}
+                    </option>
 
-                        <option
-                            v-for="status in contactStatuses"
-                            :key="status.value"
-                            :value="status.value"
-                        >
-                            {{ status.label }}
-                        </option>
-                    </select>
+                </select>
 
-                    <div
-                        v-if="interactionForm.errors.status_after_call"
-                        class="text-red-600 mt-1"
-                    >
-                        {{ interactionForm.errors.status_after_call }}
-                    </div>
-
+                <div
+                    v-if="
+                        interactionForm
+                            .errors
+                            .status_after_call
+                    "
+                    class="text-red-600 mb-3"
+                >
+                    {{
+                        interactionForm
+                            .errors
+                            .status_after_call
+                    }}
                 </div>
 
 
-                <div class="mb-3">
-
-                    <label class="block mb-2">
-                        توضیحات تماس
-                    </label>
-
-                    <textarea
-                        v-model="interactionForm.description"
-                        rows="5"
-                        class="border p-2 w-full rounded"
-                        placeholder="توضیحات تماس"
-                    ></textarea>
-
-                    <div
-                        v-if="interactionForm.errors.description"
-                        class="text-red-600 mt-1"
-                    >
-                        {{ interactionForm.errors.description }}
-                    </div>
-
-                </div>
+                <textarea
+                    v-model="
+                        interactionForm
+                            .description
+                    "
+                    rows="5"
+                    class="
+                        border
+                        p-2
+                        w-full
+                        rounded
+                        mb-3
+                    "
+                    placeholder="توضیحات تماس"
+                ></textarea>
 
 
                 <div
                     v-if="
-                        interactionForm.status_after_call ===
-                        'follow_up'
+                        interactionForm
+                            .status_after_call
+                        === 'follow_up'
                     "
                     class="mb-3"
                 >
 
                     <label class="block mb-2">
-                        تاریخ و ساعت پیگیری بعدی
+                        تاریخ و ساعت پیگیری
                     </label>
 
                     <input
-                        v-model="interactionForm.next_follow_up"
+                        v-model="
+                            interactionForm
+                                .next_follow_up
+                        "
                         type="datetime-local"
-                        class="border p-2 w-full rounded"
+                        class="
+                            border
+                            p-2
+                            w-full
+                            rounded
+                        "
                     >
 
                     <div
-                        v-if="interactionForm.errors.next_follow_up"
+                        v-if="
+                            interactionForm
+                                .errors
+                                .next_follow_up
+                        "
                         class="text-red-600 mt-1"
                     >
-                        {{ interactionForm.errors.next_follow_up }}
+                        {{
+                            interactionForm
+                                .errors
+                                .next_follow_up
+                        }}
                     </div>
 
                 </div>
@@ -405,14 +530,19 @@ const removeInteraction = (id) => {
 
                 <button
                     type="submit"
-                    :disabled="interactionForm.processing"
-                    class="bg-green-600 text-white px-5 py-2 rounded"
+                    :disabled="
+                        interactionForm
+                            .processing
+                    "
+                    class="
+                        bg-green-600
+                        text-white
+                        px-5
+                        py-2
+                        rounded
+                    "
                 >
-                    {{
-                        interactionForm.processing
-                            ? 'در حال ثبت...'
-                            : 'ثبت تماس'
-                    }}
+                    ثبت تماس
                 </button>
 
             </form>
@@ -429,95 +559,94 @@ const removeInteraction = (id) => {
 
             <form @submit.prevent="sendSms">
 
-                <div class="mb-3">
+                <select
+                    v-model="
+                        smsForm.template_id
+                    "
+                    class="
+                        border
+                        p-2
+                        w-full
+                        rounded
+                        mb-3
+                    "
+                >
 
-                    <label class="block mb-2">
-                        قالب پیامک
-                    </label>
+                    <option value="">
+                        پیامک دستی
+                    </option>
 
-                    <select
-                        v-model="smsForm.template_id"
-                        class="border p-2 w-full rounded"
+                    <option
+                        v-for="
+                            template in
+                            smsTemplates
+                        "
+                        :key="template.id"
+                        :value="template.id"
                     >
-                        <option value="">
-                            پیامک دستی
-                        </option>
+                        {{ template.title }}
+                    </option>
 
-                        <option
-                            v-for="template in smsTemplates"
-                            :key="template.id"
-                            :value="template.id"
-                        >
-                            {{ template.title }}
-                        </option>
-                    </select>
-
-                    <div
-                        v-if="smsForm.errors.template_id"
-                        class="text-red-600 mt-1"
-                    >
-                        {{ smsForm.errors.template_id }}
-                    </div>
-
-                </div>
+                </select>
 
 
-                <div class="mb-3">
-
-                    <label class="block mb-2">
-                        شماره گیرنده
-                    </label>
-
-                    <input
-                        v-model="smsForm.to"
-                        type="text"
-                        class="border p-2 w-full rounded"
-                    >
-
-                    <div
-                        v-if="smsForm.errors.to"
-                        class="text-red-600 mt-1"
-                    >
-                        {{ smsForm.errors.to }}
-                    </div>
-
-                </div>
+                <input
+                    v-model="smsForm.to"
+                    type="text"
+                    class="
+                        border
+                        p-2
+                        w-full
+                        rounded
+                        mb-3
+                    "
+                >
 
 
-                <div class="mb-3">
+                <textarea
+                    v-model="smsForm.message"
+                    :readonly="
+                        Boolean(
+                            smsForm.template_id
+                        )
+                    "
+                    rows="7"
+                    class="
+                        border
+                        p-2
+                        w-full
+                        rounded
+                        mb-3
+                    "
+                    placeholder="متن پیامک"
+                ></textarea>
 
-                    <label class="block mb-2">
-                        متن پیامک
-                    </label>
-
-                    <textarea
-                        v-model="smsForm.message"
-                        :readonly="Boolean(smsForm.template_id)"
-                        rows="7"
-                        class="border p-2 w-full rounded"
-                        placeholder="متن پیامک"
-                    ></textarea>
-
-                    <div
-                        v-if="smsForm.errors.message"
-                        class="text-red-600 mt-1"
-                    >
-                        {{ smsForm.errors.message }}
-                    </div>
-
+                <div
+                    v-if="
+                        smsForm.errors.message
+                    "
+                    class="text-red-600 mb-3"
+                >
+                    {{
+                        smsForm.errors.message
+                    }}
                 </div>
 
 
                 <button
                     type="submit"
-                    :disabled="smsForm.processing"
-                    class="bg-blue-600 text-white px-5 py-2 rounded"
-                >
-                    {{
+                    :disabled="
                         smsForm.processing
-                            ? 'در حال ارسال...'
-                            : 'ارسال پیامک'
-                    }}
+                    "
+                    class="
+                        bg-blue-600
+                        text-white
+                        px-5
+                        py-2
+                        rounded
+                    "
+                >
+                    ارسال پیامک
                 </button>
 
             </form>
@@ -525,34 +654,132 @@ const removeInteraction = (id) => {
         </div>
 
 
-        <!-- ثبت پیگیری دستی -->
-        <div class="border rounded p-5 mb-6">
+        <!-- ثبت سفارش -->
+        <div
+            v-if="
+                contact.status ===
+                'customer'
+            "
+            class="border rounded p-5 mb-6"
+        >
 
             <h2 class="font-bold text-lg mb-4">
-                ثبت پیگیری جدید
+                ثبت سفارش جدید
             </h2>
 
-            <form @submit.prevent="submitFollowUp">
+            <form @submit.prevent="submitOrder">
 
                 <div class="mb-3">
 
                     <label class="block mb-2">
-                        عنوان پیگیری
+                        محصول
                     </label>
 
                     <input
-                        v-model="followUpForm.title"
+                        v-model="
+                            orderForm
+                                .product_name
+                        "
                         type="text"
-                        class="border p-2 w-full rounded"
-                        placeholder="عنوان پیگیری"
+                        class="
+                            border
+                            p-2
+                            w-full
+                            rounded
+                        "
                     >
 
                     <div
-                        v-if="followUpForm.errors.title"
+                        v-if="
+                            orderForm
+                                .errors
+                                .product_name
+                        "
                         class="text-red-600 mt-1"
                     >
-                        {{ followUpForm.errors.title }}
+                        {{
+                            orderForm
+                                .errors
+                                .product_name
+                        }}
                     </div>
+
+                </div>
+
+
+                <div class="mb-3">
+
+                    <label class="block mb-2">
+                        مبلغ
+                    </label>
+
+                    <input
+                        v-model="
+                            orderForm.amount
+                        "
+                        type="number"
+                        min="0"
+                        step="0.01"
+                        class="
+                            border
+                            p-2
+                            w-full
+                            rounded
+                        "
+                    >
+
+                    <div
+                        v-if="
+                            orderForm
+                                .errors
+                                .amount
+                        "
+                        class="text-red-600 mt-1"
+                    >
+                        {{
+                            orderForm
+                                .errors
+                                .amount
+                        }}
+                    </div>
+
+                </div>
+
+
+                <div class="mb-3">
+
+                    <label class="block mb-2">
+                        وضعیت سفارش
+                    </label>
+
+                    <select
+                        v-model="
+                            orderForm.status
+                        "
+                        class="
+                            border
+                            p-2
+                            w-full
+                            rounded
+                        "
+                    >
+
+                        <option
+                            v-for="
+                                status in
+                                orderStatuses
+                            "
+                            :key="
+                                status.value
+                            "
+                            :value="
+                                status.value
+                            "
+                        >
+                            {{ status.label }}
+                        </option>
+
+                    </select>
 
                 </div>
 
@@ -564,87 +791,36 @@ const removeInteraction = (id) => {
                     </label>
 
                     <textarea
-                        v-model="followUpForm.description"
+                        v-model="
+                            orderForm
+                                .description
+                        "
                         rows="4"
-                        class="border p-2 w-full rounded"
-                        placeholder="توضیحات پیگیری"
+                        class="
+                            border
+                            p-2
+                            w-full
+                            rounded
+                        "
                     ></textarea>
-
-                    <div
-                        v-if="followUpForm.errors.description"
-                        class="text-red-600 mt-1"
-                    >
-                        {{ followUpForm.errors.description }}
-                    </div>
-
-                </div>
-
-
-                <div class="mb-3">
-
-                    <label class="block mb-2">
-                        تاریخ و ساعت پیگیری
-                    </label>
-
-                    <input
-                        v-model="followUpForm.follow_up_at"
-                        type="datetime-local"
-                        class="border p-2 w-full rounded"
-                    >
-
-                    <div
-                        v-if="followUpForm.errors.follow_up_at"
-                        class="text-red-600 mt-1"
-                    >
-                        {{ followUpForm.errors.follow_up_at }}
-                    </div>
-
-                </div>
-
-
-                <div class="mb-3">
-
-                    <label class="block mb-2">
-                        وضعیت
-                    </label>
-
-                    <select
-                        v-model="followUpForm.status"
-                        class="border p-2 w-full rounded"
-                    >
-                        <option value="pending">
-                            در انتظار
-                        </option>
-
-                        <option value="done">
-                            انجام شده
-                        </option>
-
-                        <option value="cancelled">
-                            لغو شده
-                        </option>
-                    </select>
-
-                    <div
-                        v-if="followUpForm.errors.status"
-                        class="text-red-600 mt-1"
-                    >
-                        {{ followUpForm.errors.status }}
-                    </div>
 
                 </div>
 
 
                 <button
                     type="submit"
-                    :disabled="followUpForm.processing"
-                    class="bg-purple-600 text-white px-5 py-2 rounded"
+                    :disabled="
+                        orderForm.processing
+                    "
+                    class="
+                        bg-indigo-600
+                        text-white
+                        px-5
+                        py-2
+                        rounded
+                    "
                 >
-                    {{
-                        followUpForm.processing
-                            ? 'در حال ثبت...'
-                            : 'ثبت پیگیری'
-                    }}
+                    ثبت سفارش
                 </button>
 
             </form>
@@ -652,7 +828,256 @@ const removeInteraction = (id) => {
         </div>
 
 
-        <!-- لیست پیگیری‌ها -->
+        <div
+            v-else
+            class="
+                border
+                border-yellow-300
+                bg-yellow-50
+                rounded
+                p-4
+                mb-6
+            "
+        >
+            برای ثبت سفارش، وضعیت مخاطب باید
+            «مشتری شد» باشد.
+        </div>
+
+
+        <!-- سفارش‌های مخاطب -->
+        <div class="border rounded p-5 mb-6">
+
+            <h2 class="font-bold text-lg mb-4">
+                سفارش‌های مخاطب
+            </h2>
+
+            <div class="overflow-x-auto">
+
+                <table
+                    class="
+                        w-full
+                        border-collapse
+                        border
+                    "
+                >
+
+                    <thead>
+
+                        <tr>
+
+                            <th class="border p-2">
+                                محصول
+                            </th>
+
+                            <th class="border p-2">
+                                مبلغ
+                            </th>
+
+                            <th class="border p-2">
+                                وضعیت
+                            </th>
+
+                            <th class="border p-2">
+                                ثبت‌کننده
+                            </th>
+
+                            <th class="border p-2">
+                                تاریخ
+                            </th>
+
+                            <th class="border p-2">
+                                عملیات
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody>
+
+                        <tr
+                            v-for="
+                                order in
+                                contact.orders
+                            "
+                            :key="order.id"
+                        >
+
+                            <td class="border p-2">
+                                {{
+                                    order.product_name
+                                }}
+                            </td>
+
+                            <td class="border p-2">
+
+                                {{
+                                    formatAmount(
+                                        order.amount
+                                    )
+                                }}
+
+                            </td>
+
+                            <td class="border p-2">
+
+                                {{
+                                    orderStatusLabels[
+                                        order.status
+                                    ]
+                                        ?? order.status
+                                }}
+
+                            </td>
+
+                            <td class="border p-2">
+
+                                {{
+                                    order.user
+                                        ?.name
+                                        ?? '-'
+                                }}
+
+                            </td>
+
+                            <td class="border p-2">
+                                {{
+                                    order.created_at
+                                }}
+                            </td>
+
+                            <td class="border p-2">
+
+                                <a
+                                    :href="
+                                        `/orders/${order.id}/edit`
+                                    "
+                                    class="text-blue-600"
+                                >
+                                    ویرایش
+                                </a>
+
+                            </td>
+
+                        </tr>
+
+
+                        <tr
+                            v-if="
+                                !contact.orders
+                                ||
+                                !contact.orders.length
+                            "
+                        >
+
+                            <td
+                                colspan="6"
+                                class="
+                                    border
+                                    p-4
+                                    text-center
+                                "
+                            >
+                                سفارشی ثبت نشده است
+                            </td>
+
+                        </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+
+        <!-- ثبت پیگیری دستی -->
+        <div class="border rounded p-5 mb-6">
+
+            <h2 class="font-bold text-lg mb-4">
+                ثبت پیگیری جدید
+            </h2>
+
+            <form
+                @submit.prevent="
+                    submitFollowUp
+                "
+            >
+
+                <input
+                    v-model="
+                        followUpForm.title
+                    "
+                    type="text"
+                    class="
+                        border
+                        p-2
+                        w-full
+                        rounded
+                        mb-3
+                    "
+                    placeholder="عنوان پیگیری"
+                >
+
+
+                <textarea
+                    v-model="
+                        followUpForm
+                            .description
+                    "
+                    rows="4"
+                    class="
+                        border
+                        p-2
+                        w-full
+                        rounded
+                        mb-3
+                    "
+                    placeholder="توضیحات"
+                ></textarea>
+
+
+                <input
+                    v-model="
+                        followUpForm
+                            .follow_up_at
+                    "
+                    type="datetime-local"
+                    class="
+                        border
+                        p-2
+                        w-full
+                        rounded
+                        mb-3
+                    "
+                >
+
+
+                <button
+                    type="submit"
+                    :disabled="
+                        followUpForm
+                            .processing
+                    "
+                    class="
+                        bg-purple-600
+                        text-white
+                        px-5
+                        py-2
+                        rounded
+                    "
+                >
+                    ثبت پیگیری
+                </button>
+
+            </form>
+
+        </div>
+
+
+        <!-- پیگیری‌ها -->
         <div class="border rounded p-5 mb-6">
 
             <h2 class="font-bold text-lg mb-4">
@@ -661,17 +1086,19 @@ const removeInteraction = (id) => {
 
             <div class="overflow-x-auto">
 
-                <table class="w-full border-collapse border">
+                <table
+                    class="
+                        w-full
+                        border-collapse
+                        border
+                    "
+                >
 
                     <thead>
 
                         <tr>
                             <th class="border p-2">
                                 عنوان
-                            </th>
-
-                            <th class="border p-2">
-                                توضیحات
                             </th>
 
                             <th class="border p-2">
@@ -692,7 +1119,10 @@ const removeInteraction = (id) => {
                     <tbody>
 
                         <tr
-                            v-for="item in contact.follow_ups"
+                            v-for="
+                                item in
+                                contact.follow_ups
+                            "
                             :key="item.id"
                         >
 
@@ -701,11 +1131,9 @@ const removeInteraction = (id) => {
                             </td>
 
                             <td class="border p-2">
-                                {{ item.description ?? '-' }}
-                            </td>
-
-                            <td class="border p-2">
-                                {{ item.follow_up_at }}
+                                {{
+                                    item.follow_up_at
+                                }}
                             </td>
 
                             <td class="border p-2">
@@ -713,7 +1141,10 @@ const removeInteraction = (id) => {
                             </td>
 
                             <td class="border p-2">
-                                {{ item.user?.name ?? '-' }}
+                                {{
+                                    item.user?.name
+                                    ?? '-'
+                                }}
                             </td>
 
                         </tr>
@@ -721,16 +1152,25 @@ const removeInteraction = (id) => {
 
                         <tr
                             v-if="
-                                !contact.follow_ups ||
-                                !contact.follow_ups.length
+                                !contact.follow_ups
+                                ||
+                                !contact
+                                    .follow_ups
+                                    .length
                             "
                         >
+
                             <td
-                                colspan="5"
-                                class="border p-4 text-center"
+                                colspan="4"
+                                class="
+                                    border
+                                    p-4
+                                    text-center
+                                "
                             >
                                 پیگیری ثبت نشده است
                             </td>
+
                         </tr>
 
                     </tbody>
@@ -751,11 +1191,18 @@ const removeInteraction = (id) => {
 
             <div class="overflow-x-auto">
 
-                <table class="w-full border-collapse border">
+                <table
+                    class="
+                        w-full
+                        border-collapse
+                        border
+                    "
+                >
 
                     <thead>
 
                         <tr>
+
                             <th class="border p-2">
                                 نوع
                             </th>
@@ -773,14 +1220,6 @@ const removeInteraction = (id) => {
                             </th>
 
                             <th class="border p-2">
-                                توضیحات
-                            </th>
-
-                            <th class="border p-2">
-                                پیگیری بعدی
-                            </th>
-
-                            <th class="border p-2">
                                 کاربر
                             </th>
 
@@ -791,6 +1230,7 @@ const removeInteraction = (id) => {
                             <th class="border p-2">
                                 عملیات
                             </th>
+
                         </tr>
 
                     </thead>
@@ -798,7 +1238,10 @@ const removeInteraction = (id) => {
                     <tbody>
 
                         <tr
-                            v-for="item in contact.interactions"
+                            v-for="
+                                item in
+                                contact.interactions
+                            "
                             :key="item.id"
                         >
 
@@ -807,37 +1250,53 @@ const removeInteraction = (id) => {
                             </td>
 
                             <td class="border p-2">
-                                {{ item.subject ?? '-' }}
-                            </td>
-
-                            <td class="border p-2">
-                                {{ item.result ?? '-' }}
-                            </td>
-
-                            <td class="border p-2">
                                 {{
-                                    item.status_after_call
-                                        ?? '-'
+                                    item.subject
+                                    ?? '-'
                                 }}
                             </td>
 
                             <td class="border p-2">
-                                {{ item.description ?? '-' }}
+
+                                {{
+                                    callResultLabels[
+                                        item.result
+                                    ]
+                                        ?? item.result
+                                        ?? '-'
+                                }}
+
+                            </td>
+
+                            <td class="border p-2">
+
+                                {{
+                                    statusLabels[
+                                        item
+                                            .status_after_call
+                                    ]
+                                        ??
+                                        item
+                                            .status_after_call
+                                        ??
+                                        '-'
+                                }}
+
+                            </td>
+
+                            <td class="border p-2">
+
+                                {{
+                                    item.user?.name
+                                    ?? '-'
+                                }}
+
                             </td>
 
                             <td class="border p-2">
                                 {{
-                                    item.next_follow_up
-                                        ?? '-'
+                                    item.created_at
                                 }}
-                            </td>
-
-                            <td class="border p-2">
-                                {{ item.user?.name ?? '-' }}
-                            </td>
-
-                            <td class="border p-2">
-                                {{ item.created_at }}
                             </td>
 
                             <td class="border p-2">
@@ -861,16 +1320,25 @@ const removeInteraction = (id) => {
 
                         <tr
                             v-if="
-                                !contact.interactions ||
-                                !contact.interactions.length
+                                !contact.interactions
+                                ||
+                                !contact
+                                    .interactions
+                                    .length
                             "
                         >
+
                             <td
-                                colspan="9"
-                                class="border p-4 text-center"
+                                colspan="7"
+                                class="
+                                    border
+                                    p-4
+                                    text-center
+                                "
                             >
                                 ارتباطی ثبت نشده است
                             </td>
+
                         </tr>
 
                     </tbody>
