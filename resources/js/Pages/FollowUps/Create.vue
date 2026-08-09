@@ -1,5 +1,8 @@
 <script setup>
-import { useForm } from '@inertiajs/vue3'
+import {
+    Link,
+    useForm,
+} from '@inertiajs/vue3'
 
 const props = defineProps({
     contacts: Array,
@@ -20,38 +23,75 @@ const submit = () => {
 
 <template>
     <div class="p-6">
+
         <h1 class="text-xl font-bold mb-6">
             ایجاد پیگیری جدید
         </h1>
+
 
         <form
             @submit.prevent="submit"
             class="max-w-xl"
         >
+
             <div class="mb-4">
+
                 <label class="block mb-2">
-                    مشتری
+                    مخاطب
                 </label>
 
                 <select
                     v-model="form.contact_id"
-                    class="border p-2 rounded w-full"
+                    class="
+                        border
+                        p-2
+                        rounded
+                        w-full
+                    "
                 >
                     <option value="">
-                        انتخاب مشتری
+                        انتخاب مخاطب
                     </option>
 
                     <option
-                        v-for="contact in props.contacts"
+                        v-for="contact in contacts"
                         :key="contact.id"
                         :value="contact.id"
                     >
-                        {{ contact.name }} - {{ contact.mobile }}
+                        {{ contact.name }}
+
+                        <template
+                            v-if="
+                                contact.business_name
+                            "
+                        >
+                            -
+                            {{ contact.business_name }}
+                        </template>
+
+                        -
+                        {{ contact.mobile }}
                     </option>
+
                 </select>
+
+                <div
+                    v-if="
+                        form.errors.contact_id
+                    "
+                    class="
+                        text-red-600
+                        mt-1
+                    "
+                >
+                    {{ form.errors.contact_id }}
+                </div>
+
             </div>
 
+
             <div class="mb-4">
+
                 <label class="block mb-2">
                     عنوان
                 </label>
@@ -59,11 +99,26 @@ const submit = () => {
                 <input
                     v-model="form.title"
                     type="text"
-                    class="border p-2 rounded w-full"
+                    class="
+                        border
+                        p-2
+                        rounded
+                        w-full
+                    "
                 >
+
+                <div
+                    v-if="form.errors.title"
+                    class="text-red-600 mt-1"
+                >
+                    {{ form.errors.title }}
+                </div>
+
             </div>
 
+
             <div class="mb-4">
+
                 <label class="block mb-2">
                     توضیحات
                 </label>
@@ -71,11 +126,28 @@ const submit = () => {
                 <textarea
                     v-model="form.description"
                     rows="4"
-                    class="border p-2 rounded w-full"
+                    class="
+                        border
+                        p-2
+                        rounded
+                        w-full
+                    "
                 ></textarea>
+
+                <div
+                    v-if="
+                        form.errors.description
+                    "
+                    class="text-red-600 mt-1"
+                >
+                    {{ form.errors.description }}
+                </div>
+
             </div>
 
+
             <div class="mb-4">
+
                 <label class="block mb-2">
                     زمان پیگیری
                 </label>
@@ -83,39 +155,63 @@ const submit = () => {
                 <input
                     v-model="form.follow_up_at"
                     type="datetime-local"
-                    class="border p-2 rounded w-full"
+                    class="
+                        border
+                        p-2
+                        rounded
+                        w-full
+                    "
                 >
+
+                <div
+                    v-if="
+                        form.errors.follow_up_at
+                    "
+                    class="text-red-600 mt-1"
+                >
+                    {{ form.errors.follow_up_at }}
+                </div>
+
             </div>
 
-            <div class="mb-4">
-                <label class="block mb-2">
-                    وضعیت
-                </label>
 
-                <select
-                    v-model="form.status"
-                    class="border p-2 rounded w-full"
-                >
-                    <option value="pending">
-                        در انتظار
-                    </option>
-
-                    <option value="done">
-                        انجام شده
-                    </option>
-
-                    <option value="cancelled">
-                        لغو شده
-                    </option>
-                </select>
-            </div>
-
-            <button
-                type="submit"
-                class="bg-green-600 text-white px-5 py-2 rounded"
+            <input
+                v-model="form.status"
+                type="hidden"
             >
-                ذخیره
-            </button>
+
+
+            <div class="flex gap-3">
+
+                <button
+                    type="submit"
+                    :disabled="form.processing"
+                    class="
+                        bg-green-600
+                        text-white
+                        px-5
+                        py-2
+                        rounded
+                    "
+                >
+                    ذخیره
+                </button>
+
+                <Link
+                    href="/followups"
+                    class="
+                        border
+                        px-5
+                        py-2
+                        rounded
+                    "
+                >
+                    بازگشت
+                </Link>
+
+            </div>
+
         </form>
+
     </div>
 </template>
