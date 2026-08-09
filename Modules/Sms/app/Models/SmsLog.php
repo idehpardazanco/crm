@@ -2,48 +2,48 @@
 
 namespace Modules\Sms\app\Models;
 
-
-use Illuminate\Database\Eloquent\Model;
-use Modules\Contacts\app\Models\Contact;
 use App\Models\User;
-
-
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
+use Modules\Sms\app\Enums\SmsStatus;
 
 class SmsLog extends Model
 {
-
-
     protected $fillable = [
-
+        'sendable_type',
+        'sendable_id',
         'user_id',
-
-        'contact_id',
-
-        'from',
-
-        'to',
-
+        'provider',
+        'from_number',
+        'mobile',
         'message',
-
         'status',
-
-        'response',
-
+        'request_payload',
+        'provider_response',
+        'error_message',
+        'response_code',
+        'cost',
+        'sent_at',
     ];
+
+    protected function casts(): array
+    {
+        return [
+            'status' => SmsStatus::class,
+            'request_payload' => 'array',
+            'provider_response' => 'array',
+            'sent_at' => 'datetime',
+            'cost' => 'decimal:2',
+        ];
+    }
 
     public function user()
     {
-        return $this->belongsTo(
-            User::class
-        );
+        return $this->belongsTo(User::class);
     }
 
-    public function contact()
+    public function sendable(): MorphTo
     {
-        return $this->belongsTo(
-            Contact::class
-        );
+        return $this->morphTo();
     }
-
-
 }
