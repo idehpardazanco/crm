@@ -30,6 +30,7 @@ class OrdersController extends Controller
                         $request
                             ->string('search')
                             ->toString(),
+
                         $request->user()
                     ),
 
@@ -71,10 +72,26 @@ class OrdersController extends Controller
     public function store(
         StoreOrderRequest $request
     ): RedirectResponse {
-        $this->service->create(
+        $order = $this->service->create(
             $request->validated(),
             $request->user()
         );
+
+        if (
+            $request->boolean(
+                'return_to_contact'
+            )
+        ) {
+            return redirect()
+                ->route(
+                    'contacts.show',
+                    $order->contact_id
+                )
+                ->with(
+                    'success',
+                    'سفارش با موفقیت ثبت شد.'
+                );
+        }
 
         return redirect()
             ->route('orders.index')
