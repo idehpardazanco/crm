@@ -2,56 +2,66 @@
 
 namespace Modules\Sms\app\Services;
 
-
-use Modules\Sms\app\Models\SmsLog;
-use Modules\Sms\Contracts\SmsProviderInterface;
+use Modules\Contacts\app\Models\Contact;
 use Modules\Interactions\app\Models\Interaction;
-
-
+use Modules\Sms\app\Enums\SmsStatus;
+use Modules\Sms\app\Jobs\SendSmsJob;
+use Modules\Sms\app\Models\SmsLog;
 
 class SmsService
 {
+    public function send(
+        string $to,
+        string $message,
+        ?int $contactId = null
+    ): SmsLog {
+        $contact = $contactId
+            ? Contact::query()->findOrFail($contactId)
+            : null;
 
+        $log = SmsLog::query()->create([
+            'sendable_type' => $contact
+                ? Contact::class
+                : null,
 
-    public function __construct(
-        protected SmsProviderInterface $provider
-    )
-    {
+            'sendable_id' => $contact?->id,
 
-    }
-
-
-
-
-    public function send(string $to,string $message,?int $contactId = null): SmsLog
-    {
-
-        $response = $this->provider->send($to,$message);
-
-        $log = SmsLog::create([
             'user_id' => auth()->id(),
-            'contact_id' => $contactId,
-            'from' => config('sms.from'),
-            'to' => $to,
+
+            'provider' => config(
+                'sms.default',
+                'payam_matni'
+            ),
+
+            'from_number' => null,
+
+            'mobile' => $to,
+
             'message' => $message,
-            'status' => $response['status'] ?? 'failed',
-            'response' => json_encode($response),
+
+            'status' => SmsStatus::QUEUED,
         ]);
 
-        if($contactId)
-        {
-            Interaction::create([
+        if ($contact) {
+            Interaction::query()->create([
+                'contact_id' => $contact->id,
 
-                'contact_id' => $contactId,
                 'user_id' => auth()->id(),
+
                 'type' => 'sms',
+
                 'subject' => 'ارسال پیامک',
+
                 'description' => $message,
-                'result' => $log->status,
+
+                'result' => SmsStatus::QUEUED->value,
             ]);
         }
 
-        return $log;
-    }
+        SendSmsJob::dispatch(
+            $log->id
+        );
 
+        return $log->refresh();
+    }
 }
