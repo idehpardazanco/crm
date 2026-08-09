@@ -1,48 +1,40 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use Modules\Users\Http\Controllers\UsersController;
-
+use Modules\Users\app\Http\Controllers\UsersController;
 
 Route::middleware('auth')
     ->prefix('users')
     ->name('users.')
-    ->group(function(){
+    ->group(function () {
 
-
-        Route::get('/',[
+        Route::get('/', [
             UsersController::class,
-            'index'
+            'index',
         ])->name('index');
 
-
-        Route::get('/create',[
+        Route::get('/create', [
             UsersController::class,
-            'create'
+            'create',
         ])->name('create');
 
-
-        Route::post('/',[
+        Route::post('/', [
             UsersController::class,
-            'store'
+            'store',
         ])->name('store');
 
-
-        Route::get('/{id}/edit',[
+        Route::get('/{id}/edit', [
             UsersController::class,
-            'edit'
+            'edit',
         ])->name('edit');
 
-
-        Route::put('/{id}',[
+        Route::put('/{id}', [
             UsersController::class,
-            'update'
+            'update',
         ])->name('update');
 
-
-        Route::delete('/{id}',[
+        Route::delete('/{id}', [
             UsersController::class,
-            'destroy'
+            'destroy',
         ])->name('destroy');
-
-});
+    });
