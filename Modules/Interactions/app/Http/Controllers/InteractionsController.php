@@ -3,6 +3,7 @@
 namespace Modules\Interactions\app\Http\Controllers;
 
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Modules\Interactions\app\Http\Requests\StoreInteractionRequest;
 use Modules\Interactions\app\Services\InteractionService;
@@ -14,22 +15,23 @@ class InteractionsController extends Controller
     ) {
     }
 
-    public function index(int $contactId)
-    {
+    public function index(
+        Request $request,
+        int $contactId
+    ) {
         return $this->service->list(
-            $contactId
+            $contactId,
+            $request->user()
         );
     }
 
     public function store(
         StoreInteractionRequest $request
     ): RedirectResponse {
-        $this->service->create([
-            ...$request->validated(),
-
-            'user_id' =>
-                $request->user()->id,
-        ]);
+        $this->service->create(
+            $request->validated(),
+            $request->user()
+        );
 
         return back()->with(
             'success',
@@ -38,10 +40,12 @@ class InteractionsController extends Controller
     }
 
     public function destroy(
+        Request $request,
         int $id
     ): RedirectResponse {
         $this->service->delete(
-            $id
+            $id,
+            $request->user()
         );
 
         return back()->with(
