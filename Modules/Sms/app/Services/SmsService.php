@@ -13,7 +13,8 @@ class SmsService
     public function send(
         string $to,
         string $message,
-        ?int $contactId = null
+        ?int $contactId = null,
+        ?int $templateId = null
     ): SmsLog {
         $contact = $contactId
             ? Contact::query()->findOrFail($contactId)
@@ -27,6 +28,8 @@ class SmsService
             'sendable_id' => $contact?->id,
 
             'user_id' => auth()->id(),
+
+            'sms_template_id' => $templateId,
 
             'provider' => config(
                 'sms.default',
