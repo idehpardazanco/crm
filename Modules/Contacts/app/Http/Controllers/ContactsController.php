@@ -5,6 +5,7 @@ namespace Modules\Contacts\app\Http\Controllers;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Controller;
 use Inertia\Inertia;
 use Inertia\Response;
 use Modules\Contacts\app\Enums\ContactStatus;
@@ -15,7 +16,7 @@ use Modules\Interactions\app\Enums\CallResult;
 use Modules\Sms\app\Services\SmsTemplateRenderer;
 use Modules\Sms\app\Services\SmsTemplateService;
 
-class ContactsController
+class ContactsController extends Controller
 {
     public function __construct(
         private readonly ContactService $service,
@@ -27,39 +28,50 @@ class ContactsController
     public function index(
         Request $request
     ): Response {
+        $user = $request->user();
+
         return Inertia::render(
             'Contacts/Index',
             [
-                'contacts' =>
-                    $this->service->list(
-                        $request
-                            ->string('search')
-                            ->toString()
-                    ),
-
-                'users' =>
-                    $this->users(),
+                'contacts' => $this->service->list(
+                    $request
+                        ->string('search')
+                        ->toString(),
+                    $user
+                ),
 
                 'filters' => [
-                    'search' =>
-                        $request
-                            ->string('search')
-                            ->toString(),
+                    'search' => $request
+                        ->string('search')
+                        ->toString(),
                 ],
+
+                'isAdmin' =>
+                    $user->hasRole(
+                        'super_admin'
+                    ),
             ]
         );
     }
 
-    public function create(): Response
-    {
+    public function create(
+        Request $request
+    ): Response {
+        $user = $request->user();
+
         return Inertia::render(
             'Contacts/Create',
             [
                 'users' =>
-                    $this->users(),
+                    $this->usersFor($user),
 
                 'contactStatuses' =>
                     ContactStatus::crmOptions(),
+
+                'isAdmin' =>
+                    $user->hasRole(
+                        'super_admin'
+                    ),
             ]
         );
     }
@@ -68,7 +80,8 @@ class ContactsController
         StoreContactRequest $request
     ): RedirectResponse {
         $contact = $this->service->create(
-            $request->validated()
+            $request->validated(),
+            $request->user()
         );
 
         return redirect()
@@ -88,7 +101,8 @@ class ContactsController
     ): Response {
         $contactModel =
             $this->service->find(
-                $contact
+                $contact,
+                $request->user()
             );
 
         return Inertia::render(
@@ -136,11 +150,15 @@ class ContactsController
     }
 
     public function edit(
+        Request $request,
         int $contact
     ): Response {
+        $user = $request->user();
+
         $contactModel =
             $this->service->find(
-                $contact
+                $contact,
+                $user
             );
 
         return Inertia::render(
@@ -150,11 +168,16 @@ class ContactsController
                     $contactModel,
 
                 'users' =>
-                    $this->users(),
+                    $this->usersFor($user),
 
                 'contactStatuses' =>
                     ContactStatus::optionsForCurrent(
                         $contactModel->status
+                    ),
+
+                'isAdmin' =>
+                    $user->hasRole(
+                        'super_admin'
                     ),
             ]
         );
@@ -166,7 +189,8 @@ class ContactsController
     ): RedirectResponse {
         $this->service->update(
             $contact,
-            $request->validated()
+            $request->validated(),
+            $request->user()
         );
 
         return redirect()
@@ -181,10 +205,12 @@ class ContactsController
     }
 
     public function destroy(
+        Request $request,
         int $contact
     ): RedirectResponse {
         $this->service->delete(
-            $contact
+            $contact,
+            $request->user()
         );
 
         return redirect()
@@ -195,8 +221,17 @@ class ContactsController
             );
     }
 
-    private function users()
-    {
+    private function usersFor(
+        User $actor
+    ) {
+        if (
+            ! $actor->hasRole(
+                'super_admin'
+            )
+        ) {
+            return [];
+        }
+
         return User::query()
             ->where(
                 'status',
