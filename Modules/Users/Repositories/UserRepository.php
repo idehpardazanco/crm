@@ -3,37 +3,71 @@
 namespace Modules\Users\Repositories;
 
 use App\Models\User;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
-/**
- * Database access layer for users
- */
 class UserRepository
 {
-    public function all()
-    {
-        return User::with('roles')->latest()->get();
+    public function paginate(
+        ?string $search = null
+    ): LengthAwarePaginator {
+        return User::query()
+            ->with('roles')
+            ->when(
+                $search,
+                function ($query, string $search) {
+                    $query->where(
+                        function ($query) use ($search) {
+                            $query
+                                ->where(
+                                    'name',
+                                    'like',
+                                    "%{$search}%"
+                                )
+                                ->orWhere(
+                                    'mobile',
+                                    'like',
+                                    "%{$search}%"
+                                )
+                                ->orWhere(
+                                    'email',
+                                    'like',
+                                    "%{$search}%"
+                                );
+                        }
+                    );
+                }
+            )
+            ->latest()
+            ->paginate(15)
+            ->withQueryString();
     }
 
-    public function find(int $id)
+    public function find(int $id): User
     {
-        return User::with('roles')->findOrFail($id);
+        return User::query()
+            ->with('roles')
+            ->findOrFail($id);
     }
 
-    public function create(array $data)
+    public function create(array $data): User
     {
         return User::create($data);
     }
 
-    public function update(int $id, array $data)
-    {
+    public function update(
+        int $id,
+        array $data
+    ): User {
         $user = User::findOrFail($id);
+
         $user->update($data);
 
-        return $user;
+        return $user->refresh();
     }
 
     public function delete(int $id): bool
     {
-        return User::findOrFail($id)->delete();
+        return (bool) User::findOrFail($id)
+            ->delete();
     }
 }
