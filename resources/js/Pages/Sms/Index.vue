@@ -36,6 +36,7 @@ const doSearch = () => {
         </h1>
 
         <div class="mb-5">
+
             <input
                 v-model="search"
                 @keyup.enter="doSearch"
@@ -43,22 +44,33 @@ const doSearch = () => {
                 class="border p-2 rounded"
                 placeholder="جستجو شماره یا متن پیامک"
             >
+
         </div>
 
         <table class="w-full border-collapse border">
 
             <thead>
+
                 <tr>
+
                     <th class="border p-2">
-                        شماره گیرنده
+                        شماره
                     </th>
 
                     <th class="border p-2">
-                        مشتری
+                        مخاطب
                     </th>
 
                     <th class="border p-2">
-                        متن پیام
+                        قالب
+                    </th>
+
+                    <th class="border p-2">
+                        متن نهایی
+                    </th>
+
+                    <th class="border p-2">
+                        ارسال‌کننده
                     </th>
 
                     <th class="border p-2">
@@ -68,14 +80,18 @@ const doSearch = () => {
                     <th class="border p-2">
                         تاریخ
                     </th>
+
                 </tr>
+
             </thead>
 
             <tbody>
+
                 <tr
                     v-for="log in logs.data"
                     :key="log.id"
                 >
+
                     <td class="border p-2">
                         {{ log.mobile }}
                     </td>
@@ -85,26 +101,41 @@ const doSearch = () => {
                     </td>
 
                     <td class="border p-2">
+                        {{ log.template?.title ?? 'دستی' }}
+                    </td>
+
+                    <td class="border p-2">
                         {{ log.message }}
                     </td>
 
                     <td class="border p-2">
-                        {{ statusLabels[log.status] ?? log.status }}
+                        {{ log.user?.name ?? '-' }}
+                    </td>
+
+                    <td class="border p-2">
+                        {{
+                            statusLabels[log.status]
+                                ?? log.status
+                        }}
                     </td>
 
                     <td class="border p-2">
                         {{ log.created_at }}
                     </td>
+
                 </tr>
 
                 <tr v-if="!logs.data.length">
+
                     <td
-                        colspan="5"
+                        colspan="7"
                         class="border p-4 text-center"
                     >
-                        موردی یافت نشد
+                        پیامکی وجود ندارد
                     </td>
+
                 </tr>
+
             </tbody>
 
         </table>
