@@ -21,38 +21,62 @@ class InteractionService
             ->get();
     }
 
-    public function create(array $data): Interaction
-    {
+    public function create(
+        array $data
+    ): Interaction {
         return DB::transaction(
             function () use ($data) {
 
-                $interaction = Interaction::query()
-                    ->create($data);
+                $interaction =
+                    Interaction::query()
+                        ->create($data);
 
                 if (
-                    $interaction->type === 'call'
-                    && ! empty($interaction->next_follow_up)
+                    $interaction->type !== 'call'
                 ) {
-                    $contact = Contact::query()
-                        ->findOrFail(
-                            $interaction->contact_id
-                        );
+                    return $interaction;
+                }
 
+                $contact = Contact::query()
+                    ->findOrFail(
+                        $interaction->contact_id
+                    );
+
+                if (
+                    ! empty(
+                        $interaction->status_after_call
+                    )
+                ) {
+                    $contact->update([
+                        'status' =>
+                            $interaction
+                                ->status_after_call,
+                    ]);
+                }
+
+                if (
+                    ! empty(
+                        $interaction->next_follow_up
+                    )
+                ) {
                     FollowUp::query()->create([
                         'contact_id' =>
-                            $interaction->contact_id,
+                            $contact->id,
 
                         'user_id' =>
                             $interaction->user_id,
 
                         'title' =>
-                            'پیگیری تماس با ' . $contact->name,
+                            'پیگیری تماس با ' .
+                            $contact->name,
 
                         'description' =>
-                            $interaction->description,
+                            $interaction
+                                ->description,
 
                         'follow_up_at' =>
-                            $interaction->next_follow_up,
+                            $interaction
+                                ->next_follow_up,
 
                         'status' =>
                             'pending',
@@ -64,8 +88,9 @@ class InteractionService
         );
     }
 
-    public function delete(int $id): bool
-    {
+    public function delete(
+        int $id
+    ): bool {
         return (bool) Interaction::query()
             ->findOrFail($id)
             ->delete();
