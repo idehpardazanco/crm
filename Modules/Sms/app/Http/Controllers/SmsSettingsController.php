@@ -17,21 +17,22 @@ class SmsSettingsController extends Controller
             'Sms/Settings',
             [
                 'settings' => [
-                    'sms_from' => Setting::query()
-                        ->where(
-                            'key',
-                            'sms_from'
-                        )
-                        ->value('value'),
+                    'sms_from' =>
+                        $this->value('sms_from'),
 
-                    'sms_username' => Setting::query()
-                        ->where(
-                            'key',
-                            'sms_username'
-                        )
-                        ->value('value'),
+                    'sms_username' =>
+                        $this->value('sms_username'),
 
                     'sms_password' => '',
+
+                    'demo_link' =>
+                        $this->value('demo_link'),
+
+                    'product_name' =>
+                        $this->value('product_name'),
+
+                    'order_link' =>
+                        $this->value('order_link'),
                 ],
             ]
         );
@@ -58,40 +59,83 @@ class SmsSettingsController extends Controller
                 'string',
                 'max:255',
             ],
+
+            'demo_link' => [
+                'nullable',
+                'string',
+                'max:2048',
+            ],
+
+            'product_name' => [
+                'nullable',
+                'string',
+                'max:255',
+            ],
+
+            'order_link' => [
+                'nullable',
+                'string',
+                'max:2048',
+            ],
         ]);
 
-        Setting::query()->updateOrCreate(
-            [
-                'key' => 'sms_from',
-            ],
-            [
-                'value' => $data['sms_from'],
-            ]
+        $this->save(
+            'sms_from',
+            $data['sms_from']
         );
 
-        Setting::query()->updateOrCreate(
-            [
-                'key' => 'sms_username',
-            ],
-            [
-                'value' => $data['sms_username'],
-            ]
+        $this->save(
+            'sms_username',
+            $data['sms_username']
         );
 
         if (! empty($data['sms_password'])) {
-            Setting::query()->updateOrCreate(
-                [
-                    'key' => 'sms_password',
-                ],
-                [
-                    'value' => $data['sms_password'],
-                ]
+            $this->save(
+                'sms_password',
+                $data['sms_password']
             );
         }
+
+        $this->save(
+            'demo_link',
+            $data['demo_link'] ?? ''
+        );
+
+        $this->save(
+            'product_name',
+            $data['product_name'] ?? ''
+        );
+
+        $this->save(
+            'order_link',
+            $data['order_link'] ?? ''
+        );
 
         return back()->with(
             'success',
             'تنظیمات پیامک ذخیره شد.'
+        );
+    }
+
+    private function value(
+        string $key
+    ): ?string {
+        return Setting::query()
+            ->where('key', $key)
+            ->value('value');
+    }
+
+    private function save(
+        string $key,
+        ?string $value
+    ): void {
+        Setting::query()->updateOrCreate(
+            [
+                'key' => $key,
+            ],
+            [
+                'value' => $value,
+            ]
         );
     }
 }
