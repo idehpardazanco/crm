@@ -2,47 +2,31 @@
 
 namespace Modules\Contacts\app\Models;
 
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
-use Modules\Interactions\app\Models\Interaction;
-use Modules\FollowUps\app\Models\FollowUp;
 use App\Models\User;
-
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Modules\FollowUps\app\Models\FollowUp;
+use Modules\Interactions\app\Models\Interaction;
 
 class Contact extends Model
 {
-    use SoftDeletes;
-
-
     protected $fillable = [
-
         'business_name',
-
         'name',
-
         'mobile',
-
         'phone',
-
         'email',
-
         'city',
-
         'category',
-
         'source',
-
         'status',
-
         'assigned_user_id',
-
         'address',
-
         'description',
-
     ];
 
-    public function assignedUser()
+    public function assignedUser(): BelongsTo
     {
         return $this->belongsTo(
             User::class,
@@ -50,16 +34,17 @@ class Contact extends Model
         );
     }
 
-    public function interactions()
+    public function interactions(): HasMany
     {
         return $this->hasMany(
-            \Modules\Interactions\app\Models\Interaction::class
+            Interaction::class
         );
     }
 
-    public function followUps()
+    public function followUps(): HasMany
     {
-        return $this->hasMany(FollowUp::class);
+        return $this->hasMany(
+            FollowUp::class
+        );
     }
-
 }
