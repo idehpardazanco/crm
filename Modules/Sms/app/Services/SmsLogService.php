@@ -14,6 +14,7 @@ class SmsLogService
             ->with([
                 'sendable',
                 'user:id,name',
+                'template:id,title',
             ])
             ->when(
                 $search,
