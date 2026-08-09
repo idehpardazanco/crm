@@ -2,97 +2,93 @@
 
 namespace Modules\Contacts\app\Services;
 
-
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Modules\Contacts\app\Models\Contact;
-
+use Modules\Monitoring\app\Services\MonitoringService;
 
 class ContactService
 {
-
-
-    public function paginate(?string $search = null)
-    {
-
-        return Contact::query()
-
-            ->with('assignedUser')
-
-            ->when(
-                $search,
-                function($query) use ($search){
-
-                    $query->where(function($q) use ($search){
-
-                        $q->where(
-                            'name',
-                            'like',
-                            "%{$search}%"
-                        )
-
-                        ->orWhere(
-                            'mobile',
-                            'like',
-                            "%{$search}%"
-                        )
-
-                        ->orWhere(
-                            'business_name',
-                            'like',
-                            "%{$search}%"
-                        );
-
-                    });
-
-                }
-            )
-
-            ->latest()
-            ->paginate(15);
-
+    public function __construct(
+        private readonly MonitoringService $monitoringService
+    ) {
     }
 
-    public function find(int $id)
+    public function list(?string $search = null): LengthAwarePaginator
+    {
+        return Contact::query()
+            ->with('assignedUser:id,name')
+            ->when($search, function ($query, $search) {
+                $query->where(function ($query) use ($search) {
+                    $query->where('name', 'like', "%{$search}%")
+                        ->orWhere('mobile', 'like', "%{$search}%")
+                        ->orWhere('business_name', 'like', "%{$search}%");
+                });
+            })
+            ->latest()
+            ->paginate(15)
+            ->withQueryString();
+    }
+
+    public function find(int $id): Contact
     {
         return Contact::query()
             ->with([
-                'assignedUser',
-                'interactions.user',
-                'followUps.user',
+                'assignedUser:id,name',
+
+                'interactions' => fn ($query) =>
+                    $query->with('user:id,name')->latest(),
+
+                'followUps' => fn ($query) =>
+                    $query->with('user:id,name')->latest('follow_up_at'),
             ])
             ->findOrFail($id);
     }
 
-    public function create(array $data)
+    public function create(array $data): Contact
     {
+        $contact = Contact::create($data);
 
-        return Contact::create($data);
+        $this->monitoringService->activity(
+            'contact_created',
+            'Contacts',
+            [
+                'contact_id' => $contact->id,
+                'mobile' => $contact->mobile,
+            ]
+        );
 
+        return $contact;
     }
 
-    public function update(int $id,array $data)
+    public function update(int $id, array $data): Contact
     {
-
         $contact = Contact::findOrFail($id);
 
         $contact->update($data);
 
-        return $contact;
+        $this->monitoringService->activity(
+            'contact_updated',
+            'Contacts',
+            [
+                'contact_id' => $contact->id,
+            ]
+        );
 
+        return $contact->refresh();
     }
 
-
-    public function delete(int $id)
+    public function delete(int $id): void
     {
+        $contact = Contact::findOrFail($id);
 
-        return Contact::findOrFail($id)
-            ->delete();
+        $contact->delete();
 
+        $this->monitoringService->activity(
+            'contact_deleted',
+            'Contacts',
+            [
+                'contact_id' => $id,
+            ]
+        );
     }
-
-    public function find(int $id)
-    {
-        return Contact::findOrFail($id);
-    }
-
-
 }
