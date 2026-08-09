@@ -2,20 +2,16 @@
 
 namespace Modules\Users\app\Providers;
 
-use App\Support\BaseModuleServiceProvider;
-use Modules\Users\app\Services\UserService;
-use Modules\Users\app\Repositories\UserRepository;
+use Nwidart\Modules\Support\ModuleServiceProvider;
 
-class UsersServiceProvider extends BaseModuleServiceProvider
+class UsersServiceProvider extends ModuleServiceProvider
 {
-    public function register(): void
-    {
-        $this->app->singleton(UserRepository::class);
-        $this->app->singleton(UserService::class);
-    }
+    protected string $name = 'Users';
 
-    public function boot(): void
-    {
-        $this->loadModule(__DIR__ . '/..');
-    }
+    protected string $nameLower = 'users';
+
+    protected array $providers = [
+        EventServiceProvider::class,
+        RouteServiceProvider::class,
+    ];
 }
