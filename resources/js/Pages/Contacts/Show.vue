@@ -6,6 +6,8 @@ const props = defineProps({
     contact: Object,
     smsTemplates: Array,
     smsVariables: Object,
+    contactStatuses: Array,
+    callResults: Array,
 })
 
 const smsForm = useForm({
