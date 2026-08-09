@@ -8,6 +8,12 @@ const props = defineProps({
 
 const search = ref('')
 
+const statusLabels = {
+    queued: 'در صف ارسال',
+    sent: 'ارسال موفق',
+    failed: 'ارسال ناموفق',
+}
+
 const doSearch = () => {
     router.get(
         '/sms/logs',
@@ -16,6 +22,7 @@ const doSearch = () => {
         },
         {
             preserveState: true,
+            replace: true,
         }
     )
 }
@@ -70,11 +77,11 @@ const doSearch = () => {
                     :key="log.id"
                 >
                     <td class="border p-2">
-                        {{ log.to }}
+                        {{ log.mobile }}
                     </td>
 
                     <td class="border p-2">
-                        {{ log.contact?.name ?? '-' }}
+                        {{ log.sendable?.name ?? '-' }}
                     </td>
 
                     <td class="border p-2">
@@ -82,7 +89,7 @@ const doSearch = () => {
                     </td>
 
                     <td class="border p-2">
-                        {{ log.status }}
+                        {{ statusLabels[log.status] ?? log.status }}
                     </td>
 
                     <td class="border p-2">
