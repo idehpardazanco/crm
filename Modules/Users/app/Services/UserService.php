@@ -2,118 +2,75 @@
 
 namespace Modules\Users\app\Services;
 
-
 use App\Models\User;
-use Illuminate\Support\Facades\Hash;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Modules\Users\Repositories\UserRepository;
-
-
 
 class UserService
 {
-
     public function __construct(
-        protected UserRepository $repository
-    )
-    {
-
+        private readonly UserRepository $repository
+    ) {
     }
 
-
-
-    public function paginate(?string $search = null)
-    {
-
-        return $this->repository->paginate($search);
-
+    public function paginate(
+        ?string $search = null
+    ): LengthAwarePaginator {
+        return $this->repository->paginate(
+            $search
+        );
     }
 
-
-
-
-
-    public function create(array $data)
+    public function find(int $id): User
     {
+        return $this->repository->find($id);
+    }
 
-        $password = $data['password'];
+    public function create(array $data): User
+    {
+        $role = $data['role'];
 
         unset($data['role']);
 
-        $data['password'] = Hash::make($password);
-
-
-        $user = User::create($data);
-
-
-        $user->assignRole(
-            request()->role
+        $user = $this->repository->create(
+            $data
         );
 
+        $user->syncRoles([
+            $role,
+        ]);
 
-        return $user;
-
+        return $user->load('roles');
     }
-
-
-
-
 
     public function update(
         int $id,
         array $data
-    )
-    {
-
-        $user = User::findOrFail($id);
-
-
-        $role = $data['role'] ?? null;
-
+    ): User {
+        $role = $data['role'];
 
         unset($data['role']);
 
-
-        if(
-            !empty($data['password'])
-        ){
-
-            $data['password'] =
-                Hash::make($data['password']);
-
-        }
-        else {
-
+        if (empty($data['password'])) {
             unset($data['password']);
-
         }
 
+        $user = $this->repository->update(
+            $id,
+            $data
+        );
 
+        $user->syncRoles([
+            $role,
+        ]);
 
-        $user->update($data);
-
-
-
-        if($role){
-
-            $user->syncRoles([
-                $role
-            ]);
-
-        }
-
-
-
-        return $user;
-
+        return $user->load('roles');
     }
 
-    public function delete(int $id)
+    public function delete(int $id): bool
     {
-
-        return User::findOrFail($id)
-            ->delete();
-
+        return $this->repository->delete(
+            $id
+        );
     }
-
-
 }
