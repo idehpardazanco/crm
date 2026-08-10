@@ -35,38 +35,56 @@ const to = ref(
 
 const expanded = ref(null)
 
+
 /*
 |--------------------------------------------------------------------------
-| عنوان عملیات‌ها
+| Action Labels
 |--------------------------------------------------------------------------
 */
 
 const actionLabels = {
+
     /*
      * ورود و خروج
      */
-    login: 'ورود به سیستم',
-    logout: 'خروج از سیستم',
+    login:
+        'ورود به سیستم',
+
+    logout:
+        'خروج از سیستم',
+
 
     /*
      * کاربران
      */
-    user_created: 'ایجاد کاربر',
-    user_updated: 'ویرایش کاربر',
-    user_deleted: 'حذف کاربر',
+    user_created:
+        'ایجاد کاربر',
+
+    user_updated:
+        'ویرایش کاربر',
+
+    user_deleted:
+        'حذف کاربر',
+
 
     /*
      * مخاطبین
      */
-    contact_created: 'ایجاد مخاطب',
-    contact_updated: 'ویرایش مخاطب',
-    contact_deleted: 'حذف مخاطب',
+    contact_created:
+        'ایجاد مخاطب',
+
+    contact_updated:
+        'ویرایش مخاطب',
+
+    contact_deleted:
+        'حذف مخاطب',
 
     contacts_imported:
         'ورود مخاطبین از Excel',
 
     contacts_exported:
         'خروجی Excel مخاطبین',
+
 
     /*
      * ارتباطات
@@ -77,6 +95,7 @@ const actionLabels = {
     interaction_deleted:
         'حذف ارتباط',
 
+
     /*
      * پیگیری‌ها
      */
@@ -86,8 +105,12 @@ const actionLabels = {
     follow_up_status_updated:
         'تغییر وضعیت پیگیری',
 
+    follow_up_due:
+        'سررسید پیگیری',
+
     follow_up_deleted:
         'حذف پیگیری',
+
 
     /*
      * پیامک
@@ -100,6 +123,7 @@ const actionLabels = {
 
     sms_failed:
         'خطا در ارسال پیامک',
+
 
     /*
      * سفارش‌ها
@@ -114,25 +138,40 @@ const actionLabels = {
         'حذف سفارش',
 }
 
+
 /*
 |--------------------------------------------------------------------------
-| نام فارسی ماژول‌ها
+| Module Labels
 |--------------------------------------------------------------------------
 */
 
 const moduleLabels = {
-    Auth: 'ورود و خروج',
-    Users: 'کاربران',
-    Contacts: 'مخاطبین',
-    Interactions: 'ارتباطات',
-    FollowUps: 'پیگیری‌ها',
-    Sms: 'پیامک',
-    Orders: 'سفارش‌ها',
+    Auth:
+        'ورود و خروج',
+
+    Users:
+        'کاربران',
+
+    Contacts:
+        'مخاطبین',
+
+    Interactions:
+        'ارتباطات',
+
+    FollowUps:
+        'پیگیری‌ها',
+
+    Sms:
+        'پیامک',
+
+    Orders:
+        'سفارش‌ها',
 }
+
 
 /*
 |--------------------------------------------------------------------------
-| Filters
+| Apply Filters
 |--------------------------------------------------------------------------
 */
 
@@ -157,11 +196,18 @@ const applyFilters = () => {
         },
         {
             preserveState: true,
-            replace: true,
             preserveScroll: true,
+            replace: true,
         }
     )
 }
+
+
+/*
+|--------------------------------------------------------------------------
+| Reset Filters
+|--------------------------------------------------------------------------
+*/
 
 const resetFilters = () => {
     search.value = ''
@@ -183,9 +229,10 @@ const resetFilters = () => {
     )
 }
 
+
 /*
 |--------------------------------------------------------------------------
-| نمایش جزئیات
+| Toggle Details
 |--------------------------------------------------------------------------
 */
 
@@ -196,9 +243,10 @@ const toggle = (id) => {
             : id
 }
 
+
 /*
 |--------------------------------------------------------------------------
-| Labels
+| Action Label
 |--------------------------------------------------------------------------
 */
 
@@ -208,15 +256,23 @@ const actionLabel = (action) => {
         ?? '-'
 }
 
+
+/*
+|--------------------------------------------------------------------------
+| Module Label
+|--------------------------------------------------------------------------
+*/
+
 const moduleLabel = (module) => {
     return moduleLabels[module]
         ?? module
         ?? '-'
 }
 
+
 /*
 |--------------------------------------------------------------------------
-| Meta
+| Meta Formatter
 |--------------------------------------------------------------------------
 */
 
@@ -276,6 +332,25 @@ const metaText = (meta) => {
                 >
                     مشاهده و بررسی فعالیت‌های انجام‌شده در CRM
                 </p>
+
+            </div>
+
+
+            <div>
+
+                <Link
+                    href="/reports"
+                    class="
+                        bg-blue-600
+                        hover:bg-blue-700
+                        text-white
+                        px-4
+                        py-2
+                        rounded
+                    "
+                >
+                    گزارش‌های پیشرفته
+                </Link>
 
             </div>
 
@@ -429,10 +504,15 @@ const metaText = (meta) => {
 
                             <option
                                 v-for="
-                                    user in users
+                                    user in
+                                    users
                                 "
-                                :key="user.id"
-                                :value="user.id"
+                                :key="
+                                    user.id
+                                "
+                                :value="
+                                    user.id
+                                "
                             >
                                 {{ user.name }}
                             </option>
@@ -500,6 +580,7 @@ const metaText = (meta) => {
                 </div>
 
 
+                <!-- Filter Buttons -->
                 <div
                     class="
                         flex
@@ -568,7 +649,7 @@ const metaText = (meta) => {
         </div>
 
 
-        <!-- Logs Table -->
+        <!-- Logs -->
         <div
             class="
                 border
@@ -591,7 +672,9 @@ const metaText = (meta) => {
                 >
 
                     <thead
-                        class="bg-gray-50"
+                        class="
+                            bg-gray-50
+                        "
                     >
 
                         <tr>
@@ -659,12 +742,15 @@ const metaText = (meta) => {
 
                         <template
                             v-for="
-                                log in logs.data
+                                log in
+                                logs.data
                             "
-                            :key="log.id"
+                            :key="
+                                log.id
+                            "
                         >
 
-                            <!-- Main Row -->
+                            <!-- Main Log Row -->
                             <tr
                                 class="
                                     hover:bg-gray-50
@@ -688,7 +774,8 @@ const metaText = (meta) => {
                                         "
                                     >
                                         {{
-                                            log.user.name
+                                            log.user
+                                                .name
                                         }}
                                     </span>
 
@@ -722,12 +809,27 @@ const metaText = (meta) => {
                                             rounded
                                             text-sm
                                         "
+                                        :class="{
+                                            'bg-orange-50 text-orange-700':
+                                                log.action ===
+                                                'follow_up_due',
+
+                                            'bg-green-50 text-green-700':
+                                                log.action ===
+                                                'sms_sent',
+
+                                            'bg-red-50 text-red-700':
+                                                log.action ===
+                                                'sms_failed',
+                                        }"
                                     >
+
                                         {{
                                             actionLabel(
                                                 log.action
                                             )
                                         }}
+
                                     </span>
 
                                 </td>
@@ -750,7 +852,7 @@ const metaText = (meta) => {
                                 </td>
 
 
-                                <!-- Created At -->
+                                <!-- Date -->
                                 <td
                                     class="
                                         border-b
@@ -801,7 +903,7 @@ const metaText = (meta) => {
                             </tr>
 
 
-                            <!-- Meta Row -->
+                            <!-- Meta -->
                             <tr
                                 v-if="
                                     expanded ===
@@ -854,7 +956,9 @@ const metaText = (meta) => {
                             v-if="
                                 !logs.data
                                 ||
-                                !logs.data.length
+                                !logs
+                                    .data
+                                    .length
                             "
                         >
 
@@ -897,9 +1001,12 @@ const metaText = (meta) => {
 
             <template
                 v-for="
-                    link in logs.links
+                    link in
+                    logs.links
                 "
-                :key="link.label"
+                :key="
+                    link.label
+                "
             >
 
                 <Link
