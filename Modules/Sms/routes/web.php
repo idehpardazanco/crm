@@ -1,66 +1,169 @@
 <?php
 
+use App\Http\Middleware\EnsureSuperAdmin;
 use Illuminate\Support\Facades\Route;
 use Modules\Sms\app\Http\Controllers\SmsController;
 use Modules\Sms\app\Http\Controllers\SmsLogsController;
 use Modules\Sms\app\Http\Controllers\SmsSettingsController;
 use Modules\Sms\app\Http\Controllers\SmsTemplatesController;
 
+
+/*
+|--------------------------------------------------------------------------
+| SMS Routes
+|--------------------------------------------------------------------------
+*/
+
 Route::middleware('auth')
     ->prefix('sms')
     ->name('sms.')
     ->group(function () {
 
-        Route::get('/templates', [
-            SmsTemplatesController::class,
-            'index',
-        ])->name('templates.index');
+        /*
+        |--------------------------------------------------------------------------
+        | Admin Only
+        |--------------------------------------------------------------------------
+        |
+        | مدیریت قالب‌ها و تنظیمات پیامک
+        | فقط برای مدیر سیستم است.
+        |
+        */
 
-        Route::get('/templates/create', [
-            SmsTemplatesController::class,
-            'create',
-        ])->name('templates.create');
+        Route::middleware(
+            EnsureSuperAdmin::class
+        )->group(function () {
 
-        Route::post('/templates', [
-            SmsTemplatesController::class,
-            'store',
-        ])->name('templates.store');
+            /*
+            |--------------------------------------------------------------------------
+            | SMS Templates
+            |--------------------------------------------------------------------------
+            */
 
-        Route::get('/templates/{id}/edit', [
-            SmsTemplatesController::class,
-            'edit',
-        ])->name('templates.edit');
+            Route::get(
+                '/templates',
+                [
+                    SmsTemplatesController::class,
+                    'index',
+                ]
+            )->name(
+                'templates.index'
+            );
 
-        Route::put('/templates/{id}', [
-            SmsTemplatesController::class,
-            'update',
-        ])->name('templates.update');
+            Route::get(
+                '/templates/create',
+                [
+                    SmsTemplatesController::class,
+                    'create',
+                ]
+            )->name(
+                'templates.create'
+            );
 
-        Route::delete('/templates/{id}', [
-            SmsTemplatesController::class,
-            'destroy',
-        ])->name('templates.destroy');
+            Route::post(
+                '/templates',
+                [
+                    SmsTemplatesController::class,
+                    'store',
+                ]
+            )->name(
+                'templates.store'
+            );
+
+            Route::get(
+                '/templates/{id}/edit',
+                [
+                    SmsTemplatesController::class,
+                    'edit',
+                ]
+            )->name(
+                'templates.edit'
+            );
+
+            Route::put(
+                '/templates/{id}',
+                [
+                    SmsTemplatesController::class,
+                    'update',
+                ]
+            )->name(
+                'templates.update'
+            );
+
+            Route::delete(
+                '/templates/{id}',
+                [
+                    SmsTemplatesController::class,
+                    'destroy',
+                ]
+            )->name(
+                'templates.destroy'
+            );
 
 
-        Route::get('/settings', [
-            SmsSettingsController::class,
-            'index',
-        ])->name('settings');
+            /*
+            |--------------------------------------------------------------------------
+            | SMS Settings
+            |--------------------------------------------------------------------------
+            */
 
-        Route::post('/settings', [
-            SmsSettingsController::class,
-            'update',
-        ])->name('settings.update');
+            Route::get(
+                '/settings',
+                [
+                    SmsSettingsController::class,
+                    'index',
+                ]
+            )->name(
+                'settings'
+            );
+
+            Route::post(
+                '/settings',
+                [
+                    SmsSettingsController::class,
+                    'update',
+                ]
+            )->name(
+                'settings.update'
+            );
+
+        });
 
 
-        Route::post('/send', [
-            SmsController::class,
-            'send',
-        ])->name('send');
+        /*
+        |--------------------------------------------------------------------------
+        | Employee + Admin
+        |--------------------------------------------------------------------------
+        */
+
+        Route::post(
+            '/send',
+            [
+                SmsController::class,
+                'send',
+            ]
+        )->name(
+            'send'
+        );
 
 
-        Route::get('/logs', [
-            SmsLogsController::class,
-            'index',
-        ])->name('logs');
+        /*
+        |--------------------------------------------------------------------------
+        | SMS Logs
+        |--------------------------------------------------------------------------
+        |
+        | Controller خودش محدودیت داده را اعمال می‌کند:
+        | مدیر همه - کارمند فقط خودش.
+        |
+        */
+
+        Route::get(
+            '/logs',
+            [
+                SmsLogsController::class,
+                'index',
+            ]
+        )->name(
+            'logs'
+        );
+
     });
