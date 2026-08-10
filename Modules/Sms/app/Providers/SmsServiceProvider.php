@@ -2,23 +2,29 @@
 
 namespace Modules\Sms\app\Providers;
 
-use App\Support\BaseModuleServiceProvider;
 use Modules\Sms\app\Contracts\SmsProviderInterface;
+use Nwidart\Modules\Support\ModuleServiceProvider;
 
-class SmsServiceProvider extends BaseModuleServiceProvider
+class SmsServiceProvider extends ModuleServiceProvider
 {
+    protected string $name =
+        'Sms';
+
+    protected string $nameLower =
+        'sms';
+
+    protected array $providers = [
+        EventServiceProvider::class,
+        RouteServiceProvider::class,
+    ];
+
     public function register(): void
     {
+        parent::register();
+
         $this->app->bind(
             SmsProviderInterface::class,
             PayamMatniSmsProvider::class
-        );
-    }
-
-    public function boot(): void
-    {
-        $this->loadModule(
-            dirname(__DIR__, 2)
         );
     }
 }
