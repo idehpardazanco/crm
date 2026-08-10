@@ -1,8 +1,14 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
-use Modules\Settings\app\Http\Controllers\SettingsController;
-
-Route::middleware(['auth', 'verified'])->group(function () {
-    Route::resource('settings', SettingsController::class)->names('settings');
-});
+/*
+|--------------------------------------------------------------------------
+| Settings Web Routes
+|--------------------------------------------------------------------------
+|
+| تنظیمات قابل استفاده CRM از طریق ماژول‌های مربوطه
+| مدیریت می‌شوند.
+|
+| SMS Settings:
+| /sms/settings
+|
+*/
