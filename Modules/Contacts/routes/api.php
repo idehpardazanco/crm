@@ -1,8 +1,13 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
-use Modules\Contacts\app\Http\Controllers\ContactsController;
-
-Route::middleware(['auth:sanctum'])->prefix('v1')->group(function () {
-    Route::apiResource('contacts', ContactsController::class)->names('contacts');
-});
+/*
+|--------------------------------------------------------------------------
+| Contacts API
+|--------------------------------------------------------------------------
+|
+| API مخاطبین در نسخه فعلی فعال نیست.
+|
+| ContactsController فعلی برای Inertia/Web طراحی شده
+| و نباید به عنوان API Resource استفاده شود.
+|
+*/
