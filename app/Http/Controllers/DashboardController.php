@@ -15,13 +15,16 @@ use Modules\Sms\app\Models\SmsLog;
 
 class DashboardController extends Controller
 {
-    public function index(Request $request): Response
-    {
-        $user = $request->user();
+    public function index(
+        Request $request
+    ): Response {
+        $user =
+            $request->user();
 
-        $isAdmin = $user->hasRole(
-            'super_admin'
-        );
+        $isAdmin =
+            $user->hasRole(
+                'super_admin'
+            );
 
         return Inertia::render(
             'Dashboard',
@@ -33,31 +36,36 @@ class DashboardController extends Controller
 
                 'stats' =>
                     $isAdmin
-                        ? $this->adminStats()
-                        : $this->employeeStats(
-                            $user->id
-                        ),
+                        ? $this
+                            ->adminStats()
+                        : $this
+                            ->employeeStats(
+                                $user->id
+                            ),
 
                 'todayFollowUps' =>
-                    $this->todayFollowUps(
-                        $isAdmin
-                            ? null
-                            : $user->id
-                    ),
+                    $this
+                        ->todayFollowUps(
+                            $isAdmin
+                                ? null
+                                : $user->id
+                        ),
 
                 'overdueFollowUps' =>
-                    $this->overdueFollowUps(
-                        $isAdmin
-                            ? null
-                            : $user->id
-                    ),
+                    $this
+                        ->overdueFollowUps(
+                            $isAdmin
+                                ? null
+                                : $user->id
+                        ),
 
                 'latestCalls' =>
-                    $this->latestCalls(
-                        $isAdmin
-                            ? null
-                            : $user->id
-                    ),
+                    $this
+                        ->latestCalls(
+                            $isAdmin
+                                ? null
+                                : $user->id
+                        ),
 
                 'employeePerformance' =>
                     $isAdmin
@@ -132,7 +140,8 @@ class DashboardController extends Controller
                     ->where(
                         'follow_up_at',
                         '<',
-                        today()->startOfDay()
+                        today()
+                            ->startOfDay()
                     )
                     ->count(),
 
@@ -148,10 +157,11 @@ class DashboardController extends Controller
                 $customers,
 
             'conversionRate' =>
-                $this->conversionRate(
-                    $customers,
-                    $totalContacts
-                ),
+                $this
+                    ->conversionRate(
+                        $customers,
+                        $totalContacts
+                    ),
         ];
     }
 
@@ -164,6 +174,14 @@ class DashboardController extends Controller
                     ->where(
                         'user_id',
                         $userId
+                    )
+                    ->whereHas(
+                        'contact',
+                        fn ($query) =>
+                        $query->where(
+                            'assigned_user_id',
+                            $userId
+                        )
                     )
                     ->where(
                         'type',
@@ -180,6 +198,14 @@ class DashboardController extends Controller
                     ->where(
                         'user_id',
                         $userId
+                    )
+                    ->whereHas(
+                        'contact',
+                        fn ($query) =>
+                        $query->where(
+                            'assigned_user_id',
+                            $userId
+                        )
                     )
                     ->where(
                         'status',
@@ -209,6 +235,14 @@ class DashboardController extends Controller
                         'user_id',
                         $userId
                     )
+                    ->whereHas(
+                        'contact',
+                        fn ($query) =>
+                        $query->where(
+                            'assigned_user_id',
+                            $userId
+                        )
+                    )
                     ->where(
                         'status',
                         'pending'
@@ -216,7 +250,8 @@ class DashboardController extends Controller
                     ->where(
                         'follow_up_at',
                         '<',
-                        today()->startOfDay()
+                        today()
+                            ->startOfDay()
                     )
                     ->count(),
 
@@ -225,6 +260,17 @@ class DashboardController extends Controller
                     ->where(
                         'user_id',
                         $userId
+                    )
+                    ->whereHasMorph(
+                        'sendable',
+                        [
+                            Contact::class,
+                        ],
+                        fn ($query) =>
+                        $query->where(
+                            'assigned_user_id',
+                            $userId
+                        )
                     )
                     ->where(
                         'status',
@@ -243,13 +289,23 @@ class DashboardController extends Controller
                         'user_id',
                         $userId
                     )
+                    ->whereHas(
+                        'contact',
+                        fn ($query) =>
+                        $query->where(
+                            'assigned_user_id',
+                            $userId
+                        )
+                    )
                     ->count(),
         ];
     }
 
     private function employeePerformance()
     {
-        return User::role('employee')
+        return User::role(
+            'employee'
+        )
             ->where(
                 'status',
                 'active'
@@ -260,8 +316,9 @@ class DashboardController extends Controller
                 'name',
             ])
             ->map(
-                function (User $user) {
-
+                function (
+                    User $user
+                ) {
                     $contacts =
                         Contact::query()
                             ->where(
@@ -281,6 +338,10 @@ class DashboardController extends Controller
                                 'customer'
                             )
                             ->count();
+
+                    /*
+                     * گزارش مدیر تاریخی است.
+                     */
 
                     $calls =
                         Interaction::query()
@@ -357,10 +418,11 @@ class DashboardController extends Controller
                             $orders,
 
                         'conversionRate' =>
-                            $this->conversionRate(
-                                $customers,
-                                $contacts
-                            ),
+                            $this
+                                ->conversionRate(
+                                    $customers,
+                                    $contacts
+                                ),
                     ];
                 }
             )
@@ -372,15 +434,24 @@ class DashboardController extends Controller
     ) {
         return FollowUp::query()
             ->with([
-                'contact:id,name,mobile,business_name',
+                'contact:id,name,mobile,business_name,assigned_user_id',
                 'user:id,name',
             ])
             ->when(
                 $userId,
                 fn ($query) =>
-                    $query->where(
+                $query
+                    ->where(
                         'user_id',
                         $userId
+                    )
+                    ->whereHas(
+                        'contact',
+                        fn ($query) =>
+                        $query->where(
+                            'assigned_user_id',
+                            $userId
+                        )
                     )
             )
             ->where(
@@ -403,15 +474,24 @@ class DashboardController extends Controller
     ) {
         return FollowUp::query()
             ->with([
-                'contact:id,name,mobile,business_name',
+                'contact:id,name,mobile,business_name,assigned_user_id',
                 'user:id,name',
             ])
             ->when(
                 $userId,
                 fn ($query) =>
-                    $query->where(
+                $query
+                    ->where(
                         'user_id',
                         $userId
+                    )
+                    ->whereHas(
+                        'contact',
+                        fn ($query) =>
+                        $query->where(
+                            'assigned_user_id',
+                            $userId
+                        )
                     )
             )
             ->where(
@@ -421,7 +501,8 @@ class DashboardController extends Controller
             ->where(
                 'follow_up_at',
                 '<',
-                today()->startOfDay()
+                today()
+                    ->startOfDay()
             )
             ->orderBy(
                 'follow_up_at'
@@ -435,15 +516,24 @@ class DashboardController extends Controller
     ) {
         return Interaction::query()
             ->with([
-                'contact:id,name,mobile,business_name',
+                'contact:id,name,mobile,business_name,assigned_user_id',
                 'user:id,name',
             ])
             ->when(
                 $userId,
                 fn ($query) =>
-                    $query->where(
+                $query
+                    ->where(
                         'user_id',
                         $userId
+                    )
+                    ->whereHas(
+                        'contact',
+                        fn ($query) =>
+                        $query->where(
+                            'assigned_user_id',
+                            $userId
+                        )
                     )
             )
             ->where(
@@ -464,8 +554,10 @@ class DashboardController extends Controller
         }
 
         return round(
-            ($customers / $contacts)
-            * 100,
+            (
+                $customers
+                / $contacts
+            ) * 100,
             2
         );
     }
