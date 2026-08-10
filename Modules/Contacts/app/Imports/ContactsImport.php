@@ -3,6 +3,7 @@
 namespace Modules\Contacts\app\Imports;
 
 use App\Models\User;
+use App\Support\IranianMobile;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
@@ -46,14 +47,6 @@ class ContactsImport implements
                     $row->toArray()
                 );
 
-            if (
-                $this->isEmptyRow(
-                    $data
-                )
-            ) {
-                continue;
-            }
-
             $validator =
                 Validator::make(
                     $data,
@@ -72,7 +65,9 @@ class ContactsImport implements
 
                         'mobile' => [
                             'required',
-                            'regex:/^09\d{9}$/',
+                            'string',
+                            'regex:' .
+                            IranianMobile::REGEX,
                         ],
 
                         'phone' => [
@@ -154,10 +149,6 @@ class ContactsImport implements
                 continue;
             }
 
-            /*
-             * جلوگیری از ورود مخاطب تکراری
-             * حتی اگر قبلاً Soft Delete شده باشد.
-             */
             $exists =
                 Contact::withTrashed()
                     ->where(
@@ -177,7 +168,8 @@ class ContactsImport implements
             ] = $this->assignedUserId;
 
             try {
-                $this->contactService
+                $this
+                    ->contactService
                     ->create(
                         $data,
                         $this->actor
@@ -236,7 +228,7 @@ class ContactsImport implements
                 ),
 
             'mobile' =>
-                $this->normalizeMobile(
+                IranianMobile::normalize(
                     $row['mobile']
                     ?? null
                 ),
@@ -293,112 +285,6 @@ class ContactsImport implements
         ];
     }
 
-    private function normalizeMobile(
-        mixed $value
-    ): ?string {
-        if (
-            $value === null
-            || $value === ''
-        ) {
-            return null;
-        }
-
-        $mobile =
-            $this->convertDigits(
-                (string) $value
-            );
-
-        $mobile =
-            preg_replace(
-                '/[\s\-\(\)]+/',
-                '',
-                $mobile
-            );
-
-        if (
-            str_starts_with(
-                $mobile,
-                '0098'
-            )
-        ) {
-            $mobile =
-                '0'
-                . substr(
-                    $mobile,
-                    4
-                );
-        } elseif (
-            str_starts_with(
-                $mobile,
-                '+98'
-            )
-        ) {
-            $mobile =
-                '0'
-                . substr(
-                    $mobile,
-                    3
-                );
-        } elseif (
-            str_starts_with(
-                $mobile,
-                '98'
-            )
-            &&
-            strlen($mobile) === 12
-        ) {
-            $mobile =
-                '0'
-                . substr(
-                    $mobile,
-                    2
-                );
-        } elseif (
-            str_starts_with(
-                $mobile,
-                '9'
-            )
-            &&
-            strlen($mobile) === 10
-        ) {
-            $mobile =
-                '0' . $mobile;
-        }
-
-        return $mobile;
-    }
-
-    private function convertDigits(
-        string $value
-    ): string {
-        return strtr(
-            $value,
-            [
-                '۰' => '0',
-                '۱' => '1',
-                '۲' => '2',
-                '۳' => '3',
-                '۴' => '4',
-                '۵' => '5',
-                '۶' => '6',
-                '۷' => '7',
-                '۸' => '8',
-                '۹' => '9',
-
-                '٠' => '0',
-                '١' => '1',
-                '٢' => '2',
-                '٣' => '3',
-                '٤' => '4',
-                '٥' => '5',
-                '٦' => '6',
-                '٧' => '7',
-                '٨' => '8',
-                '٩' => '9',
-            ]
-        );
-    }
-
     private function clean(
         mixed $value
     ): ?string {
@@ -409,27 +295,12 @@ class ContactsImport implements
             return null;
         }
 
-        $value =
-            trim(
-                (string) $value
-            );
+        $value = trim(
+            (string) $value
+        );
 
         return $value === ''
             ? null
             : $value;
-    }
-
-    private function isEmptyRow(
-        array $data
-    ): bool {
-        return empty(
-            array_filter(
-                $data,
-                fn ($value) =>
-                    $value !== null
-                    &&
-                    $value !== ''
-            )
-        );
     }
 }
