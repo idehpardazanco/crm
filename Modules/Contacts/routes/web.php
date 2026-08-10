@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use Modules\Contacts\app\Http\Controllers\ContactsController;
+use Modules\Contacts\app\Http\Controllers\ContactsExportController;
 use Modules\Contacts\app\Http\Controllers\ContactsImportController;
 
 Route::middleware('auth')
@@ -10,12 +11,10 @@ Route::middleware('auth')
     ->group(function () {
 
         /*
-         * Excel Import
-         *
-         * این Routeها باید قبل از
-         * /{contact}
-         * باشند.
-         */
+        |--------------------------------------------------------------------------
+        | Excel Import
+        |--------------------------------------------------------------------------
+        */
 
         Route::get(
             '/import',
@@ -42,6 +41,27 @@ Route::middleware('auth')
         )->name('import.template');
 
 
+        /*
+        |--------------------------------------------------------------------------
+        | Excel Export
+        |--------------------------------------------------------------------------
+        */
+
+        Route::get(
+            '/export',
+            [
+                ContactsExportController::class,
+                'export',
+            ]
+        )->name('export');
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Contacts CRUD
+        |--------------------------------------------------------------------------
+        */
+
         Route::get(
             '/',
             [
@@ -49,7 +69,6 @@ Route::middleware('auth')
                 'index',
             ]
         )->name('index');
-
 
         Route::get(
             '/create',
@@ -59,7 +78,6 @@ Route::middleware('auth')
             ]
         )->name('create');
 
-
         Route::post(
             '/',
             [
@@ -67,7 +85,6 @@ Route::middleware('auth')
                 'store',
             ]
         )->name('store');
-
 
         Route::get(
             '/{contact}/edit',
@@ -77,7 +94,6 @@ Route::middleware('auth')
             ]
         )->name('edit');
 
-
         Route::put(
             '/{contact}',
             [
@@ -86,7 +102,6 @@ Route::middleware('auth')
             ]
         )->name('update');
 
-
         Route::delete(
             '/{contact}',
             [
@@ -94,7 +109,6 @@ Route::middleware('auth')
                 'destroy',
             ]
         )->name('destroy');
-
 
         Route::get(
             '/{contact}',
