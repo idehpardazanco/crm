@@ -42,247 +42,625 @@ const doSearch = () => {
     )
 }
 
+const clearSearch = () => {
+    search.value = ''
+
+    router.get(
+        '/contacts',
+        {},
+        {
+            preserveState: true,
+            replace: true,
+        }
+    )
+}
+
 const remove = (id) => {
     if (
-        !confirm(
-            'مخاطب حذف شود؟'
+        ! confirm(
+            'آیا از حذف این مخاطب مطمئن هستید؟'
         )
     ) {
         return
     }
 
     router.delete(
-        `/contacts/${id}`
+        `/contacts/${id}`,
+        {
+            preserveScroll: true,
+        }
     )
 }
 </script>
 
 <template>
-    <div class="p-6">
+    <div
+        class="p-6"
+        dir="rtl"
+    >
 
+        <!-- عنوان و عملیات -->
         <div
             class="
                 flex
+                flex-col
+                md:flex-row
+                md:items-center
                 justify-between
-                items-center
+                gap-4
                 mb-6
             "
         >
 
-            <h1 class="text-xl font-bold">
-                مخاطبین
-            </h1>
+            <div>
+                <h1
+                    class="
+                        text-2xl
+                        font-bold
+                    "
+                >
+                    مخاطبین
+                </h1>
 
-            <Link
-                href="/contacts/create"
+                <p
+                    class="
+                        text-gray-500
+                        mt-1
+                    "
+                >
+                    مدیریت مخاطبین و کسب‌وکارها
+                </p>
+            </div>
+
+
+            <div
                 class="
-                    bg-blue-600
-                    text-white
-                    px-4
-                    py-2
-                    rounded
+                    flex
+                    flex-wrap
+                    gap-3
                 "
             >
-                مخاطب جدید
-            </Link>
+
+                <Link
+                    href="/contacts/import"
+                    class="
+                        bg-green-600
+                        hover:bg-green-700
+                        text-white
+                        px-4
+                        py-2
+                        rounded
+                    "
+                >
+                    ورود از Excel
+                </Link>
+
+
+                <Link
+                    href="/contacts/create"
+                    class="
+                        bg-blue-600
+                        hover:bg-blue-700
+                        text-white
+                        px-4
+                        py-2
+                        rounded
+                    "
+                >
+                    مخاطب جدید
+                </Link>
+
+            </div>
 
         </div>
 
 
-        <div class="mb-5">
+        <!-- جستجو -->
+        <div
+            class="
+                border
+                rounded
+                p-4
+                mb-6
+            "
+        >
 
-            <input
-                v-model="search"
-                @keyup.enter="doSearch"
-                type="text"
+            <form
+                @submit.prevent="doSearch"
                 class="
-                    border
-                    p-2
-                    rounded
-                    w-full
-                    max-w-md
+                    flex
+                    flex-col
+                    md:flex-row
+                    gap-3
+                    md:items-center
                 "
-                placeholder="جستجو نام، موبایل یا کسب‌وکار"
             >
+
+                <input
+                    v-model="search"
+                    type="text"
+                    class="
+                        border
+                        p-2
+                        rounded
+                        w-full
+                        md:max-w-md
+                    "
+                    placeholder="جستجو نام، موبایل، تلفن یا کسب‌وکار"
+                >
+
+
+                <button
+                    type="submit"
+                    class="
+                        bg-gray-800
+                        text-white
+                        px-5
+                        py-2
+                        rounded
+                    "
+                >
+                    جستجو
+                </button>
+
+
+                <button
+                    v-if="search"
+                    type="button"
+                    @click="clearSearch"
+                    class="
+                        border
+                        px-5
+                        py-2
+                        rounded
+                    "
+                >
+                    پاک کردن
+                </button>
+
+            </form>
 
         </div>
 
 
-        <div class="overflow-x-auto">
+        <!-- جدول مخاطبین -->
+        <div
+            class="
+                border
+                rounded
+                overflow-hidden
+            "
+        >
 
-            <table
-                class="
-                    w-full
-                    border-collapse
-                    border
-                "
-            >
+            <div class="overflow-x-auto">
 
-                <thead>
+                <table
+                    class="
+                        w-full
+                        border-collapse
+                    "
+                >
 
-                    <tr>
-
-                        <th class="border p-2">
-                            نام
-                        </th>
-
-                        <th class="border p-2">
-                            موبایل
-                        </th>
-
-                        <th class="border p-2">
-                            کسب‌وکار
-                        </th>
-
-                        <th class="border p-2">
-                            شهر
-                        </th>
-
-                        <th class="border p-2">
-                            وضعیت
-                        </th>
-
-                        <th class="border p-2">
-                            مسئول
-                        </th>
-
-                        <th class="border p-2">
-                            عملیات
-                        </th>
-
-                    </tr>
-
-                </thead>
-
-
-                <tbody>
-
-                    <tr
-                        v-for="contact in contacts.data"
-                        :key="contact.id"
+                    <thead
+                        class="
+                            bg-gray-50
+                        "
                     >
 
-                        <td class="border p-2">
+                        <tr>
 
-                            <Link
-                                :href="
-                                    `/contacts/${contact.id}`
+                            <th
+                                class="
+                                    border-b
+                                    p-3
+                                    text-right
                                 "
-                                class="text-blue-600"
                             >
-                                {{ contact.name }}
-                            </Link>
-
-                        </td>
+                                نام
+                            </th>
 
 
-                        <td class="border p-2">
-                            {{ contact.mobile }}
-                        </td>
+                            <th
+                                class="
+                                    border-b
+                                    p-3
+                                    text-right
+                                "
+                            >
+                                کسب‌وکار
+                            </th>
 
 
-                        <td class="border p-2">
-
-                            {{
-                                contact.business_name
-                                    ?? '-'
-                            }}
-
-                        </td>
-
-
-                        <td class="border p-2">
-                            {{ contact.city ?? '-' }}
-                        </td>
+                            <th
+                                class="
+                                    border-b
+                                    p-3
+                                    text-right
+                                "
+                            >
+                                موبایل
+                            </th>
 
 
-                        <td class="border p-2">
-
-                            {{
-                                statusLabels[
-                                    contact.status
-                                ]
-                                    ?? contact.status
-                            }}
-
-                        </td>
-
-
-                        <td class="border p-2">
-
-                            {{
-                                contact.assigned_user
-                                    ?.name
-                                    ?? '-'
-                            }}
-
-                        </td>
+                            <th
+                                class="
+                                    border-b
+                                    p-3
+                                    text-right
+                                "
+                            >
+                                تلفن
+                            </th>
 
 
-                        <td class="border p-2">
+                            <th
+                                class="
+                                    border-b
+                                    p-3
+                                    text-right
+                                "
+                            >
+                                شهر
+                            </th>
 
-                            <div class="flex gap-3">
+
+                            <th
+                                class="
+                                    border-b
+                                    p-3
+                                    text-right
+                                "
+                            >
+                                وضعیت
+                            </th>
+
+
+                            <th
+                                class="
+                                    border-b
+                                    p-3
+                                    text-right
+                                "
+                            >
+                                مسئول
+                            </th>
+
+
+                            <th
+                                class="
+                                    border-b
+                                    p-3
+                                    text-right
+                                "
+                            >
+                                عملیات
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody>
+
+                        <tr
+                            v-for="contact in contacts.data"
+                            :key="contact.id"
+                            class="
+                                hover:bg-gray-50
+                            "
+                        >
+
+                            <!-- نام -->
+                            <td
+                                class="
+                                    border-b
+                                    p-3
+                                "
+                            >
 
                                 <Link
                                     :href="
                                         `/contacts/${contact.id}`
                                     "
-                                    class="text-green-600"
+                                    class="
+                                        text-blue-600
+                                        hover:underline
+                                        font-medium
+                                    "
                                 >
-                                    مشاهده
+                                    {{ contact.name }}
                                 </Link>
 
-                                <Link
-                                    :href="
-                                        `/contacts/${contact.id}/edit`
+                            </td>
+
+
+                            <!-- کسب و کار -->
+                            <td
+                                class="
+                                    border-b
+                                    p-3
+                                "
+                            >
+
+                                {{
+                                    contact.business_name
+                                    ?? '-'
+                                }}
+
+                            </td>
+
+
+                            <!-- موبایل -->
+                            <td
+                                class="
+                                    border-b
+                                    p-3
+                                "
+                                dir="ltr"
+                            >
+                                {{ contact.mobile }}
+                            </td>
+
+
+                            <!-- تلفن -->
+                            <td
+                                class="
+                                    border-b
+                                    p-3
+                                "
+                                dir="ltr"
+                            >
+
+                                {{
+                                    contact.phone
+                                    ?? '-'
+                                }}
+
+                            </td>
+
+
+                            <!-- شهر -->
+                            <td
+                                class="
+                                    border-b
+                                    p-3
+                                "
+                            >
+
+                                {{
+                                    contact.city
+                                    ?? '-'
+                                }}
+
+                            </td>
+
+
+                            <!-- وضعیت -->
+                            <td
+                                class="
+                                    border-b
+                                    p-3
+                                "
+                            >
+
+                                <span
+                                    class="
+                                        inline-block
+                                        px-3
+                                        py-1
+                                        rounded-full
+                                        text-sm
                                     "
-                                    class="text-blue-600"
-                                >
-                                    ویرایش
-                                </Link>
+                                    :class="{
+                                        'bg-gray-100 text-gray-700':
+                                            contact.status === 'new',
 
-                                <button
-                                    v-if="isAdmin"
-                                    type="button"
-                                    @click="
-                                        remove(
-                                            contact.id
-                                        )
+                                        'bg-blue-100 text-blue-700':
+                                            contact.status === 'contacted',
+
+                                        'bg-yellow-100 text-yellow-700':
+                                            contact.status === 'interested',
+
+                                        'bg-orange-100 text-orange-700':
+                                            contact.status === 'follow_up',
+
+                                        'bg-purple-100 text-purple-700':
+                                            contact.status === 'demo_sent',
+
+                                        'bg-green-100 text-green-700':
+                                            contact.status === 'customer',
+
+                                        'bg-red-100 text-red-700':
+                                            contact.status === 'rejected',
+
+                                        'bg-slate-100 text-slate-700':
+                                            contact.status === 'no_answer',
+
+                                        'bg-green-100 text-green-700':
+                                            contact.status === 'active',
+
+                                        'bg-red-100 text-red-700':
+                                            contact.status === 'inactive',
+                                    }"
+                                >
+
+                                    {{
+                                        statusLabels[
+                                            contact.status
+                                        ]
+                                        ?? contact.status
+                                    }}
+
+                                </span>
+
+                            </td>
+
+
+                            <!-- مسئول -->
+                            <td
+                                class="
+                                    border-b
+                                    p-3
+                                "
+                            >
+
+                                {{
+                                    contact.assigned_user
+                                        ?.name
+                                    ?? '-'
+                                }}
+
+                            </td>
+
+
+                            <!-- عملیات -->
+                            <td
+                                class="
+                                    border-b
+                                    p-3
+                                "
+                            >
+
+                                <div
+                                    class="
+                                        flex
+                                        flex-wrap
+                                        gap-3
                                     "
-                                    class="text-red-600"
                                 >
-                                    حذف
-                                </button>
 
-                            </div>
+                                    <Link
+                                        :href="
+                                            `/contacts/${contact.id}`
+                                        "
+                                        class="
+                                            text-green-600
+                                            hover:underline
+                                        "
+                                    >
+                                        مشاهده
+                                    </Link>
 
-                        </td>
 
-                    </tr>
+                                    <Link
+                                        :href="
+                                            `/contacts/${contact.id}/edit`
+                                        "
+                                        class="
+                                            text-blue-600
+                                            hover:underline
+                                        "
+                                    >
+                                        ویرایش
+                                    </Link>
 
 
-                    <tr
-                        v-if="
-                            !contacts.data.length
-                        "
-                    >
+                                    <button
+                                        v-if="isAdmin"
+                                        type="button"
+                                        @click="
+                                            remove(
+                                                contact.id
+                                            )
+                                        "
+                                        class="
+                                            text-red-600
+                                            hover:underline
+                                        "
+                                    >
+                                        حذف
+                                    </button>
 
-                        <td
-                            colspan="7"
-                            class="
-                                border
-                                p-4
-                                text-center
+                                </div>
+
+                            </td>
+
+                        </tr>
+
+
+                        <!-- خالی -->
+                        <tr
+                            v-if="
+                                !contacts.data
+                                ||
+                                !contacts.data.length
                             "
                         >
-                            مخاطبی یافت نشد
-                        </td>
 
-                    </tr>
+                            <td
+                                colspan="8"
+                                class="
+                                    p-8
+                                    text-center
+                                    text-gray-500
+                                "
+                            >
+                                مخاطبی یافت نشد.
+                            </td>
 
-                </tbody>
+                        </tr>
 
-            </table>
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+
+        <!-- Pagination -->
+        <div
+            v-if="
+                contacts.links
+                &&
+                contacts.links.length > 3
+            "
+            class="
+                flex
+                flex-wrap
+                gap-2
+                mt-6
+            "
+        >
+
+            <template
+                v-for="link in contacts.links"
+                :key="link.label"
+            >
+
+                <Link
+                    v-if="link.url"
+                    :href="link.url"
+                    preserve-scroll
+                    class="
+                        border
+                        px-3
+                        py-2
+                        rounded
+                    "
+                    :class="{
+                        'bg-blue-600 text-white border-blue-600':
+                            link.active,
+                    }"
+                    v-html="link.label"
+                />
+
+
+                <span
+                    v-else
+                    class="
+                        border
+                        px-3
+                        py-2
+                        rounded
+                        opacity-40
+                    "
+                    v-html="link.label"
+                ></span>
+
+            </template>
 
         </div>
 
