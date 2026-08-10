@@ -2,64 +2,169 @@
 
 namespace Modules\Monitoring\app\Http\Controllers;
 
+use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Controller;
+use Inertia\Inertia;
+use Inertia\Response;
 use Modules\Monitoring\app\Models\ActivityLog;
-use Modules\Monitoring\app\Models\SystemLog;
-use Modules\Monitoring\app\Models\RequestLog;
 
-class MonitoringController
+class MonitoringController extends Controller
 {
-    public function activities(Request $request)
-    {
-        $data = ActivityLog::query()
-            ->when($request->module, fn($q) => $q->where('module', $request->module))
-            ->when($request->search, fn($q) => $q->where('action', 'like', "%{$request->search}%"))
+    public function index(
+        Request $request
+    ): Response {
+        abort_unless(
+            $request
+                ->user()
+                ->hasRole('super_admin'),
+            403
+        );
+
+        $logs = ActivityLog::query()
+            ->with(
+                'user:id,name'
+            )
+
+            ->when(
+                $request->filled('search'),
+                function ($query) use ($request) {
+                    $search =
+                        $request->string(
+                            'search'
+                        )->toString();
+
+                    $query->where(
+                        function ($query) use ($search) {
+                            $query
+                                ->where(
+                                    'action',
+                                    'like',
+                                    "%{$search}%"
+                                )
+                                ->orWhere(
+                                    'module',
+                                    'like',
+                                    "%{$search}%"
+                                )
+                                ->orWhereHas(
+                                    'user',
+                                    fn ($query) =>
+                                        $query->where(
+                                            'name',
+                                            'like',
+                                            "%{$search}%"
+                                        )
+                                );
+                        }
+                    );
+                }
+            )
+
+            ->when(
+                $request->filled('module'),
+                fn ($query) =>
+                    $query->where(
+                        'module',
+                        $request->string(
+                            'module'
+                        )->toString()
+                    )
+            )
+
+            ->when(
+                $request->filled('user_id'),
+                fn ($query) =>
+                    $query->where(
+                        'user_id',
+                        $request->integer(
+                            'user_id'
+                        )
+                    )
+            )
+
+            ->when(
+                $request->filled('from'),
+                fn ($query) =>
+                    $query->whereDate(
+                        'created_at',
+                        '>=',
+                        $request->input(
+                            'from'
+                        )
+                    )
+            )
+
+            ->when(
+                $request->filled('to'),
+                fn ($query) =>
+                    $query->whereDate(
+                        'created_at',
+                        '<=',
+                        $request->input(
+                            'to'
+                        )
+                    )
+            )
+
             ->latest()
-            ->paginate($request->per_page ?? 15);
+            ->paginate(25)
+            ->withQueryString();
 
-        return [
-            'data' => $data->items(),
-            'meta' => [
-                'current_page' => $data->currentPage(),
-                'last_page' => $data->lastPage(),
-                'total' => $data->total(),
+        return Inertia::render(
+            'Monitoring/Index',
+            [
+                'logs' => $logs,
+
+                'users' =>
+                    User::query()
+                        ->orderBy('name')
+                        ->get([
+                            'id',
+                            'name',
+                        ]),
+
+                'modules' =>
+                    ActivityLog::query()
+                        ->whereNotNull(
+                            'module'
+                        )
+                        ->distinct()
+                        ->orderBy('module')
+                        ->pluck('module'),
+
+                'filters' => [
+                    'search' =>
+                        $request->input(
+                            'search',
+                            ''
+                        ),
+
+                    'module' =>
+                        $request->input(
+                            'module',
+                            ''
+                        ),
+
+                    'user_id' =>
+                        $request->input(
+                            'user_id',
+                            ''
+                        ),
+
+                    'from' =>
+                        $request->input(
+                            'from',
+                            ''
+                        ),
+
+                    'to' =>
+                        $request->input(
+                            'to',
+                            ''
+                        ),
+                ],
             ]
-        ];
-    }
-
-    public function systemLogs(Request $request)
-    {
-        $data = SystemLog::query()
-            ->when($request->level, fn($q) => $q->where('level', $request->level))
-            ->when($request->search, fn($q) => $q->where('message', 'like', "%{$request->search}%"))
-            ->latest()
-            ->paginate($request->per_page ?? 15);
-
-        return [
-            'data' => $data->items(),
-            'meta' => [
-                'current_page' => $data->currentPage(),
-                'last_page' => $data->lastPage(),
-                'total' => $data->total(),
-            ]
-        ];
-    }
-
-    public function requestLogs(Request $request)
-    {
-        $data = RequestLog::query()
-            ->when($request->status, fn($q) => $q->where('status_code', $request->status))
-            ->when($request->search, fn($q) => $q->where('url', 'like', "%{$request->search}%"))
-            ->latest()
-            ->paginate($request->per_page ?? 15);
-
-        return [
-            'data' => $data->items(),
-            'meta' => [
-                'current_page' => $data->currentPage(),
-                'last_page' => $data->lastPage(),
-                'total' => $data->total(),
-            ]
-        ];
+        );
     }
 }
