@@ -1,50 +1,68 @@
 <?php
 
-use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\ProfileController;
-use Illuminate\Foundation\Application;
+use App\Http\Middleware\EnsureSuperAdmin;
 use Illuminate\Support\Facades\Route;
-use Inertia\Inertia;
+use Modules\Users\app\Http\Controllers\UsersController;
 
-Route::get('/', function () {
-    return Inertia::render('Welcome', [
-        'canLogin' => Route::has('login'),
-        'canRegister' => Route::has('register'),
-        'laravelVersion' => Application::VERSION,
-        'phpVersion' => PHP_VERSION,
-    ]);
-});
+Route::middleware([
+        'auth',
+        EnsureSuperAdmin::class,
+    ])
+    ->prefix('users')
+    ->name('users.')
+    ->group(function () {
 
-Route::middleware(['auth', 'verified'])->group(function () {
+        Route::get(
+            '/',
+            [
+                UsersController::class,
+                'index',
+            ]
+        )->name('index');
 
-    Route::get('/dashboard', [
-        DashboardController::class,
-        'index'
-    ])->name('dashboard');
 
-    Route::get('/profile', [
-        ProfileController::class,
-        'edit'
-    ])->name('profile.edit');
+        Route::get(
+            '/create',
+            [
+                UsersController::class,
+                'create',
+            ]
+        )->name('create');
 
-    Route::patch('/profile', [
-        ProfileController::class,
-        'update'
-    ])->name('profile.update');
 
-    Route::delete('/profile', [
-        ProfileController::class,
-        'destroy'
-    ])->name('profile.destroy');
+        Route::post(
+            '/',
+            [
+                UsersController::class,
+                'store',
+            ]
+        )->name('store');
 
-});
 
-Route::middleware('auth')->group(function () {
+        Route::get(
+            '/{id}/edit',
+            [
+                UsersController::class,
+                'edit',
+            ]
+        )->name('edit');
 
-    Route::get('/settings/sms', function () {
-        return Inertia::render('Settings/Sms');
+
+        Route::put(
+            '/{id}',
+            [
+                UsersController::class,
+                'update',
+            ]
+        )->name('update');
+
+
+        Route::delete(
+            '/{id}',
+            [
+                UsersController::class,
+                'destroy',
+            ]
+        )->name('destroy');
+
     });
-
-});
-
-require __DIR__ . '/auth.php';
