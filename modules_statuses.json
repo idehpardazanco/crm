@@ -1,13 +1,12 @@
 {
-    "Core": true,
+    "Core": false,
     "Users": true,
-    "Auth": true,
+    "Auth": false,
     "Sms": true,
     "Settings": true,
     "Monitoring": true,
     "Contacts": true,
     "Orders": true,
-    "Intractions": true,
     "Interactions": true,
     "FollowUps": true
 }
