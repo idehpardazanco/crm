@@ -23,21 +23,35 @@ class OrderService
     ): LengthAwarePaginator {
         return Order::query()
             ->with([
-                'contact:id,name,mobile,business_name',
+                'contact:id,name,mobile,business_name,assigned_user_id',
                 'user:id,name',
             ])
             ->when(
                 ! $this->isAdmin($user),
-                fn ($query) => $query->where(
-                    'user_id',
-                    $user->id
-                )
+                fn ($query) =>
+                $query
+                    ->where(
+                        'user_id',
+                        $user->id
+                    )
+                    ->whereHas(
+                        'contact',
+                        fn ($query) =>
+                        $query->where(
+                            'assigned_user_id',
+                            $user->id
+                        )
+                    )
             )
             ->when(
                 $search,
-                function ($query) use ($search) {
+                function ($query) use (
+                    $search
+                ) {
                     $query->where(
-                        function ($query) use ($search) {
+                        function ($query) use (
+                            $search
+                        ) {
                             $query
                                 ->where(
                                     'product_name',
@@ -46,7 +60,11 @@ class OrderService
                                 )
                                 ->orWhereHas(
                                     'contact',
-                                    function ($query) use ($search) {
+                                    function (
+                                        $query
+                                    ) use (
+                                        $search
+                                    ) {
                                         $query
                                             ->where(
                                                 'name',
@@ -85,10 +103,20 @@ class OrderService
             ])
             ->when(
                 ! $this->isAdmin($user),
-                fn ($query) => $query->where(
-                    'user_id',
-                    $user->id
-                )
+                fn ($query) =>
+                $query
+                    ->where(
+                        'user_id',
+                        $user->id
+                    )
+                    ->whereHas(
+                        'contact',
+                        fn ($query) =>
+                        $query->where(
+                            'assigned_user_id',
+                            $user->id
+                        )
+                    )
             )
             ->findOrFail($id);
     }
@@ -98,41 +126,57 @@ class OrderService
         User $user
     ): Order {
         return DB::transaction(
-            function () use ($data, $user) {
-
+            function () use (
+                $data,
+                $user
+            ) {
                 $contact =
-                    $this->findAccessibleContact(
-                        (int) $data['contact_id'],
-                        $user
-                    );
+                    $this
+                        ->findAccessibleContact(
+                            (int)
+                            $data[
+                                'contact_id'
+                            ],
+                            $user
+                        );
 
                 $this->ensureCustomer(
                     $contact
                 );
 
-                $order = Order::query()
-                    ->create([
-                        'contact_id' =>
-                            $contact->id,
+                $order =
+                    Order::query()
+                        ->create([
+                            'contact_id' =>
+                                $contact->id,
 
-                        'user_id' =>
-                            $user->id,
+                            'user_id' =>
+                                $user->id,
 
-                        'product_name' =>
-                            $data['product_name'],
+                            'product_name' =>
+                                $data[
+                                    'product_name'
+                                ],
 
-                        'amount' =>
-                            $data['amount'],
+                            'amount' =>
+                                $data[
+                                    'amount'
+                                ],
 
-                        'status' =>
-                            $data['status'],
+                            'status' =>
+                                $data[
+                                    'status'
+                                ],
 
-                        'description' =>
-                            $data['description']
-                            ?? null,
-                    ]);
+                            'description' =>
+                                $data[
+                                    'description'
+                                ]
+                                ?? null,
+                        ]);
 
-                $this->monitoringService
+                $this
+                    ->monitoringService
                     ->activity(
                         'order_created',
                         'Orders',
@@ -143,15 +187,15 @@ class OrderService
                             'contact_id' =>
                                 $contact->id,
 
-                            'user_id' =>
-                                $user->id,
-
                             'amount' =>
                                 $order->amount,
 
                             'status' =>
-                                $order->status->value,
-                        ]
+                                $order
+                                    ->status
+                                    ->value,
+                        ],
+                        $user->id
                     );
 
                 return $order;
@@ -170,54 +214,67 @@ class OrderService
                 $data,
                 $user
             ) {
-                $order = $this->find(
-                    $id,
-                    $user
-                );
-
-                $contact =
-                    $this->findAccessibleContact(
-                        (int) $data['contact_id'],
+                $order =
+                    $this->find(
+                        $id,
                         $user
                     );
+
+                $contact =
+                    $this
+                        ->findAccessibleContact(
+                            (int)
+                            $data[
+                                'contact_id'
+                            ],
+                            $user
+                        );
 
                 $this->ensureCustomer(
                     $contact
                 );
 
                 $oldStatus =
-                    $order->status->value;
+                    $order
+                        ->status
+                        ->value;
 
                 $order->update([
                     'contact_id' =>
                         $contact->id,
 
                     'product_name' =>
-                        $data['product_name'],
+                        $data[
+                            'product_name'
+                        ],
 
                     'amount' =>
-                        $data['amount'],
+                        $data[
+                            'amount'
+                        ],
 
                     'status' =>
-                        $data['status'],
+                        $data[
+                            'status'
+                        ],
 
                     'description' =>
-                        $data['description']
+                        $data[
+                            'description'
+                        ]
                         ?? null,
                 ]);
 
                 $order->refresh();
 
-                $this->monitoringService
+                $this
+                    ->monitoringService
                     ->activity(
                         'order_updated',
                         'Orders',
                         [
                             'order_id' =>
                                 $order->id,
-
-                            'user_id' =>
-                                $user->id,
 
                             'old_status' =>
                                 $oldStatus,
@@ -226,7 +283,8 @@ class OrderService
                                 $order
                                     ->status
                                     ->value,
-                        ]
+                        ],
+                        $user->id
                     );
 
                 return $order;
@@ -243,24 +301,25 @@ class OrderService
             403
         );
 
-        $order = Order::query()
-            ->findOrFail($id);
+        $order =
+            Order::query()
+                ->findOrFail($id);
 
-        $orderId = $order->id;
+        $orderId =
+            $order->id;
 
         $order->delete();
 
-        $this->monitoringService
+        $this
+            ->monitoringService
             ->activity(
                 'order_deleted',
                 'Orders',
                 [
                     'order_id' =>
                         $orderId,
-
-                    'user_id' =>
-                        $user->id,
-                ]
+                ],
+                $user->id
             );
     }
 
@@ -274,7 +333,8 @@ class OrderService
             )
             ->when(
                 ! $this->isAdmin($user),
-                fn ($query) => $query->where(
+                fn ($query) =>
+                $query->where(
                     'assigned_user_id',
                     $user->id
                 )
@@ -295,7 +355,8 @@ class OrderService
         return Contact::query()
             ->when(
                 ! $this->isAdmin($user),
-                fn ($query) => $query->where(
+                fn ($query) =>
+                $query->where(
                     'assigned_user_id',
                     $user->id
                 )
@@ -309,8 +370,8 @@ class OrderService
         Contact $contact
     ): void {
         if (
-            $contact->status ===
-            'customer'
+            $contact->status
+            === 'customer'
         ) {
             return;
         }
