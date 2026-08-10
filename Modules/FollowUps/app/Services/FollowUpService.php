@@ -35,9 +35,13 @@ class FollowUpService
             )
             ->when(
                 $search,
-                function ($query) use ($search) {
+                function ($query) use (
+                    $search
+                ) {
                     $query->where(
-                        function ($query) use ($search) {
+                        function ($query) use (
+                            $search
+                        ) {
                             $query
                                 ->where(
                                     'title',
@@ -46,7 +50,11 @@ class FollowUpService
                                 )
                                 ->orWhereHas(
                                     'contact',
-                                    function ($query) use ($search) {
+                                    function (
+                                        $query
+                                    ) use (
+                                        $search
+                                    ) {
                                         $query
                                             ->where(
                                                 'name',
@@ -76,7 +84,9 @@ class FollowUpService
                     ELSE 1
                 END"
             )
-            ->orderBy('follow_up_at')
+            ->orderBy(
+                'follow_up_at'
+            )
             ->paginate(20)
             ->withQueryString();
     }
@@ -99,6 +109,9 @@ class FollowUpService
         $data['user_id'] =
             $user->id;
 
+        $data['notified_at'] =
+            null;
+
         $followUp =
             FollowUp::query()
                 ->create($data);
@@ -116,7 +129,9 @@ class FollowUpService
                         $contact->id,
 
                     'follow_up_at' =>
-                        $followUp->follow_up_at,
+                        $followUp
+                            ->follow_up_at
+                            ?->toDateTimeString(),
                 ],
                 $user->id
             );
@@ -138,9 +153,28 @@ class FollowUpService
         $oldStatus =
             $followUp->status;
 
-        $followUp->update([
-            'status' => $status,
-        ]);
+        $updateData = [
+            'status' =>
+                $status,
+        ];
+
+        /*
+         * اگر پیگیری انجام‌شده یا لغوشده
+         * دوباره باز شود، Scheduler باید
+         * دوباره بتواند آن را پردازش کند.
+         */
+        if (
+            $status === 'pending'
+            && $oldStatus !== 'pending'
+        ) {
+            $updateData[
+                'notified_at'
+            ] = null;
+        }
+
+        $followUp->update(
+            $updateData
+        );
 
         $this
             ->monitoringService
@@ -152,7 +186,8 @@ class FollowUpService
                         $followUp->id,
 
                     'contact_id' =>
-                        $followUp->contact_id,
+                        $followUp
+                            ->contact_id,
 
                     'old_status' =>
                         $oldStatus,
