@@ -45,7 +45,7 @@ const expanded = ref(null)
 const actionLabels = {
 
     /*
-     * ورود و خروج
+     * Authentication
      */
     login:
         'ورود به سیستم',
@@ -55,7 +55,7 @@ const actionLabels = {
 
 
     /*
-     * کاربران
+     * Users
      */
     user_created:
         'ایجاد کاربر',
@@ -68,7 +68,7 @@ const actionLabels = {
 
 
     /*
-     * مخاطبین
+     * Contacts
      */
     contact_created:
         'ایجاد مخاطب',
@@ -79,6 +79,9 @@ const actionLabels = {
     contact_deleted:
         'حذف مخاطب',
 
+    contact_status_changed:
+        'تغییر وضعیت مخاطب',
+
     contacts_imported:
         'ورود مخاطبین از Excel',
 
@@ -87,7 +90,7 @@ const actionLabels = {
 
 
     /*
-     * ارتباطات
+     * Interactions
      */
     interaction_created:
         'ثبت ارتباط',
@@ -97,7 +100,7 @@ const actionLabels = {
 
 
     /*
-     * پیگیری‌ها
+     * Follow Ups
      */
     follow_up_created:
         'ایجاد پیگیری',
@@ -113,7 +116,7 @@ const actionLabels = {
 
 
     /*
-     * پیامک
+     * SMS
      */
     sms_queued:
         'قرار گرفتن پیامک در صف',
@@ -126,7 +129,7 @@ const actionLabels = {
 
 
     /*
-     * سفارش‌ها
+     * Orders
      */
     order_created:
         'ثبت سفارش',
@@ -211,13 +214,9 @@ const applyFilters = () => {
 
 const resetFilters = () => {
     search.value = ''
-
     moduleFilter.value = ''
-
     userFilter.value = ''
-
     from.value = ''
-
     to.value = ''
 
     router.get(
@@ -232,7 +231,7 @@ const resetFilters = () => {
 
 /*
 |--------------------------------------------------------------------------
-| Toggle Details
+| Details
 |--------------------------------------------------------------------------
 */
 
@@ -244,12 +243,6 @@ const toggle = (id) => {
 }
 
 
-/*
-|--------------------------------------------------------------------------
-| Action Label
-|--------------------------------------------------------------------------
-*/
-
 const actionLabel = (action) => {
     return actionLabels[action]
         ?? action
@@ -257,24 +250,12 @@ const actionLabel = (action) => {
 }
 
 
-/*
-|--------------------------------------------------------------------------
-| Module Label
-|--------------------------------------------------------------------------
-*/
-
 const moduleLabel = (module) => {
     return moduleLabels[module]
         ?? module
         ?? '-'
 }
 
-
-/*
-|--------------------------------------------------------------------------
-| Meta Formatter
-|--------------------------------------------------------------------------
-*/
 
 const metaText = (meta) => {
     if (!meta) {
@@ -336,23 +317,19 @@ const metaText = (meta) => {
             </div>
 
 
-            <div>
-
-                <Link
-                    href="/reports"
-                    class="
-                        bg-blue-600
-                        hover:bg-blue-700
-                        text-white
-                        px-4
-                        py-2
-                        rounded
-                    "
-                >
-                    گزارش‌های پیشرفته
-                </Link>
-
-            </div>
+            <Link
+                href="/reports"
+                class="
+                    bg-blue-600
+                    hover:bg-blue-700
+                    text-white
+                    px-4
+                    py-2
+                    rounded
+                "
+            >
+                گزارش‌های پیشرفته
+            </Link>
 
         </div>
 
@@ -393,7 +370,6 @@ const metaText = (meta) => {
                     "
                 >
 
-                    <!-- Search -->
                     <div>
 
                         <label
@@ -422,7 +398,6 @@ const metaText = (meta) => {
                     </div>
 
 
-                    <!-- Module -->
                     <div>
 
                         <label
@@ -454,8 +429,7 @@ const metaText = (meta) => {
 
                             <option
                                 v-for="
-                                    module in
-                                    modules
+                                    module in modules
                                 "
                                 :key="module"
                                 :value="module"
@@ -472,7 +446,6 @@ const metaText = (meta) => {
                     </div>
 
 
-                    <!-- User -->
                     <div>
 
                         <label
@@ -504,15 +477,10 @@ const metaText = (meta) => {
 
                             <option
                                 v-for="
-                                    user in
-                                    users
+                                    user in users
                                 "
-                                :key="
-                                    user.id
-                                "
-                                :value="
-                                    user.id
-                                "
+                                :key="user.id"
+                                :value="user.id"
                             >
                                 {{ user.name }}
                             </option>
@@ -522,7 +490,6 @@ const metaText = (meta) => {
                     </div>
 
 
-                    <!-- From -->
                     <div>
 
                         <label
@@ -550,7 +517,6 @@ const metaText = (meta) => {
                     </div>
 
 
-                    <!-- To -->
                     <div>
 
                         <label
@@ -580,7 +546,6 @@ const metaText = (meta) => {
                 </div>
 
 
-                <!-- Filter Buttons -->
                 <div
                     class="
                         flex
@@ -627,7 +592,7 @@ const metaText = (meta) => {
         </div>
 
 
-        <!-- Result Count -->
+        <!-- Count -->
         <div
             class="
                 text-sm
@@ -649,7 +614,7 @@ const metaText = (meta) => {
         </div>
 
 
-        <!-- Logs -->
+        <!-- Logs Table -->
         <div
             class="
                 border
@@ -658,11 +623,7 @@ const metaText = (meta) => {
             "
         >
 
-            <div
-                class="
-                    overflow-x-auto
-                "
-            >
+            <div class="overflow-x-auto">
 
                 <table
                     class="
@@ -672,9 +633,7 @@ const metaText = (meta) => {
                 >
 
                     <thead
-                        class="
-                            bg-gray-50
-                        "
+                        class="bg-gray-50"
                     >
 
                         <tr>
@@ -689,7 +648,6 @@ const metaText = (meta) => {
                                 کاربر
                             </th>
 
-
                             <th
                                 class="
                                     border-b
@@ -699,7 +657,6 @@ const metaText = (meta) => {
                             >
                                 عملیات
                             </th>
-
 
                             <th
                                 class="
@@ -711,7 +668,6 @@ const metaText = (meta) => {
                                 بخش
                             </th>
 
-
                             <th
                                 class="
                                     border-b
@@ -721,7 +677,6 @@ const metaText = (meta) => {
                             >
                                 تاریخ
                             </th>
-
 
                             <th
                                 class="
@@ -742,15 +697,11 @@ const metaText = (meta) => {
 
                         <template
                             v-for="
-                                log in
-                                logs.data
+                                log in logs.data
                             "
-                            :key="
-                                log.id
-                            "
+                            :key="log.id"
                         >
 
-                            <!-- Main Log Row -->
                             <tr
                                 class="
                                     hover:bg-gray-50
@@ -769,13 +720,10 @@ const metaText = (meta) => {
                                         v-if="
                                             log.user
                                         "
-                                        class="
-                                            font-medium
-                                        "
+                                        class="font-medium"
                                     >
                                         {{
-                                            log.user
-                                                .name
+                                            log.user.name
                                         }}
                                     </span>
 
@@ -821,6 +769,10 @@ const metaText = (meta) => {
                                             'bg-red-50 text-red-700':
                                                 log.action ===
                                                 'sms_failed',
+
+                                            'bg-purple-50 text-purple-700':
+                                                log.action ===
+                                                'contact_status_changed',
                                         }"
                                     >
 
@@ -903,7 +855,7 @@ const metaText = (meta) => {
                             </tr>
 
 
-                            <!-- Meta -->
+                            <!-- Meta Details -->
                             <tr
                                 v-if="
                                     expanded ===
@@ -956,9 +908,7 @@ const metaText = (meta) => {
                             v-if="
                                 !logs.data
                                 ||
-                                !logs
-                                    .data
-                                    .length
+                                !logs.data.length
                             "
                         >
 
@@ -1001,8 +951,7 @@ const metaText = (meta) => {
 
             <template
                 v-for="
-                    link in
-                    logs.links
+                    link in logs.links
                 "
                 :key="
                     link.label
@@ -1010,12 +959,8 @@ const metaText = (meta) => {
             >
 
                 <Link
-                    v-if="
-                        link.url
-                    "
-                    :href="
-                        link.url
-                    "
+                    v-if="link.url"
+                    :href="link.url"
                     preserve-scroll
                     class="
                         border
