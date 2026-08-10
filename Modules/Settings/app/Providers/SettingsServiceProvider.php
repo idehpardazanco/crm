@@ -2,32 +2,18 @@
 
 namespace Modules\Settings\app\Providers;
 
-use App\Support\BaseModuleServiceProvider;
-use Modules\Settings\app\Repositories\SettingsRepository;
-use Modules\Settings\app\Services\SettingsService;
+use Nwidart\Modules\Support\ModuleServiceProvider;
 
-/**
- * Settings Module Provider
- */
-class SettingsServiceProvider extends BaseModuleServiceProvider
+class SettingsServiceProvider extends ModuleServiceProvider
 {
-    public function register(): void
-    {
-        // Bind Repository
-        $this->app->singleton(
-            SettingsRepository::class,
-            SettingsRepository::class
-        );
+    protected string $name =
+        'Settings';
 
-        // Bind Service
-        $this->app->singleton(
-            SettingsService::class,
-            SettingsService::class
-        );
-    }
+    protected string $nameLower =
+        'settings';
 
-    public function boot(): void
-    {
-        $this->loadModule(__DIR__ . '/..');
-    }
+    protected array $providers = [
+        EventServiceProvider::class,
+        RouteServiceProvider::class,
+    ];
 }
