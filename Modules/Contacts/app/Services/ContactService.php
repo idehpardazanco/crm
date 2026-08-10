@@ -66,28 +66,67 @@ class ContactService
         int $id,
         User $actor
     ): Contact {
+        $isAdmin =
+            $this->isAdmin($actor);
+
         return Contact::query()
             ->with([
                 'assignedUser:id,name',
 
-                'interactions' => fn ($query) =>
+                'interactions' =>
+                    fn ($query) =>
                     $query
-                        ->with('user:id,name')
+                        ->when(
+                            ! $isAdmin,
+                            fn ($query) =>
+                            $query->where(
+                                'user_id',
+                                $actor->id
+                            )
+                        )
+                        ->with(
+                            'user:id,name'
+                        )
                         ->latest(),
 
-                'followUps' => fn ($query) =>
+                'followUps' =>
+                    fn ($query) =>
                     $query
-                        ->with('user:id,name')
-                        ->latest('follow_up_at'),
+                        ->when(
+                            ! $isAdmin,
+                            fn ($query) =>
+                            $query->where(
+                                'user_id',
+                                $actor->id
+                            )
+                        )
+                        ->with(
+                            'user:id,name'
+                        )
+                        ->latest(
+                            'follow_up_at'
+                        ),
 
-                'orders' => fn ($query) =>
+                'orders' =>
+                    fn ($query) =>
                     $query
-                        ->with('user:id,name')
+                        ->when(
+                            ! $isAdmin,
+                            fn ($query) =>
+                            $query->where(
+                                'user_id',
+                                $actor->id
+                            )
+                        )
+                        ->with(
+                            'user:id,name'
+                        )
                         ->latest(),
             ])
             ->when(
-                ! $this->isAdmin($actor),
-                fn ($query) => $query->where(
+                ! $isAdmin,
+                fn ($query) =>
+                $query->where(
                     'assigned_user_id',
                     $actor->id
                 )
@@ -100,22 +139,29 @@ class ContactService
         User $actor
     ): Contact {
         if (! $this->isAdmin($actor)) {
-            $data['assigned_user_id'] =
-                $actor->id;
+            $data[
+                'assigned_user_id'
+            ] = $actor->id;
         }
 
-        $contact = Contact::query()
-            ->create($data);
+        $contact =
+            Contact::query()
+                ->create($data);
 
-        $this->monitoringService->activity(
-            'contact_created',
-            'Contacts',
-            [
-                'contact_id' => $contact->id,
-                'user_id' => $actor->id,
-                'mobile' => $contact->mobile,
-            ]
-        );
+        $this
+            ->monitoringService
+            ->activity(
+                'contact_created',
+                'Contacts',
+                [
+                    'contact_id' =>
+                        $contact->id,
+
+                    'mobile' =>
+                        $contact->mobile,
+                ],
+                $actor->id
+            );
 
         return $contact;
     }
@@ -125,28 +171,36 @@ class ContactService
         array $data,
         User $actor
     ): Contact {
-        $contact = $this->find(
-            $id,
-            $actor
-        );
+        $contact =
+            $this->find(
+                $id,
+                $actor
+            );
 
         if (! $this->isAdmin($actor)) {
-            $data['assigned_user_id'] =
-                $actor->id;
+            $data[
+                'assigned_user_id'
+            ] = $actor->id;
         }
 
-        $contact->update($data);
-
-        $this->monitoringService->activity(
-            'contact_updated',
-            'Contacts',
-            [
-                'contact_id' => $contact->id,
-                'user_id' => $actor->id,
-            ]
+        $contact->update(
+            $data
         );
 
-        return $contact->refresh();
+        $this
+            ->monitoringService
+            ->activity(
+                'contact_updated',
+                'Contacts',
+                [
+                    'contact_id' =>
+                        $contact->id,
+                ],
+                $actor->id
+            );
+
+        return $contact
+            ->refresh();
     }
 
     public function delete(
@@ -158,19 +212,23 @@ class ContactService
             403
         );
 
-        $contact = Contact::query()
-            ->findOrFail($id);
+        $contact =
+            Contact::query()
+                ->findOrFail($id);
 
         $contact->delete();
 
-        $this->monitoringService->activity(
-            'contact_deleted',
-            'Contacts',
-            [
-                'contact_id' => $id,
-                'user_id' => $actor->id,
-            ]
-        );
+        $this
+            ->monitoringService
+            ->activity(
+                'contact_deleted',
+                'Contacts',
+                [
+                    'contact_id' =>
+                        $id,
+                ],
+                $actor->id
+            );
     }
 
     private function isAdmin(
