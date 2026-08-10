@@ -2,8 +2,9 @@
 
 namespace Modules\FollowUps\app\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use App\Models\User;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Modules\Contacts\app\Models\Contact;
 
 class FollowUp extends Model
@@ -15,19 +16,28 @@ class FollowUp extends Model
         'description',
         'follow_up_at',
         'status',
+        'notified_at',
     ];
 
     protected $casts = [
-        'follow_up_at' => 'datetime',
+        'follow_up_at' =>
+            'datetime',
+
+        'notified_at' =>
+            'datetime',
     ];
 
-    public function contact()
+    public function contact(): BelongsTo
     {
-        return $this->belongsTo(Contact::class);
+        return $this->belongsTo(
+            Contact::class
+        );
     }
 
-    public function user()
+    public function user(): BelongsTo
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(
+            User::class
+        );
     }
 }
