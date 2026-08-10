@@ -4,7 +4,10 @@ import {
     router,
 } from '@inertiajs/vue3'
 
-import { ref } from 'vue'
+import {
+    computed,
+    ref,
+} from 'vue'
 
 const props = defineProps({
     contacts: Object,
@@ -29,11 +32,34 @@ const statusLabels = {
     inactive: 'غیرفعال',
 }
 
+const exportUrl = computed(() => {
+    const params =
+        new URLSearchParams()
+
+    const currentSearch =
+        props.filters?.search ?? ''
+
+    if (currentSearch) {
+        params.set(
+            'search',
+            currentSearch
+        )
+    }
+
+    const query =
+        params.toString()
+
+    return query
+        ? `/contacts/export?${query}`
+        : '/contacts/export'
+})
+
 const doSearch = () => {
     router.get(
         '/contacts',
         {
-            search: search.value,
+            search:
+                search.value,
         },
         {
             preserveState: true,
@@ -79,7 +105,7 @@ const remove = (id) => {
         dir="rtl"
     >
 
-        <!-- عنوان و عملیات -->
+        <!-- عنوان -->
         <div
             class="
                 flex
@@ -93,6 +119,7 @@ const remove = (id) => {
         >
 
             <div>
+
                 <h1
                     class="
                         text-2xl
@@ -110,9 +137,11 @@ const remove = (id) => {
                 >
                     مدیریت مخاطبین و کسب‌وکارها
                 </p>
+
             </div>
 
 
+            <!-- عملیات -->
             <div
                 class="
                     flex
@@ -121,6 +150,23 @@ const remove = (id) => {
                 "
             >
 
+                <!-- Export -->
+                <a
+                    :href="exportUrl"
+                    class="
+                        bg-emerald-600
+                        hover:bg-emerald-700
+                        text-white
+                        px-4
+                        py-2
+                        rounded
+                    "
+                >
+                    خروجی Excel
+                </a>
+
+
+                <!-- Import -->
                 <Link
                     href="/contacts/import"
                     class="
@@ -136,6 +182,7 @@ const remove = (id) => {
                 </Link>
 
 
+                <!-- Create -->
                 <Link
                     href="/contacts/create"
                     class="
@@ -166,7 +213,9 @@ const remove = (id) => {
         >
 
             <form
-                @submit.prevent="doSearch"
+                @submit.prevent="
+                    doSearch
+                "
                 class="
                     flex
                     flex-col
@@ -207,7 +256,9 @@ const remove = (id) => {
                 <button
                     v-if="search"
                     type="button"
-                    @click="clearSearch"
+                    @click="
+                        clearSearch
+                    "
                     class="
                         border
                         px-5
@@ -223,7 +274,27 @@ const remove = (id) => {
         </div>
 
 
-        <!-- جدول مخاطبین -->
+        <!-- تعداد نتایج -->
+        <div
+            class="
+                text-sm
+                text-gray-500
+                mb-3
+            "
+        >
+            تعداد مخاطبین:
+
+            <strong>
+                {{
+                    contacts.total
+                    ?? contacts.data?.length
+                    ?? 0
+                }}
+            </strong>
+        </div>
+
+
+        <!-- جدول -->
         <div
             class="
                 border
@@ -242,9 +313,7 @@ const remove = (id) => {
                 >
 
                     <thead
-                        class="
-                            bg-gray-50
-                        "
+                        class="bg-gray-50"
                     >
 
                         <tr>
@@ -259,7 +328,6 @@ const remove = (id) => {
                                 نام
                             </th>
 
-
                             <th
                                 class="
                                     border-b
@@ -269,7 +337,6 @@ const remove = (id) => {
                             >
                                 کسب‌وکار
                             </th>
-
 
                             <th
                                 class="
@@ -281,7 +348,6 @@ const remove = (id) => {
                                 موبایل
                             </th>
 
-
                             <th
                                 class="
                                     border-b
@@ -291,7 +357,6 @@ const remove = (id) => {
                             >
                                 تلفن
                             </th>
-
 
                             <th
                                 class="
@@ -303,7 +368,6 @@ const remove = (id) => {
                                 شهر
                             </th>
 
-
                             <th
                                 class="
                                     border-b
@@ -314,7 +378,6 @@ const remove = (id) => {
                                 وضعیت
                             </th>
 
-
                             <th
                                 class="
                                     border-b
@@ -324,7 +387,6 @@ const remove = (id) => {
                             >
                                 مسئول
                             </th>
-
 
                             <th
                                 class="
@@ -344,14 +406,19 @@ const remove = (id) => {
                     <tbody>
 
                         <tr
-                            v-for="contact in contacts.data"
-                            :key="contact.id"
+                            v-for="
+                                contact in
+                                contacts.data
+                            "
+                            :key="
+                                contact.id
+                            "
                             class="
                                 hover:bg-gray-50
                             "
                         >
 
-                            <!-- نام -->
+                            <!-- Name -->
                             <td
                                 class="
                                     border-b
@@ -375,7 +442,7 @@ const remove = (id) => {
                             </td>
 
 
-                            <!-- کسب و کار -->
+                            <!-- Business -->
                             <td
                                 class="
                                     border-b
@@ -384,43 +451,50 @@ const remove = (id) => {
                             >
 
                                 {{
-                                    contact.business_name
+                                    contact
+                                        .business_name
                                     ?? '-'
                                 }}
 
                             </td>
 
 
-                            <!-- موبایل -->
+                            <!-- Mobile -->
                             <td
                                 class="
                                     border-b
                                     p-3
                                 "
-                                dir="ltr"
                             >
-                                {{ contact.mobile }}
+
+                                <span dir="ltr">
+                                    {{ contact.mobile }}
+                                </span>
+
                             </td>
 
 
-                            <!-- تلفن -->
+                            <!-- Phone -->
                             <td
                                 class="
                                     border-b
                                     p-3
                                 "
-                                dir="ltr"
                             >
 
-                                {{
-                                    contact.phone
-                                    ?? '-'
-                                }}
+                                <span dir="ltr">
+
+                                    {{
+                                        contact.phone
+                                        ?? '-'
+                                    }}
+
+                                </span>
 
                             </td>
 
 
-                            <!-- شهر -->
+                            <!-- City -->
                             <td
                                 class="
                                     border-b
@@ -436,7 +510,7 @@ const remove = (id) => {
                             </td>
 
 
-                            <!-- وضعیت -->
+                            <!-- Status -->
                             <td
                                 class="
                                     border-b
@@ -469,19 +543,17 @@ const remove = (id) => {
                                             contact.status === 'demo_sent',
 
                                         'bg-green-100 text-green-700':
-                                            contact.status === 'customer',
-
-                                        'bg-red-100 text-red-700':
-                                            contact.status === 'rejected',
-
-                                        'bg-slate-100 text-slate-700':
-                                            contact.status === 'no_answer',
-
-                                        'bg-green-100 text-green-700':
+                                            contact.status === 'customer'
+                                            ||
                                             contact.status === 'active',
 
                                         'bg-red-100 text-red-700':
+                                            contact.status === 'rejected'
+                                            ||
                                             contact.status === 'inactive',
+
+                                        'bg-slate-100 text-slate-700':
+                                            contact.status === 'no_answer',
                                     }"
                                 >
 
@@ -497,7 +569,7 @@ const remove = (id) => {
                             </td>
 
 
-                            <!-- مسئول -->
+                            <!-- Assigned user -->
                             <td
                                 class="
                                     border-b
@@ -506,7 +578,8 @@ const remove = (id) => {
                             >
 
                                 {{
-                                    contact.assigned_user
+                                    contact
+                                        .assigned_user
                                         ?.name
                                     ?? '-'
                                 }}
@@ -514,7 +587,7 @@ const remove = (id) => {
                             </td>
 
 
-                            <!-- عملیات -->
+                            <!-- Actions -->
                             <td
                                 class="
                                     border-b
@@ -557,7 +630,9 @@ const remove = (id) => {
 
 
                                     <button
-                                        v-if="isAdmin"
+                                        v-if="
+                                            isAdmin
+                                        "
                                         type="button"
                                         @click="
                                             remove(
@@ -579,12 +654,14 @@ const remove = (id) => {
                         </tr>
 
 
-                        <!-- خالی -->
+                        <!-- Empty -->
                         <tr
                             v-if="
                                 !contacts.data
                                 ||
-                                !contacts.data.length
+                                !contacts
+                                    .data
+                                    .length
                             "
                         >
 
@@ -626,13 +703,22 @@ const remove = (id) => {
         >
 
             <template
-                v-for="link in contacts.links"
-                :key="link.label"
+                v-for="
+                    link in
+                    contacts.links
+                "
+                :key="
+                    link.label
+                "
             >
 
                 <Link
-                    v-if="link.url"
-                    :href="link.url"
+                    v-if="
+                        link.url
+                    "
+                    :href="
+                        link.url
+                    "
                     preserve-scroll
                     class="
                         border
@@ -644,7 +730,9 @@ const remove = (id) => {
                         'bg-blue-600 text-white border-blue-600':
                             link.active,
                     }"
-                    v-html="link.label"
+                    v-html="
+                        link.label
+                    "
                 />
 
 
@@ -657,7 +745,9 @@ const remove = (id) => {
                         rounded
                         opacity-40
                     "
-                    v-html="link.label"
+                    v-html="
+                        link.label
+                    "
                 ></span>
 
             </template>
