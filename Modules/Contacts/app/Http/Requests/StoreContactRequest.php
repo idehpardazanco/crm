@@ -2,6 +2,7 @@
 
 namespace Modules\Contacts\app\Http\Requests;
 
+use App\Support\IranianMobile;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 use Modules\Contacts\app\Enums\ContactStatus;
@@ -11,6 +12,18 @@ class StoreContactRequest extends FormRequest
     public function authorize(): bool
     {
         return true;
+    }
+
+    protected function prepareForValidation(): void
+    {
+        if ($this->has('mobile')) {
+            $this->merge([
+                'mobile' =>
+                    IranianMobile::normalize(
+                        $this->input('mobile')
+                    ),
+            ]);
+        }
     }
 
     public function rules(): array
@@ -31,7 +44,7 @@ class StoreContactRequest extends FormRequest
             'mobile' => [
                 'required',
                 'string',
-                'max:20',
+                'regex:' . IranianMobile::REGEX,
             ],
 
             'phone' => [
@@ -67,7 +80,7 @@ class StoreContactRequest extends FormRequest
             'status' => [
                 'required',
                 Rule::in(
-                    ContactStatus::values()
+                    ContactStatus::crmValues()
                 ),
             ],
 
@@ -86,6 +99,26 @@ class StoreContactRequest extends FormRequest
                 'nullable',
                 'string',
             ],
+        ];
+    }
+
+    public function messages(): array
+    {
+        return [
+            'name.required' =>
+                'نام مخاطب الزامی است.',
+
+            'mobile.required' =>
+                'شماره موبایل الزامی است.',
+
+            'mobile.regex' =>
+                'شماره موبایل معتبر نیست. نمونه صحیح: 09121234567',
+
+            'email.email' =>
+                'فرمت ایمیل معتبر نیست.',
+
+            'status.in' =>
+                'وضعیت مخاطب معتبر نیست.',
         ];
     }
 }
