@@ -9,6 +9,12 @@ class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
+        /*
+        |--------------------------------------------------------------------------
+        | CRM Seeders
+        |--------------------------------------------------------------------------
+        */
+
         $this->call([
             UsersDatabaseSeeder::class,
         ]);
