@@ -1,68 +1,113 @@
 <?php
 
-use App\Http\Middleware\EnsureSuperAdmin;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\ProfileController;
+use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
-use Modules\Users\app\Http\Controllers\UsersController;
+use Inertia\Inertia;
 
-Route::middleware([
-        'auth',
-        EnsureSuperAdmin::class,
-    ])
-    ->prefix('users')
-    ->name('users.')
+
+/*
+|--------------------------------------------------------------------------
+| Home
+|--------------------------------------------------------------------------
+*/
+
+Route::get(
+    '/',
+    function () {
+        return Inertia::render(
+            'Welcome',
+            [
+                'canLogin' =>
+                    Route::has(
+                        'login'
+                    ),
+
+                /*
+                 * ثبت‌نام عمومی CRM
+                 * غیرفعال است.
+                 */
+                'canRegister' =>
+                    false,
+
+                'laravelVersion' =>
+                    Application::VERSION,
+
+                'phpVersion' =>
+                    PHP_VERSION,
+            ]
+        );
+    }
+);
+
+
+/*
+|--------------------------------------------------------------------------
+| Authenticated Routes
+|--------------------------------------------------------------------------
+*/
+
+Route::middleware('auth')
     ->group(function () {
 
+        /*
+        |--------------------------------------------------------------------------
+        | Dashboard
+        |--------------------------------------------------------------------------
+        */
+
         Route::get(
-            '/',
+            '/dashboard',
             [
-                UsersController::class,
+                DashboardController::class,
                 'index',
             ]
-        )->name('index');
+        )->name(
+            'dashboard'
+        );
 
 
-        Route::get(
-            '/create',
-            [
-                UsersController::class,
-                'create',
-            ]
-        )->name('create');
-
-
-        Route::post(
-            '/',
-            [
-                UsersController::class,
-                'store',
-            ]
-        )->name('store');
-
+        /*
+        |--------------------------------------------------------------------------
+        | Profile
+        |--------------------------------------------------------------------------
+        */
 
         Route::get(
-            '/{id}/edit',
+            '/profile',
             [
-                UsersController::class,
+                ProfileController::class,
                 'edit',
             ]
-        )->name('edit');
+        )->name(
+            'profile.edit'
+        );
 
 
-        Route::put(
-            '/{id}',
+        Route::patch(
+            '/profile',
             [
-                UsersController::class,
+                ProfileController::class,
                 'update',
             ]
-        )->name('update');
+        )->name(
+            'profile.update'
+        );
 
 
         Route::delete(
-            '/{id}',
+            '/profile',
             [
-                UsersController::class,
+                ProfileController::class,
                 'destroy',
             ]
-        )->name('destroy');
+        )->name(
+            'profile.destroy'
+        );
 
     });
+
+
+require __DIR__
+    . '/auth.php';
