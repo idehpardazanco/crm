@@ -4,6 +4,7 @@ namespace Modules\Sms\app\Services;
 
 use App\Models\User;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Modules\Contacts\app\Models\Contact;
 use Modules\Sms\app\Models\SmsLog;
 
 class SmsLogService
@@ -23,16 +24,32 @@ class SmsLogService
                     'super_admin'
                 ),
                 fn ($query) =>
-                    $query->where(
+                $query
+                    ->where(
                         'user_id',
                         $user->id
+                    )
+                    ->whereHasMorph(
+                        'sendable',
+                        [
+                            Contact::class,
+                        ],
+                        fn ($query) =>
+                        $query->where(
+                            'assigned_user_id',
+                            $user->id
+                        )
                     )
             )
             ->when(
                 $search,
-                function ($query) use ($search) {
+                function ($query) use (
+                    $search
+                ) {
                     $query->where(
-                        function ($query) use ($search) {
+                        function ($query) use (
+                            $search
+                        ) {
                             $query
                                 ->where(
                                     'mobile',
