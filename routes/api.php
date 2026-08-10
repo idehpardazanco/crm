@@ -1,8 +1,14 @@
 <?php
 
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Route;
-
-Route::get('/user', function (Request $request) {
-    return $request->user();
-})->middleware('auth:sanctum');
+/*
+|--------------------------------------------------------------------------
+| API Routes
+|--------------------------------------------------------------------------
+|
+| در نسخه فعلی CRM هیچ API عمومی ارائه نمی‌شود.
+|
+| در صورت نیاز به API در آینده، Routeها باید
+| همراه با Authentication، Authorization و
+| Responseهای اختصاصی JSON طراحی شوند.
+|
+*/
