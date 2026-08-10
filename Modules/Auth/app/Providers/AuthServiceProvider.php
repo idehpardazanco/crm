@@ -2,20 +2,17 @@
 
 namespace Modules\Auth\app\Providers;
 
-use App\Support\BaseModuleServiceProvider;
-use Modules\Auth\app\Services\AuthService;
-// use Modules\Auth\Services\OtpService;
+use Nwidart\Modules\Support\ModuleServiceProvider;
 
-class AuthServiceProvider extends BaseModuleServiceProvider
+class AuthServiceProvider extends ModuleServiceProvider
 {
-    public function register(): void
-    {
-        $this->app->singleton(AuthService::class);
-        // $this->app->singleton(OtpService::class);
-    }
+    protected string $name =
+        'Auth';
 
-    public function boot(): void
-    {
-        $this->loadModule(__DIR__ . '/..');
-    }
+    protected string $nameLower =
+        'auth';
+
+    protected array $providers = [
+        //
+    ];
 }
