@@ -2,8 +2,8 @@
 
 namespace App\Http\Requests\Auth;
 
+use App\Support\IranianMobile;
 use Illuminate\Auth\Events\Lockout;
-use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\RateLimiter;
@@ -12,75 +12,186 @@ use Illuminate\Validation\ValidationException;
 
 class LoginRequest extends FormRequest
 {
-    /**
-     * Determine if the user is authorized to make this request.
-     */
     public function authorize(): bool
     {
         return true;
     }
 
-    /**
-     * Get the validation rules that apply to the request.
-     *
-     * @return array<string, ValidationRule|array<mixed>|string>
-     */
+
+    /*
+    |--------------------------------------------------------------------------
+    | Prepare Mobile
+    |--------------------------------------------------------------------------
+    */
+
+    protected function prepareForValidation(): void
+    {
+        if ($this->has('mobile')) {
+            $this->merge([
+                'mobile' =>
+                    IranianMobile::normalize(
+                        $this->input(
+                            'mobile'
+                        )
+                    ),
+            ]);
+        }
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Rules
+    |--------------------------------------------------------------------------
+    */
+
     public function rules(): array
     {
         return [
-            'email' => ['required', 'string', 'email'],
-            'password' => ['required', 'string'],
+            'mobile' => [
+                'required',
+                'string',
+                'regex:' .
+                IranianMobile::REGEX,
+            ],
+
+            'password' => [
+                'required',
+                'string',
+            ],
+
+            'remember' => [
+                'nullable',
+                'boolean',
+            ],
         ];
     }
 
-    /**
-     * Attempt to authenticate the request's credentials.
-     *
-     * @throws ValidationException
-     */
+
+    /*
+    |--------------------------------------------------------------------------
+    | Authenticate
+    |--------------------------------------------------------------------------
+    */
+
     public function authenticate(): void
     {
         $this->ensureIsNotRateLimited();
 
-        if (! Auth::attempt($this->only('email', 'password'), $this->boolean('remember'))) {
-            RateLimiter::hit($this->throttleKey());
+        $authenticated =
+            Auth::attempt(
+                [
+                    'mobile' =>
+                        $this->string(
+                            'mobile'
+                        )->toString(),
+
+                    /*
+                     * کاربر غیرفعال حتی با رمز صحیح
+                     * اجازه ورود ندارد.
+                     */
+                    'status' =>
+                        'active',
+
+                    'password' =>
+                        $this->input(
+                            'password'
+                        ),
+                ],
+                $this->boolean(
+                    'remember'
+                )
+            );
+
+        if (! $authenticated) {
+            RateLimiter::hit(
+                $this->throttleKey()
+            );
 
             throw ValidationException::withMessages([
-                'email' => trans('auth.failed'),
+                'mobile' =>
+                    'شماره موبایل یا رمز عبور صحیح نیست.',
             ]);
         }
 
-        RateLimiter::clear($this->throttleKey());
+        RateLimiter::clear(
+            $this->throttleKey()
+        );
     }
 
-    /**
-     * Ensure the login request is not rate limited.
-     *
-     * @throws ValidationException
-     */
+
+    /*
+    |--------------------------------------------------------------------------
+    | Rate Limit
+    |--------------------------------------------------------------------------
+    */
+
     public function ensureIsNotRateLimited(): void
     {
-        if (! RateLimiter::tooManyAttempts($this->throttleKey(), 5)) {
+        if (
+            ! RateLimiter::tooManyAttempts(
+                $this->throttleKey(),
+                5
+            )
+        ) {
             return;
         }
 
-        event(new Lockout($this));
+        event(
+            new Lockout($this)
+        );
 
-        $seconds = RateLimiter::availableIn($this->throttleKey());
+        $seconds =
+            RateLimiter::availableIn(
+                $this->throttleKey()
+            );
 
         throw ValidationException::withMessages([
-            'email' => trans('auth.throttle', [
-                'seconds' => $seconds,
-                'minutes' => ceil($seconds / 60),
-            ]),
+            'mobile' =>
+                'تعداد تلاش‌های ورود بیش از حد مجاز است. لطفاً '
+                . $seconds
+                . ' ثانیه دیگر تلاش کنید.',
         ]);
     }
 
-    /**
-     * Get the rate limiting throttle key for the request.
-     */
+
+    /*
+    |--------------------------------------------------------------------------
+    | Throttle Key
+    |--------------------------------------------------------------------------
+    */
+
     public function throttleKey(): string
     {
-        return Str::transliterate(Str::lower($this->string('email')).'|'.$this->ip());
+        return Str::transliterate(
+            Str::lower(
+                $this->string(
+                    'mobile'
+                )->toString()
+            )
+            . '|'
+            . $this->ip()
+        );
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Messages
+    |--------------------------------------------------------------------------
+    */
+
+    public function messages(): array
+    {
+        return [
+            'mobile.required' =>
+                'شماره موبایل الزامی است.',
+
+            'mobile.regex' =>
+                'شماره موبایل معتبر نیست. نمونه: 09121234567',
+
+            'password.required' =>
+                'رمز عبور الزامی است.',
+        ];
     }
 }
