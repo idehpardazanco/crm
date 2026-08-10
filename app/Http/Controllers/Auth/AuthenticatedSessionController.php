@@ -7,7 +7,6 @@ use App\Http\Requests\Auth\LoginRequest;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use Inertia\Response;
 use Modules\Monitoring\app\Services\MonitoringService;
@@ -19,21 +18,32 @@ class AuthenticatedSessionController extends Controller
     ) {
     }
 
+
+    /*
+    |--------------------------------------------------------------------------
+    | Login Page
+    |--------------------------------------------------------------------------
+    */
+
     public function create(): Response
     {
         return Inertia::render(
             'Auth/Login',
             [
-                'canResetPassword' =>
-                    Route::has(
-                        'password.request'
-                    ),
-
                 'status' =>
-                    session('status'),
+                    session(
+                        'status'
+                    ),
             ]
         );
     }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Login
+    |--------------------------------------------------------------------------
+    */
 
     public function store(
         LoginRequest $request
@@ -43,6 +53,31 @@ class AuthenticatedSessionController extends Controller
         $request
             ->session()
             ->regenerate();
+
+        $user =
+            $request->user();
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Update Last Login
+        |--------------------------------------------------------------------------
+        */
+
+        $user->forceFill([
+            'last_login_at' =>
+                now(),
+
+            'last_login_ip' =>
+                $request->ip(),
+        ])->save();
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Monitoring
+        |--------------------------------------------------------------------------
+        */
 
         $this
             ->monitoringService
@@ -57,8 +92,15 @@ class AuthenticatedSessionController extends Controller
                         $request
                             ->userAgent(),
                 ],
-                $request->user()->id
+                $user->id
             );
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Redirect
+        |--------------------------------------------------------------------------
+        */
 
         return redirect()
             ->intended(
@@ -69,11 +111,20 @@ class AuthenticatedSessionController extends Controller
             );
     }
 
+
+    /*
+    |--------------------------------------------------------------------------
+    | Logout
+    |--------------------------------------------------------------------------
+    */
+
     public function destroy(
         Request $request
     ): RedirectResponse {
         $userId =
-            $request->user()?->id;
+            $request
+                ->user()
+                ?->id;
 
         if ($userId) {
             $this
@@ -100,6 +151,7 @@ class AuthenticatedSessionController extends Controller
             ->session()
             ->regenerateToken();
 
-        return redirect('/');
+        return redirect()
+            ->route('login');
     }
 }
