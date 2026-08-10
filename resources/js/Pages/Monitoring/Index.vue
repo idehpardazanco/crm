@@ -35,60 +35,159 @@ const to = ref(
 
 const expanded = ref(null)
 
+/*
+|--------------------------------------------------------------------------
+| عنوان عملیات‌ها
+|--------------------------------------------------------------------------
+*/
+
 const actionLabels = {
+    /*
+     * ورود و خروج
+     */
     login: 'ورود به سیستم',
     logout: 'خروج از سیستم',
 
+    /*
+     * کاربران
+     */
     user_created: 'ایجاد کاربر',
     user_updated: 'ویرایش کاربر',
     user_deleted: 'حذف کاربر',
 
+    /*
+     * مخاطبین
+     */
     contact_created: 'ایجاد مخاطب',
     contact_updated: 'ویرایش مخاطب',
     contact_deleted: 'حذف مخاطب',
 
-    interaction_created: 'ثبت ارتباط',
-    interaction_deleted: 'حذف ارتباط',
+    contacts_imported:
+        'ورود مخاطبین از Excel',
 
-    follow_up_created: 'ایجاد پیگیری',
-    follow_up_status_updated: 'تغییر وضعیت پیگیری',
-    follow_up_deleted: 'حذف پیگیری',
+    contacts_exported:
+        'خروجی Excel مخاطبین',
 
-    sms_queued: 'قرار گرفتن پیامک در صف',
-    sms_sent: 'ارسال موفق پیامک',
-    sms_failed: 'خطا در ارسال پیامک',
+    /*
+     * ارتباطات
+     */
+    interaction_created:
+        'ثبت ارتباط',
 
-    order_created: 'ثبت سفارش',
-    order_updated: 'ویرایش سفارش',
-    order_deleted: 'حذف سفارش',
+    interaction_deleted:
+        'حذف ارتباط',
+
+    /*
+     * پیگیری‌ها
+     */
+    follow_up_created:
+        'ایجاد پیگیری',
+
+    follow_up_status_updated:
+        'تغییر وضعیت پیگیری',
+
+    follow_up_deleted:
+        'حذف پیگیری',
+
+    /*
+     * پیامک
+     */
+    sms_queued:
+        'قرار گرفتن پیامک در صف',
+
+    sms_sent:
+        'ارسال موفق پیامک',
+
+    sms_failed:
+        'خطا در ارسال پیامک',
+
+    /*
+     * سفارش‌ها
+     */
+    order_created:
+        'ثبت سفارش',
+
+    order_updated:
+        'ویرایش سفارش',
+
+    order_deleted:
+        'حذف سفارش',
 }
+
+/*
+|--------------------------------------------------------------------------
+| نام فارسی ماژول‌ها
+|--------------------------------------------------------------------------
+*/
+
+const moduleLabels = {
+    Auth: 'ورود و خروج',
+    Users: 'کاربران',
+    Contacts: 'مخاطبین',
+    Interactions: 'ارتباطات',
+    FollowUps: 'پیگیری‌ها',
+    Sms: 'پیامک',
+    Orders: 'سفارش‌ها',
+}
+
+/*
+|--------------------------------------------------------------------------
+| Filters
+|--------------------------------------------------------------------------
+*/
 
 const applyFilters = () => {
     router.get(
         '/monitoring',
         {
-            search: search.value,
-            module: moduleFilter.value,
-            user_id: userFilter.value,
-            from: from.value,
-            to: to.value,
+            search:
+                search.value,
+
+            module:
+                moduleFilter.value,
+
+            user_id:
+                userFilter.value,
+
+            from:
+                from.value,
+
+            to:
+                to.value,
         },
         {
             preserveState: true,
             replace: true,
+            preserveScroll: true,
         }
     )
 }
 
 const resetFilters = () => {
     search.value = ''
+
     moduleFilter.value = ''
+
     userFilter.value = ''
+
     from.value = ''
+
     to.value = ''
 
-    router.get('/monitoring')
+    router.get(
+        '/monitoring',
+        {},
+        {
+            replace: true,
+        }
+    )
 }
+
+/*
+|--------------------------------------------------------------------------
+| نمایش جزئیات
+|--------------------------------------------------------------------------
+*/
 
 const toggle = (id) => {
     expanded.value =
@@ -97,20 +196,47 @@ const toggle = (id) => {
             : id
 }
 
+/*
+|--------------------------------------------------------------------------
+| Labels
+|--------------------------------------------------------------------------
+*/
+
+const actionLabel = (action) => {
+    return actionLabels[action]
+        ?? action
+        ?? '-'
+}
+
 const moduleLabel = (module) => {
-    const labels = {
-        Auth: 'ورود و خروج',
-        Users: 'کاربران',
-        Contacts: 'مخاطبین',
-        Interactions: 'ارتباطات',
-        FollowUps: 'پیگیری‌ها',
-        Sms: 'پیامک',
-        Orders: 'سفارش‌ها',
+    return moduleLabels[module]
+        ?? module
+        ?? '-'
+}
+
+/*
+|--------------------------------------------------------------------------
+| Meta
+|--------------------------------------------------------------------------
+*/
+
+const metaText = (meta) => {
+    if (!meta) {
+        return '{}'
     }
 
-    return labels[module] ?? module
+    try {
+        return JSON.stringify(
+            meta,
+            null,
+            2
+        )
+    } catch {
+        return '{}'
+    }
 }
 </script>
+
 
 <template>
     <div
@@ -118,328 +244,643 @@ const moduleLabel = (module) => {
         dir="rtl"
     >
 
-        <div class="mb-6">
+        <!-- Header -->
+        <div
+            class="
+                flex
+                flex-col
+                md:flex-row
+                md:items-center
+                justify-between
+                gap-4
+                mb-6
+            "
+        >
 
-            <h1 class="text-2xl font-bold">
-                گزارش فعالیت کاربران
-            </h1>
+            <div>
 
-            <p class="text-gray-500 mt-2">
-                تاریخچه عملیات انجام‌شده در CRM
-            </p>
+                <h1
+                    class="
+                        text-2xl
+                        font-bold
+                    "
+                >
+                    گزارش فعالیت کاربران
+                </h1>
+
+                <p
+                    class="
+                        text-gray-500
+                        mt-2
+                    "
+                >
+                    مشاهده و بررسی فعالیت‌های انجام‌شده در CRM
+                </p>
+
+            </div>
 
         </div>
 
 
+        <!-- Filters -->
         <div
             class="
                 border
                 rounded
-                p-4
+                p-5
                 mb-6
+            "
+        >
+
+            <h2
+                class="
+                    font-bold
+                    mb-4
+                "
+            >
+                فیلتر گزارش‌ها
+            </h2>
+
+
+            <form
+                @submit.prevent="
+                    applyFilters
+                "
+            >
+
+                <div
+                    class="
+                        grid
+                        grid-cols-1
+                        md:grid-cols-2
+                        lg:grid-cols-5
+                        gap-4
+                    "
+                >
+
+                    <!-- Search -->
+                    <div>
+
+                        <label
+                            class="
+                                block
+                                text-sm
+                                font-medium
+                                mb-2
+                            "
+                        >
+                            جستجو
+                        </label>
+
+                        <input
+                            v-model="search"
+                            type="text"
+                            class="
+                                border
+                                rounded
+                                p-2
+                                w-full
+                            "
+                            placeholder="عملیات، بخش یا کاربر"
+                        >
+
+                    </div>
+
+
+                    <!-- Module -->
+                    <div>
+
+                        <label
+                            class="
+                                block
+                                text-sm
+                                font-medium
+                                mb-2
+                            "
+                        >
+                            بخش
+                        </label>
+
+                        <select
+                            v-model="
+                                moduleFilter
+                            "
+                            class="
+                                border
+                                rounded
+                                p-2
+                                w-full
+                            "
+                        >
+
+                            <option value="">
+                                همه بخش‌ها
+                            </option>
+
+                            <option
+                                v-for="
+                                    module in
+                                    modules
+                                "
+                                :key="module"
+                                :value="module"
+                            >
+                                {{
+                                    moduleLabel(
+                                        module
+                                    )
+                                }}
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <!-- User -->
+                    <div>
+
+                        <label
+                            class="
+                                block
+                                text-sm
+                                font-medium
+                                mb-2
+                            "
+                        >
+                            کاربر
+                        </label>
+
+                        <select
+                            v-model="
+                                userFilter
+                            "
+                            class="
+                                border
+                                rounded
+                                p-2
+                                w-full
+                            "
+                        >
+
+                            <option value="">
+                                همه کاربران
+                            </option>
+
+                            <option
+                                v-for="
+                                    user in users
+                                "
+                                :key="user.id"
+                                :value="user.id"
+                            >
+                                {{ user.name }}
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <!-- From -->
+                    <div>
+
+                        <label
+                            class="
+                                block
+                                text-sm
+                                font-medium
+                                mb-2
+                            "
+                        >
+                            از تاریخ
+                        </label>
+
+                        <input
+                            v-model="from"
+                            type="date"
+                            class="
+                                border
+                                rounded
+                                p-2
+                                w-full
+                            "
+                        >
+
+                    </div>
+
+
+                    <!-- To -->
+                    <div>
+
+                        <label
+                            class="
+                                block
+                                text-sm
+                                font-medium
+                                mb-2
+                            "
+                        >
+                            تا تاریخ
+                        </label>
+
+                        <input
+                            v-model="to"
+                            type="date"
+                            class="
+                                border
+                                rounded
+                                p-2
+                                w-full
+                            "
+                        >
+
+                    </div>
+
+                </div>
+
+
+                <div
+                    class="
+                        flex
+                        flex-wrap
+                        gap-3
+                        mt-5
+                    "
+                >
+
+                    <button
+                        type="submit"
+                        class="
+                            bg-blue-600
+                            hover:bg-blue-700
+                            text-white
+                            px-5
+                            py-2
+                            rounded
+                        "
+                    >
+                        اعمال فیلتر
+                    </button>
+
+
+                    <button
+                        type="button"
+                        @click="
+                            resetFilters
+                        "
+                        class="
+                            border
+                            px-5
+                            py-2
+                            rounded
+                        "
+                    >
+                        حذف فیلترها
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+
+        <!-- Result Count -->
+        <div
+            class="
+                text-sm
+                text-gray-500
+                mb-3
+            "
+        >
+
+            تعداد گزارش‌ها:
+
+            <strong>
+                {{
+                    logs.total
+                    ?? logs.data?.length
+                    ?? 0
+                }}
+            </strong>
+
+        </div>
+
+
+        <!-- Logs Table -->
+        <div
+            class="
+                border
+                rounded
+                overflow-hidden
             "
         >
 
             <div
                 class="
-                    grid
-                    grid-cols-1
-                    md:grid-cols-2
-                    lg:grid-cols-5
-                    gap-3
+                    overflow-x-auto
                 "
             >
 
-                <input
-                    v-model="search"
-                    @keyup.enter="
-                        applyFilters
-                    "
-                    type="text"
+                <table
                     class="
-                        border
-                        rounded
-                        p-2
-                    "
-                    placeholder="جستجو..."
-                >
-
-
-                <select
-                    v-model="moduleFilter"
-                    class="
-                        border
-                        rounded
-                        p-2
+                        w-full
+                        border-collapse
                     "
                 >
 
-                    <option value="">
-                        همه بخش‌ها
-                    </option>
-
-                    <option
-                        v-for="module in modules"
-                        :key="module"
-                        :value="module"
-                    >
-                        {{
-                            moduleLabel(
-                                module
-                            )
-                        }}
-                    </option>
-
-                </select>
-
-
-                <select
-                    v-model="userFilter"
-                    class="
-                        border
-                        rounded
-                        p-2
-                    "
-                >
-
-                    <option value="">
-                        همه کاربران
-                    </option>
-
-                    <option
-                        v-for="user in users"
-                        :key="user.id"
-                        :value="user.id"
-                    >
-                        {{ user.name }}
-                    </option>
-
-                </select>
-
-
-                <input
-                    v-model="from"
-                    type="date"
-                    class="
-                        border
-                        rounded
-                        p-2
-                    "
-                >
-
-
-                <input
-                    v-model="to"
-                    type="date"
-                    class="
-                        border
-                        rounded
-                        p-2
-                    "
-                >
-
-            </div>
-
-
-            <div class="flex gap-3 mt-4">
-
-                <button
-                    type="button"
-                    @click="applyFilters"
-                    class="
-                        bg-blue-600
-                        text-white
-                        px-4
-                        py-2
-                        rounded
-                    "
-                >
-                    اعمال فیلتر
-                </button>
-
-                <button
-                    type="button"
-                    @click="resetFilters"
-                    class="
-                        border
-                        px-4
-                        py-2
-                        rounded
-                    "
-                >
-                    حذف فیلترها
-                </button>
-
-            </div>
-
-        </div>
-
-
-        <div class="overflow-x-auto">
-
-            <table
-                class="
-                    w-full
-                    border-collapse
-                    border
-                "
-            >
-
-                <thead>
-
-                    <tr>
-
-                        <th class="border p-2">
-                            کاربر
-                        </th>
-
-                        <th class="border p-2">
-                            عملیات
-                        </th>
-
-                        <th class="border p-2">
-                            بخش
-                        </th>
-
-                        <th class="border p-2">
-                            تاریخ
-                        </th>
-
-                        <th class="border p-2">
-                            جزئیات
-                        </th>
-
-                    </tr>
-
-                </thead>
-
-
-                <tbody>
-
-                    <template
-                        v-for="log in logs.data"
-                        :key="log.id"
+                    <thead
+                        class="bg-gray-50"
                     >
 
                         <tr>
 
-                            <td class="border p-2">
-
-                                {{
-                                    log.user?.name
-                                    ?? 'سیستم'
-                                }}
-
-                            </td>
-
-
-                            <td class="border p-2">
-
-                                {{
-                                    actionLabels[
-                                        log.action
-                                    ]
-                                    ?? log.action
-                                }}
-
-                            </td>
+                            <th
+                                class="
+                                    border-b
+                                    p-3
+                                    text-right
+                                "
+                            >
+                                کاربر
+                            </th>
 
 
-                            <td class="border p-2">
-
-                                {{
-                                    moduleLabel(
-                                        log.module
-                                    )
-                                }}
-
-                            </td>
-
-
-                            <td class="border p-2">
-                                {{ log.created_at }}
-                            </td>
+                            <th
+                                class="
+                                    border-b
+                                    p-3
+                                    text-right
+                                "
+                            >
+                                عملیات
+                            </th>
 
 
-                            <td class="border p-2">
+                            <th
+                                class="
+                                    border-b
+                                    p-3
+                                    text-right
+                                "
+                            >
+                                بخش
+                            </th>
 
-                                <button
-                                    type="button"
-                                    @click="
-                                        toggle(log.id)
-                                    "
-                                    class="text-blue-600"
-                                >
-                                    {{
-                                        expanded ===
-                                        log.id
-                                            ? 'بستن'
-                                            : 'نمایش'
-                                    }}
-                                </button>
 
-                            </td>
+                            <th
+                                class="
+                                    border-b
+                                    p-3
+                                    text-right
+                                "
+                            >
+                                تاریخ
+                            </th>
+
+
+                            <th
+                                class="
+                                    border-b
+                                    p-3
+                                    text-right
+                                "
+                            >
+                                جزئیات
+                            </th>
 
                         </tr>
 
+                    </thead>
 
+
+                    <tbody>
+
+                        <template
+                            v-for="
+                                log in logs.data
+                            "
+                            :key="log.id"
+                        >
+
+                            <!-- Main Row -->
+                            <tr
+                                class="
+                                    hover:bg-gray-50
+                                "
+                            >
+
+                                <!-- User -->
+                                <td
+                                    class="
+                                        border-b
+                                        p-3
+                                    "
+                                >
+
+                                    <span
+                                        v-if="
+                                            log.user
+                                        "
+                                        class="
+                                            font-medium
+                                        "
+                                    >
+                                        {{
+                                            log.user.name
+                                        }}
+                                    </span>
+
+                                    <span
+                                        v-else
+                                        class="
+                                            text-gray-500
+                                        "
+                                    >
+                                        سیستم
+                                    </span>
+
+                                </td>
+
+
+                                <!-- Action -->
+                                <td
+                                    class="
+                                        border-b
+                                        p-3
+                                    "
+                                >
+
+                                    <span
+                                        class="
+                                            inline-block
+                                            bg-blue-50
+                                            text-blue-700
+                                            px-3
+                                            py-1
+                                            rounded
+                                            text-sm
+                                        "
+                                    >
+                                        {{
+                                            actionLabel(
+                                                log.action
+                                            )
+                                        }}
+                                    </span>
+
+                                </td>
+
+
+                                <!-- Module -->
+                                <td
+                                    class="
+                                        border-b
+                                        p-3
+                                    "
+                                >
+
+                                    {{
+                                        moduleLabel(
+                                            log.module
+                                        )
+                                    }}
+
+                                </td>
+
+
+                                <!-- Created At -->
+                                <td
+                                    class="
+                                        border-b
+                                        p-3
+                                        whitespace-nowrap
+                                    "
+                                >
+
+                                    {{
+                                        log.created_at
+                                    }}
+
+                                </td>
+
+
+                                <!-- Details -->
+                                <td
+                                    class="
+                                        border-b
+                                        p-3
+                                    "
+                                >
+
+                                    <button
+                                        type="button"
+                                        @click="
+                                            toggle(
+                                                log.id
+                                            )
+                                        "
+                                        class="
+                                            text-blue-600
+                                            hover:underline
+                                        "
+                                    >
+
+                                        {{
+                                            expanded ===
+                                            log.id
+                                                ? 'بستن جزئیات'
+                                                : 'نمایش جزئیات'
+                                        }}
+
+                                    </button>
+
+                                </td>
+
+                            </tr>
+
+
+                            <!-- Meta Row -->
+                            <tr
+                                v-if="
+                                    expanded ===
+                                    log.id
+                                "
+                            >
+
+                                <td
+                                    colspan="5"
+                                    class="
+                                        border-b
+                                        p-4
+                                        bg-gray-50
+                                    "
+                                >
+
+                                    <div
+                                        class="
+                                            mb-2
+                                            font-medium
+                                        "
+                                    >
+                                        اطلاعات ثبت‌شده:
+                                    </div>
+
+
+                                    <pre
+                                        class="
+                                            bg-white
+                                            border
+                                            rounded
+                                            p-4
+                                            text-sm
+                                            whitespace-pre-wrap
+                                            break-words
+                                            overflow-x-auto
+                                        "
+                                        dir="ltr"
+                                    >{{ metaText(log.meta) }}</pre>
+
+                                </td>
+
+                            </tr>
+
+                        </template>
+
+
+                        <!-- Empty -->
                         <tr
                             v-if="
-                                expanded ===
-                                log.id
+                                !logs.data
+                                ||
+                                !logs.data.length
                             "
                         >
 
                             <td
                                 colspan="5"
                                 class="
-                                    border
-                                    p-4
-                                    bg-gray-50
+                                    p-8
+                                    text-center
+                                    text-gray-500
                                 "
                             >
-
-                                <pre
-                                    class="
-                                        text-sm
-                                        whitespace-pre-wrap
-                                        break-words
-                                        text-left
-                                    "
-                                    dir="ltr"
-                                >{{ JSON.stringify(log.meta ?? {}, null, 2) }}</pre>
-
+                                هیچ فعالیتی با این فیلترها یافت نشد.
                             </td>
 
                         </tr>
 
-                    </template>
+                    </tbody>
 
+                </table>
 
-                    <tr
-                        v-if="!logs.data.length"
-                    >
-
-                        <td
-                            colspan="5"
-                            class="
-                                border
-                                p-6
-                                text-center
-                            "
-                        >
-                            فعالیتی یافت نشد
-                        </td>
-
-                    </tr>
-
-                </tbody>
-
-            </table>
+            </div>
 
         </div>
 
 
+        <!-- Pagination -->
         <div
             v-if="
                 logs.links
@@ -455,13 +896,19 @@ const moduleLabel = (module) => {
         >
 
             <template
-                v-for="link in logs.links"
+                v-for="
+                    link in logs.links
+                "
                 :key="link.label"
             >
 
                 <Link
-                    v-if="link.url"
-                    :href="link.url"
+                    v-if="
+                        link.url
+                    "
+                    :href="
+                        link.url
+                    "
                     preserve-scroll
                     class="
                         border
@@ -470,11 +917,14 @@ const moduleLabel = (module) => {
                         rounded
                     "
                     :class="{
-                        'bg-blue-600 text-white':
+                        'bg-blue-600 text-white border-blue-600':
                             link.active,
                     }"
-                    v-html="link.label"
+                    v-html="
+                        link.label
+                    "
                 />
+
 
                 <span
                     v-else
@@ -485,7 +935,9 @@ const moduleLabel = (module) => {
                         rounded
                         opacity-40
                     "
-                    v-html="link.label"
+                    v-html="
+                        link.label
+                    "
                 ></span>
 
             </template>
