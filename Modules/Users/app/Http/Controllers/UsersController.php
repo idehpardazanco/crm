@@ -31,10 +31,7 @@ class UsersController extends Controller
     public function create(): Response
     {
         return Inertia::render('Users/Create', [
-            'roles' => Role::query()
-                ->orderBy('name')
-                ->pluck('name')
-                ->values(),
+           
         ]);
     }
 
