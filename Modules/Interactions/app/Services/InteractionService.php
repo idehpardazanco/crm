@@ -33,6 +33,14 @@ class InteractionService
                 'contact_id',
                 $contactId
             )
+            ->when(
+                ! $this->isAdmin($user),
+                fn ($query) =>
+                $query->where(
+                    'user_id',
+                    $user->id
+                )
+            )
             ->latest()
             ->get();
     }
@@ -46,7 +54,6 @@ class InteractionService
                 $data,
                 $user
             ) {
-
                 $contact =
                     $this
                         ->findAccessibleContact(
@@ -57,18 +64,18 @@ class InteractionService
                             $user
                         );
 
-                $data['user_id'] =
-                    $user->id;
+                $data[
+                    'user_id'
+                ] = $user->id;
 
                 $interaction =
                     Interaction::query()
                         ->create($data);
 
                 if (
-                    $interaction->type ===
-                    'call'
+                    $interaction->type
+                    === 'call'
                 ) {
-
                     if (
                         ! empty(
                             $interaction
@@ -111,6 +118,9 @@ class InteractionService
 
                                     'status' =>
                                         'pending',
+
+                                    'notified_at' =>
+                                        null,
                                 ]);
 
                         $this
@@ -175,15 +185,16 @@ class InteractionService
                 ->with('contact')
                 ->findOrFail($id);
 
-        if (
-            ! $user->hasRole(
-                'super_admin'
-            )
-        ) {
+        if (! $this->isAdmin($user)) {
             abort_unless(
-                $interaction->contact
-                &&
                 (int)
+                $interaction->user_id
+                ===
+                (int) $user->id
+
+                && $interaction->contact
+
+                && (int)
                 $interaction
                     ->contact
                     ->assigned_user_id
@@ -198,7 +209,8 @@ class InteractionService
                 $interaction->id,
 
             'contact_id' =>
-                $interaction->contact_id,
+                $interaction
+                    ->contact_id,
 
             'type' =>
                 $interaction->type,
@@ -222,17 +234,23 @@ class InteractionService
     ): Contact {
         return Contact::query()
             ->when(
-                ! $user->hasRole(
-                    'super_admin'
-                ),
+                ! $this->isAdmin($user),
                 fn ($query) =>
-                    $query->where(
-                        'assigned_user_id',
-                        $user->id
-                    )
+                $query->where(
+                    'assigned_user_id',
+                    $user->id
+                )
             )
             ->findOrFail(
                 $contactId
             );
+    }
+
+    private function isAdmin(
+        User $user
+    ): bool {
+        return $user->hasRole(
+            'super_admin'
+        );
     }
 }
