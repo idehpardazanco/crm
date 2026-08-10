@@ -5,9 +5,15 @@ namespace Modules\FollowUps\app\Services;
 use App\Models\User;
 use Modules\Contacts\app\Models\Contact;
 use Modules\FollowUps\app\Models\FollowUp;
+use Modules\Monitoring\app\Services\MonitoringService;
 
 class FollowUpService
 {
+    public function __construct(
+        private readonly MonitoringService $monitoringService
+    ) {
+    }
+
     public function paginate(
         ?string $search,
         User $user
@@ -18,11 +24,14 @@ class FollowUpService
                 'user:id,name',
             ])
             ->when(
-                ! $user->hasRole('super_admin'),
-                fn ($query) => $query->where(
-                    'user_id',
-                    $user->id
-                )
+                ! $user->hasRole(
+                    'super_admin'
+                ),
+                fn ($query) =>
+                    $query->where(
+                        'user_id',
+                        $user->id
+                    )
             )
             ->when(
                 $search,
@@ -62,7 +71,8 @@ class FollowUpService
             )
             ->orderByRaw(
                 "CASE
-                    WHEN status = 'pending' THEN 0
+                    WHEN status = 'pending'
+                    THEN 0
                     ELSE 1
                 END"
             )
@@ -75,20 +85,43 @@ class FollowUpService
         array $data,
         User $user
     ): FollowUp {
-        $contact = Contact::query()
-            ->findOrFail(
-                $data['contact_id']
-            );
+        $contact =
+            Contact::query()
+                ->findOrFail(
+                    $data['contact_id']
+                );
 
         $this->ensureContactAccess(
             $contact,
             $user
         );
 
-        $data['user_id'] = $user->id;
+        $data['user_id'] =
+            $user->id;
 
-        return FollowUp::query()
-            ->create($data);
+        $followUp =
+            FollowUp::query()
+                ->create($data);
+
+        $this
+            ->monitoringService
+            ->activity(
+                'follow_up_created',
+                'FollowUps',
+                [
+                    'follow_up_id' =>
+                        $followUp->id,
+
+                    'contact_id' =>
+                        $contact->id,
+
+                    'follow_up_at' =>
+                        $followUp->follow_up_at,
+                ],
+                $user->id
+            );
+
+        return $followUp;
     }
 
     public function updateStatus(
@@ -96,14 +129,39 @@ class FollowUpService
         string $status,
         User $user
     ): FollowUp {
-        $followUp = $this->findAccessible(
-            $id,
-            $user
-        );
+        $followUp =
+            $this->findAccessible(
+                $id,
+                $user
+            );
+
+        $oldStatus =
+            $followUp->status;
 
         $followUp->update([
             'status' => $status,
         ]);
+
+        $this
+            ->monitoringService
+            ->activity(
+                'follow_up_status_updated',
+                'FollowUps',
+                [
+                    'follow_up_id' =>
+                        $followUp->id,
+
+                    'contact_id' =>
+                        $followUp->contact_id,
+
+                    'old_status' =>
+                        $oldStatus,
+
+                    'new_status' =>
+                        $status,
+                ],
+                $user->id
+            );
 
         return $followUp->refresh();
     }
@@ -112,12 +170,30 @@ class FollowUpService
         int $id,
         User $user
     ): void {
-        $followUp = $this->findAccessible(
-            $id,
-            $user
-        );
+        $followUp =
+            $this->findAccessible(
+                $id,
+                $user
+            );
+
+        $meta = [
+            'follow_up_id' =>
+                $followUp->id,
+
+            'contact_id' =>
+                $followUp->contact_id,
+        ];
 
         $followUp->delete();
+
+        $this
+            ->monitoringService
+            ->activity(
+                'follow_up_deleted',
+                'FollowUps',
+                $meta,
+                $user->id
+            );
     }
 
     private function findAccessible(
@@ -126,11 +202,14 @@ class FollowUpService
     ): FollowUp {
         return FollowUp::query()
             ->when(
-                ! $user->hasRole('super_admin'),
-                fn ($query) => $query->where(
-                    'user_id',
-                    $user->id
-                )
+                ! $user->hasRole(
+                    'super_admin'
+                ),
+                fn ($query) =>
+                    $query->where(
+                        'user_id',
+                        $user->id
+                    )
             )
             ->findOrFail($id);
     }
@@ -139,12 +218,18 @@ class FollowUpService
         Contact $contact,
         User $user
     ): void {
-        if ($user->hasRole('super_admin')) {
+        if (
+            $user->hasRole(
+                'super_admin'
+            )
+        ) {
             return;
         }
 
         abort_unless(
-            (int) $contact->assigned_user_id ===
+            (int)
+            $contact->assigned_user_id
+            ===
             (int) $user->id,
             403
         );
