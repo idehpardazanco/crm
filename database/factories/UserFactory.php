@@ -12,7 +12,16 @@ use Illuminate\Support\Str;
  */
 class UserFactory extends Factory
 {
+    protected $model = User::class;
+
     protected static ?string $password;
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Default Definition
+    |--------------------------------------------------------------------------
+    */
 
     public function definition(): array
     {
@@ -21,7 +30,12 @@ class UserFactory extends Factory
                 fake()->name(),
 
             /*
+             * شماره موبایل معتبر ایرانی:
+             *
              * 09 + 9 رقم
+             *
+             * مثال:
+             * 09121234567
              */
             'mobile' =>
                 '09'
@@ -39,18 +53,32 @@ class UserFactory extends Factory
             'email_verified_at' =>
                 now(),
 
+            /*
+             * رمز پیش‌فرض تمام کاربران Factory:
+             *
+             * password
+             */
             'password' =>
                 static::$password
                 ??= Hash::make(
                     'password'
                 ),
 
+            /*
+             * کاربر به‌صورت پیش‌فرض فعال است.
+             */
             'status' =>
                 'active',
 
+            /*
+             * Two Factor
+             */
             'two_factor_enabled' =>
                 false,
 
+            /*
+             * اطلاعات آخرین ورود
+             */
             'last_login_at' =>
                 null,
 
@@ -63,6 +91,12 @@ class UserFactory extends Factory
     }
 
 
+    /*
+    |--------------------------------------------------------------------------
+    | Inactive User
+    |--------------------------------------------------------------------------
+    */
+
     public function inactive(): static
     {
         return $this->state(
@@ -73,6 +107,29 @@ class UserFactory extends Factory
         );
     }
 
+
+    /*
+    |--------------------------------------------------------------------------
+    | Active User
+    |--------------------------------------------------------------------------
+    */
+
+    public function active(): static
+    {
+        return $this->state(
+            fn (array $attributes) => [
+                'status' =>
+                    'active',
+            ]
+        );
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Unverified User
+    |--------------------------------------------------------------------------
+    */
 
     public function unverified(): static
     {
