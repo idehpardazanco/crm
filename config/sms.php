@@ -1,13 +1,66 @@
 <?php
 
 return [
-    'default' => env('SMS_PROVIDER', 'payam_matni'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Default Provider
+    |--------------------------------------------------------------------------
+    */
+
+    'default' =>
+        env(
+            'SMS_PROVIDER',
+            'payam_matni'
+        ),
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Duplicate Protection
+    |--------------------------------------------------------------------------
+    |
+    | اگر همان متن به همان شماره در این بازه
+    | قبلاً در صف یا ارسال شده باشد،
+    | ارسال مجدد مسدود می‌شود.
+    |
+    */
+
+    'duplicate_window_seconds' =>
+        (int) env(
+            'SMS_DUPLICATE_WINDOW_SECONDS',
+            120
+        ),
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Providers
+    |--------------------------------------------------------------------------
+    */
 
     'providers' => [
+
         'payam_matni' => [
-            'from' => env('SMS_PAYAM_MATNI_FROM', '9982008568'),
-            'username' => env('SMS_PAYAM_MATNI_USERNAME'),
-            'password' => env('SMS_PAYAM_MATNI_PASSWORD'),
+
+            'from' =>
+                env(
+                    'SMS_PAYAM_MATNI_FROM',
+                    '9982008568'
+                ),
+
+            'username' =>
+                env(
+                    'SMS_PAYAM_MATNI_USERNAME'
+                ),
+
+            'password' =>
+                env(
+                    'SMS_PAYAM_MATNI_PASSWORD'
+                ),
+
         ],
+
     ],
+
 ];
