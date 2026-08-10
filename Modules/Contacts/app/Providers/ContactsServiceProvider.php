@@ -2,30 +2,29 @@
 
 namespace Modules\Contacts\app\Providers;
 
-use Nwidart\Modules\Support\ModuleServiceProvider;
 use Illuminate\Console\Scheduling\Schedule;
+use Modules\Contacts\app\Models\Contact;
+use Modules\Contacts\app\Observers\ContactObserver;
+use Nwidart\Modules\Support\ModuleServiceProvider;
 
 class ContactsServiceProvider extends ModuleServiceProvider
 {
     /**
      * The name of the module.
      */
-    protected string $name = 'Contacts';
+    protected string $name =
+        'Contacts';
 
     /**
-     * The lowercase version of the module name.
+     * The lowercase version
+     * of the module name.
      */
-    protected string $nameLower = 'contacts';
+    protected string $nameLower =
+        'contacts';
 
     /**
-     * Command classes to register.
-     *
-     * @var string[]
-     */
-    // protected array $commands = [];
-
-    /**
-     * Provider classes to register.
+     * Provider classes
+     * to register.
      *
      * @var string[]
      */
@@ -35,12 +34,22 @@ class ContactsServiceProvider extends ModuleServiceProvider
     ];
 
     /**
-     * Define module schedules.
-     * 
-     * @param $schedule
+     * Boot module.
      */
-    // protected function configureSchedules(Schedule $schedule): void
-    // {
-    //     $schedule->command('inspire')->hourly();
+    public function boot(): void
+    {
+        parent::boot();
+
+        Contact::observe(
+            ContactObserver::class
+        );
+    }
+
+    /**
+     * Define module schedules.
+     */
+    // protected function configureSchedules(
+    //     Schedule $schedule
+    // ): void {
     // }
 }
