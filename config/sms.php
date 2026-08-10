@@ -19,11 +19,6 @@ return [
     |--------------------------------------------------------------------------
     | Duplicate Protection
     |--------------------------------------------------------------------------
-    |
-    | اگر همان متن به همان شماره در این بازه
-    | قبلاً در صف یا ارسال شده باشد،
-    | ارسال مجدد مسدود می‌شود.
-    |
     */
 
     'duplicate_window_seconds' =>
@@ -43,16 +38,28 @@ return [
 
         'payam_matni' => [
 
+            /*
+             * Endpoint از Environment خوانده می‌شود
+             * و دیگر داخل Provider Hardcode نیست.
+             */
+            'endpoint' =>
+                env(
+                    'SMS_PAYAM_MATNI_ENDPOINT',
+                    'http://payammatni.com/webservice/url/send.php'
+                ),
+
+
             'from' =>
                 env(
-                    'SMS_PAYAM_MATNI_FROM',
-                    '9982008568'
+                    'SMS_PAYAM_MATNI_FROM'
                 ),
+
 
             'username' =>
                 env(
                     'SMS_PAYAM_MATNI_USERNAME'
                 ),
+
 
             'password' =>
                 env(
