@@ -1,11 +1,13 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
-use Modules\Settings\app\Http\Controllers\SettingsController;
-
-
-Route::middleware(['auth:sanctum'])->prefix('v1')->group(function () {
-    Route::apiResource('settings', SettingsController::class)->names('settings');
-});
-Route::get('/settings/sms', [SettingsController::class, 'sms']);
-Route::post('/settings/sms', [SettingsController::class, 'updateSms']);
+/*
+|--------------------------------------------------------------------------
+| Settings API Routes
+|--------------------------------------------------------------------------
+|
+| API قدیمی Settings عمداً غیرفعال شده است.
+|
+| تنظیمات حساس نباید بدون احراز هویت و
+| سطح دسترسی مدیریتی در API عمومی قرار گیرند.
+|
+*/
