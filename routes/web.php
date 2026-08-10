@@ -39,17 +39,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
 });
 
-Route::middleware([
-    'auth',
-    \App\Http\Middleware\EnsureMonitoringAccess::class
-])->group(function () {
-
-    Route::get('/monitoring', function () {
-        return Inertia::render('Monitoring/Index');
-    });
-
-});
-
 Route::middleware('auth')->group(function () {
 
     Route::get('/settings/sms', function () {
