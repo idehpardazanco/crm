@@ -7,6 +7,7 @@ const props = defineProps({
     todayFollowUps: Array,
     overdueFollowUps: Array,
     latestCalls: Array,
+    employeePerformance: Array,
 })
 
 const statusLabels = {
@@ -18,6 +19,8 @@ const statusLabels = {
     customer: 'مشتری شد',
     rejected: 'رد شد',
     no_answer: 'پاسخ نداد',
+    active: 'فعال',
+    inactive: 'غیرفعال',
 }
 
 const callResultLabels = {
@@ -33,7 +36,10 @@ const callResultLabels = {
 </script>
 
 <template>
-    <div class="p-6">
+    <div
+        class="p-6"
+        dir="rtl"
+    >
 
         <div class="mb-6">
 
@@ -50,8 +56,9 @@ const callResultLabels = {
         </div>
 
 
-        <!-- آمار -->
+        <!-- داشبورد مدیر -->
         <div
+            v-if="dashboardType === 'admin'"
             class="
                 grid
                 grid-cols-1
@@ -63,79 +70,169 @@ const callResultLabels = {
         >
 
             <div class="border rounded p-5">
+                <div class="text-gray-500 mb-2">
+                    کل مخاطبین
+                </div>
 
-                <p class="text-gray-600 mb-2">
-                    مخاطبین
-                </p>
-
-                <strong class="text-2xl">
+                <div class="text-2xl font-bold">
                     {{ stats.contacts }}
-                </strong>
-
+                </div>
             </div>
 
 
             <div class="border rounded p-5">
-
-                <p class="text-gray-600 mb-2">
-                    مخاطبین جدید
-                </p>
-
-                <strong class="text-2xl">
-                    {{ stats.newContacts }}
-                </strong>
-
-            </div>
-
-
-            <div class="border rounded p-5">
-
-                <p class="text-gray-600 mb-2">
-                    مشتریان
-                </p>
-
-                <strong class="text-2xl">
-                    {{ stats.customers }}
-                </strong>
-
-            </div>
-
-
-            <div class="border rounded p-5">
-
-                <p class="text-gray-600 mb-2">
+                <div class="text-gray-500 mb-2">
                     تماس‌های امروز
-                </p>
+                </div>
 
-                <strong class="text-2xl">
+                <div class="text-2xl font-bold">
                     {{ stats.todayCalls }}
-                </strong>
-
+                </div>
             </div>
 
 
             <div class="border rounded p-5">
+                <div class="text-gray-500 mb-2">
+                    پیامک‌های ارسال‌شده امروز
+                </div>
 
-                <p class="text-gray-600 mb-2">
-                    پیامک‌های امروز
-                </p>
-
-                <strong class="text-2xl">
+                <div class="text-2xl font-bold">
                     {{ stats.todaySms }}
-                </strong>
+                </div>
+            </div>
+
+
+            <div class="border rounded p-5">
+                <div class="text-gray-500 mb-2">
+                    یادآوری‌های امروز
+                </div>
+
+                <div class="text-2xl font-bold">
+                    {{ stats.todayFollowUps }}
+                </div>
+            </div>
+
+
+            <div class="border rounded p-5">
+                <div class="text-gray-500 mb-2">
+                    سفارش‌های جدید
+                </div>
+
+                <div class="text-2xl font-bold">
+                    {{ stats.newOrders }}
+                </div>
+            </div>
+
+
+            <div class="border rounded p-5">
+                <div class="text-gray-500 mb-2">
+                    مشتریان
+                </div>
+
+                <div class="text-2xl font-bold">
+                    {{ stats.customers }}
+                </div>
+            </div>
+
+
+            <div
+                class="
+                    border
+                    border-red-300
+                    rounded
+                    p-5
+                "
+            >
+                <div class="text-red-600 mb-2">
+                    پیگیری‌های عقب‌افتاده
+                </div>
+
+                <div
+                    class="
+                        text-2xl
+                        font-bold
+                        text-red-600
+                    "
+                >
+                    {{ stats.overdueFollowUps }}
+                </div>
+            </div>
+
+
+            <div
+                class="
+                    border
+                    border-green-300
+                    rounded
+                    p-5
+                "
+            >
+                <div class="text-green-700 mb-2">
+                    نرخ تبدیل به مشتری
+                </div>
+
+                <div
+                    class="
+                        text-2xl
+                        font-bold
+                        text-green-700
+                    "
+                >
+                    {{ stats.conversionRate }}%
+                </div>
+            </div>
+
+        </div>
+
+
+        <!-- داشبورد کارمند -->
+        <div
+            v-else
+            class="
+                grid
+                grid-cols-1
+                sm:grid-cols-2
+                lg:grid-cols-3
+                gap-4
+                mb-8
+            "
+        >
+
+            <div class="border rounded p-5">
+
+                <div class="text-gray-500 mb-2">
+                    تماس‌های امروز
+                </div>
+
+                <div class="text-2xl font-bold">
+                    {{ stats.todayCalls }}
+                </div>
 
             </div>
 
 
             <div class="border rounded p-5">
 
-                <p class="text-gray-600 mb-2">
-                    پیگیری‌های امروز
-                </p>
+                <div class="text-gray-500 mb-2">
+                    یادآوری‌های امروز
+                </div>
 
-                <strong class="text-2xl">
+                <div class="text-2xl font-bold">
                     {{ stats.todayFollowUps }}
-                </strong>
+                </div>
+
+            </div>
+
+
+            <div class="border rounded p-5">
+
+                <div class="text-gray-500 mb-2">
+                    مخاطبین جدید
+                </div>
+
+                <div class="text-2xl font-bold">
+                    {{ stats.newContacts }}
+                </div>
 
             </div>
 
@@ -143,19 +240,209 @@ const callResultLabels = {
             <div
                 class="
                     border
+                    border-red-300
                     rounded
                     p-5
-                    border-red-300
                 "
             >
 
-                <p class="text-red-600 mb-2">
+                <div class="text-red-600 mb-2">
                     پیگیری‌های عقب‌افتاده
-                </p>
+                </div>
 
-                <strong class="text-2xl text-red-600">
+                <div
+                    class="
+                        text-2xl
+                        font-bold
+                        text-red-600
+                    "
+                >
                     {{ stats.overdueFollowUps }}
-                </strong>
+                </div>
+
+            </div>
+
+
+            <div class="border rounded p-5">
+
+                <div class="text-gray-500 mb-2">
+                    پیامک‌های امروز من
+                </div>
+
+                <div class="text-2xl font-bold">
+                    {{ stats.todaySms }}
+                </div>
+
+            </div>
+
+
+            <div class="border rounded p-5">
+
+                <div class="text-gray-500 mb-2">
+                    سفارش‌های ثبت‌شده من
+                </div>
+
+                <div class="text-2xl font-bold">
+                    {{ stats.orders }}
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- عملکرد کارمندان -->
+        <div
+            v-if="dashboardType === 'admin'"
+            class="border rounded p-5 mb-8"
+        >
+
+            <h2 class="text-lg font-bold mb-4">
+                عملکرد کارمندان
+            </h2>
+
+
+            <div class="overflow-x-auto">
+
+                <table
+                    class="
+                        w-full
+                        border-collapse
+                        border
+                    "
+                >
+
+                    <thead>
+
+                        <tr>
+
+                            <th class="border p-2">
+                                کارمند
+                            </th>
+
+                            <th class="border p-2">
+                                مخاطبین
+                            </th>
+
+                            <th class="border p-2">
+                                مشتریان
+                            </th>
+
+                            <th class="border p-2">
+                                کل تماس‌ها
+                            </th>
+
+                            <th class="border p-2">
+                                تماس امروز
+                            </th>
+
+                            <th class="border p-2">
+                                پیامک موفق
+                            </th>
+
+                            <th class="border p-2">
+                                سفارش
+                            </th>
+
+                            <th class="border p-2">
+                                نرخ تبدیل
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody>
+
+                        <tr
+                            v-for="
+                                employee in
+                                employeePerformance
+                            "
+                            :key="employee.id"
+                        >
+
+                            <td
+                                class="
+                                    border
+                                    p-2
+                                    font-medium
+                                "
+                            >
+                                {{ employee.name }}
+                            </td>
+
+
+                            <td class="border p-2">
+                                {{ employee.contacts }}
+                            </td>
+
+
+                            <td class="border p-2">
+                                {{ employee.customers }}
+                            </td>
+
+
+                            <td class="border p-2">
+                                {{ employee.calls }}
+                            </td>
+
+
+                            <td class="border p-2">
+                                {{ employee.todayCalls }}
+                            </td>
+
+
+                            <td class="border p-2">
+                                {{ employee.sms }}
+                            </td>
+
+
+                            <td class="border p-2">
+                                {{ employee.orders }}
+                            </td>
+
+
+                            <td
+                                class="
+                                    border
+                                    p-2
+                                    font-bold
+                                "
+                            >
+                                {{
+                                    employee
+                                        .conversionRate
+                                }}%
+                            </td>
+
+                        </tr>
+
+
+                        <tr
+                            v-if="
+                                !employeePerformance
+                                    .length
+                            "
+                        >
+
+                            <td
+                                colspan="8"
+                                class="
+                                    border
+                                    p-4
+                                    text-center
+                                "
+                            >
+                                کارمند فعالی وجود ندارد
+                            </td>
+
+                        </tr>
+
+                    </tbody>
+
+                </table>
 
             </div>
 
@@ -183,7 +470,12 @@ const callResultLabels = {
                 "
             >
 
-                <h2 class="font-bold text-red-600">
+                <h2
+                    class="
+                        font-bold
+                        text-red-600
+                    "
+                >
                     پیگیری‌های عقب‌افتاده
                 </h2>
 
@@ -213,6 +505,10 @@ const callResultLabels = {
 
                             <th class="border p-2">
                                 مخاطب
+                            </th>
+
+                            <th class="border p-2">
+                                کسب‌وکار
                             </th>
 
                             <th class="border p-2">
@@ -260,7 +556,18 @@ const callResultLabels = {
 
                                 {{
                                     item.contact?.name
-                                        ?? '-'
+                                    ?? '-'
+                                }}
+
+                            </td>
+
+
+                            <td class="border p-2">
+
+                                {{
+                                    item.contact
+                                        ?.business_name
+                                    ?? '-'
                                 }}
 
                             </td>
@@ -270,7 +577,7 @@ const callResultLabels = {
 
                                 {{
                                     item.contact?.mobile
-                                        ?? '-'
+                                    ?? '-'
                                 }}
 
                             </td>
@@ -302,7 +609,7 @@ const callResultLabels = {
 
                                 {{
                                     item.user?.name
-                                        ?? '-'
+                                    ?? '-'
                                 }}
 
                             </td>
@@ -416,7 +723,8 @@ const callResultLabels = {
 
                         <tr
                             v-for="
-                                item in todayFollowUps
+                                item in
+                                todayFollowUps
                             "
                             :key="item.id"
                         >
@@ -425,7 +733,7 @@ const callResultLabels = {
 
                                 {{
                                     item.contact?.name
-                                        ?? '-'
+                                    ?? '-'
                                 }}
 
                             </td>
@@ -436,7 +744,7 @@ const callResultLabels = {
                                 {{
                                     item.contact
                                         ?.business_name
-                                        ?? '-'
+                                    ?? '-'
                                 }}
 
                             </td>
@@ -446,7 +754,7 @@ const callResultLabels = {
 
                                 {{
                                     item.contact?.mobile
-                                        ?? '-'
+                                    ?? '-'
                                 }}
 
                             </td>
@@ -472,7 +780,7 @@ const callResultLabels = {
 
                                 {{
                                     item.user?.name
-                                        ?? '-'
+                                    ?? '-'
                                 }}
 
                             </td>
@@ -598,7 +906,7 @@ const callResultLabels = {
 
                                 {{
                                     item.contact?.name
-                                        ?? '-'
+                                    ?? '-'
                                 }}
 
                             </td>
@@ -610,8 +918,8 @@ const callResultLabels = {
                                     callResultLabels[
                                         item.result
                                     ]
-                                        ?? item.result
-                                        ?? '-'
+                                    ?? item.result
+                                    ?? '-'
                                 }}
 
                             </td>
@@ -621,10 +929,14 @@ const callResultLabels = {
 
                                 {{
                                     statusLabels[
-                                        item.status_after_call
+                                        item
+                                            .status_after_call
                                     ]
-                                        ?? item.status_after_call
-                                        ?? '-'
+                                    ??
+                                    item
+                                        .status_after_call
+                                    ??
+                                    '-'
                                 }}
 
                             </td>
@@ -640,7 +952,7 @@ const callResultLabels = {
 
                                 {{
                                     item.user?.name
-                                        ?? '-'
+                                    ?? '-'
                                 }}
 
                             </td>
