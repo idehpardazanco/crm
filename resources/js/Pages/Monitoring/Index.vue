@@ -1,294 +1,494 @@
 <script setup>
-import { ref, onMounted } from 'vue'
-import axios from 'axios'
-import AdminLayout from '@/Layouts/AdminLayout.vue'
+import {
+    Link,
+    router,
+} from '@inertiajs/vue3'
 
-defineOptions({
-    layout: AdminLayout
+import { ref } from 'vue'
+
+const props = defineProps({
+    logs: Object,
+    users: Array,
+    modules: Array,
+    filters: Object,
 })
 
-/**
- * Tabs
- */
-const tab = ref('activities')
+const search = ref(
+    props.filters?.search ?? ''
+)
 
-/**
- * Data
- */
-const activities = ref([])
-const systemLogs = ref([])
-const requestLogs = ref([])
+const moduleFilter = ref(
+    props.filters?.module ?? ''
+)
 
-/**
- * Loading
- */
-const loading = ref(false)
+const userFilter = ref(
+    props.filters?.user_id ?? ''
+)
 
-/**
- * Filters
- */
-const search = ref('')
-const moduleFilter = ref('')
-const levelFilter = ref('')
-const from = ref('')
-const to = ref('')
+const from = ref(
+    props.filters?.from ?? ''
+)
 
-/**
- * Pagination
- */
-const page = ref(1)
-const meta = ref({})
+const to = ref(
+    props.filters?.to ?? ''
+)
 
-/**
- * Modal
- */
-const selectedLog = ref(null)
-const showModal = ref(false)
+const expanded = ref(null)
 
-/**
- * Open modal
- */
-const openModal = (item) => {
-    selectedLog.value = item
-    showModal.value = true
+const actionLabels = {
+    login: 'ورود به سیستم',
+    logout: 'خروج از سیستم',
+
+    user_created: 'ایجاد کاربر',
+    user_updated: 'ویرایش کاربر',
+    user_deleted: 'حذف کاربر',
+
+    contact_created: 'ایجاد مخاطب',
+    contact_updated: 'ویرایش مخاطب',
+    contact_deleted: 'حذف مخاطب',
+
+    interaction_created: 'ثبت ارتباط',
+    interaction_deleted: 'حذف ارتباط',
+
+    follow_up_created: 'ایجاد پیگیری',
+    follow_up_status_updated: 'تغییر وضعیت پیگیری',
+    follow_up_deleted: 'حذف پیگیری',
+
+    sms_queued: 'قرار گرفتن پیامک در صف',
+    sms_sent: 'ارسال موفق پیامک',
+    sms_failed: 'خطا در ارسال پیامک',
+
+    order_created: 'ثبت سفارش',
+    order_updated: 'ویرایش سفارش',
+    order_deleted: 'حذف سفارش',
 }
 
-/**
- * Fetch data
- */
-const fetchData = async () => {
-
-    loading.value = true
-
-    let url = ''
-
-    if (tab.value === 'activities') {
-        url = '/api/v1/monitoring/activities'
-    }
-
-    if (tab.value === 'system') {
-        url = '/api/v1/monitoring/system-logs'
-    }
-
-    if (tab.value === 'requests') {
-        url = '/api/v1/monitoring/request-logs'
-    }
-
-    const res = await axios.get(url, {
-        params: {
+const applyFilters = () => {
+    router.get(
+        '/monitoring',
+        {
             search: search.value,
             module: moduleFilter.value,
-            level: levelFilter.value,
-            page: page.value,
+            user_id: userFilter.value,
             from: from.value,
-            to: to.value
+            to: to.value,
+        },
+        {
+            preserveState: true,
+            replace: true,
         }
-    })
-
-    const payload = res.data
-
-    if (tab.value === 'activities') activities.value = payload.data
-    if (tab.value === 'system') systemLogs.value = payload.data
-    if (tab.value === 'requests') requestLogs.value = payload.data
-
-    meta.value = payload.meta
-
-    loading.value = false
+    )
 }
 
-/**
- * Change tab
- */
-const changeTab = async (t) => {
-    tab.value = t
-    page.value = 1
-    await fetchData()
+const resetFilters = () => {
+    search.value = ''
+    moduleFilter.value = ''
+    userFilter.value = ''
+    from.value = ''
+    to.value = ''
+
+    router.get('/monitoring')
 }
 
-/**
- * Auto refresh on filter change
- */
-onMounted(fetchData)
+const toggle = (id) => {
+    expanded.value =
+        expanded.value === id
+            ? null
+            : id
+}
+
+const moduleLabel = (module) => {
+    const labels = {
+        Auth: 'ورود و خروج',
+        Users: 'کاربران',
+        Contacts: 'مخاطبین',
+        Interactions: 'ارتباطات',
+        FollowUps: 'پیگیری‌ها',
+        Sms: 'پیامک',
+        Orders: 'سفارش‌ها',
+    }
+
+    return labels[module] ?? module
+}
 </script>
 
 <template>
-    <div class="p-6 bg-gray-50 min-h-screen" dir="rtl">
+    <div
+        class="p-6"
+        dir="rtl"
+    >
 
-        <!-- HEADER -->
-        <div class="mb-4">
-            <h1 class="text-xl font-bold text-gray-800">
-                Monitoring Dashboard
+        <div class="mb-6">
+
+            <h1 class="text-2xl font-bold">
+                گزارش فعالیت کاربران
             </h1>
-        </div>
 
-        <!-- FILTERS -->
-        <div class="flex gap-2 mb-4 flex-wrap">
-
-            <input v-model="search" placeholder="جستجو..."
-                   class="border p-2 rounded" />
-
-            <select v-model="moduleFilter" class="border p-2 rounded">
-                <option value="">همه ماژول‌ها</option>
-                <option value="Auth">Auth</option>
-                <option value="Sms">Sms</option>
-            </select>
-
-            <select v-model="levelFilter" class="border p-2 rounded">
-                <option value="">همه سطح‌ها</option>
-                <option value="error">Error</option>
-                <option value="info">Info</option>
-            </select>
-
-            <input type="date" v-model="from" class="border p-2 rounded" />
-            <input type="date" v-model="to" class="border p-2 rounded" />
-
-            <button @click="fetchData"
-                    class="px-4 py-2 bg-blue-600 text-white rounded">
-                اعمال فیلتر
-            </button>
+            <p class="text-gray-500 mt-2">
+                تاریخچه عملیات انجام‌شده در CRM
+            </p>
 
         </div>
 
-        <!-- TABS -->
-        <div class="flex gap-2 mb-4">
 
-            <button @click="changeTab('activities')"
-                    class="px-4 py-2 bg-blue-600 text-white rounded">
-                Activities
-            </button>
+        <div
+            class="
+                border
+                rounded
+                p-4
+                mb-6
+            "
+        >
 
-            <button @click="changeTab('system')"
-                    class="px-4 py-2 bg-red-600 text-white rounded">
-                Errors
-            </button>
+            <div
+                class="
+                    grid
+                    grid-cols-1
+                    md:grid-cols-2
+                    lg:grid-cols-5
+                    gap-3
+                "
+            >
 
-            <button @click="changeTab('requests')"
-                    class="px-4 py-2 bg-green-600 text-white rounded">
-                Requests
-            </button>
+                <input
+                    v-model="search"
+                    @keyup.enter="
+                        applyFilters
+                    "
+                    type="text"
+                    class="
+                        border
+                        rounded
+                        p-2
+                    "
+                    placeholder="جستجو..."
+                >
 
-        </div>
 
-        <!-- LOADING -->
-        <div v-if="loading" class="text-center py-10 text-gray-500">
-            در حال بارگذاری...
-        </div>
+                <select
+                    v-model="moduleFilter"
+                    class="
+                        border
+                        rounded
+                        p-2
+                    "
+                >
 
-        <!-- TABLES -->
-        <div v-if="!loading">
+                    <option value="">
+                        همه بخش‌ها
+                    </option>
 
-            <!-- Activities -->
-            <table v-if="tab === 'activities'" class="w-full bg-white shadow rounded">
-                <tbody>
-                    <tr v-for="i in activities" :key="i.id"
-                        @click="openModal(i)"
-                        class="border-b hover:bg-gray-50 cursor-pointer">
+                    <option
+                        v-for="module in modules"
+                        :key="module"
+                        :value="module"
+                    >
+                        {{
+                            moduleLabel(
+                                module
+                            )
+                        }}
+                    </option>
 
-                        <td class="p-3 font-bold">{{ i.action }}</td>
+                </select>
 
-                        <td class="p-3">
-                            <span class="px-2 py-1 bg-blue-100 text-blue-700 rounded text-xs">
-                                {{ i.module }}
-                            </span>
-                        </td>
 
-                        <td class="p-3 text-xs text-gray-500">
-                            {{ i.created_at }}
-                        </td>
+                <select
+                    v-model="userFilter"
+                    class="
+                        border
+                        rounded
+                        p-2
+                    "
+                >
 
-                    </tr>
-                </tbody>
-            </table>
+                    <option value="">
+                        همه کاربران
+                    </option>
 
-            <!-- System Logs -->
-            <table v-if="tab === 'system'" class="w-full bg-white shadow rounded">
-                <tbody>
-                    <tr v-for="i in systemLogs" :key="i.id"
-                        @click="openModal(i)"
-                        class="border-b hover:bg-gray-50 cursor-pointer">
+                    <option
+                        v-for="user in users"
+                        :key="user.id"
+                        :value="user.id"
+                    >
+                        {{ user.name }}
+                    </option>
 
-                        <td class="p-3">
-                            <span :class="i.level === 'error'
-                                ? 'bg-red-100 text-red-700'
-                                : 'bg-yellow-100 text-yellow-700'"
-                                  class="px-2 py-1 rounded text-xs font-bold">
-                                {{ i.level }}
-                            </span>
-                        </td>
+                </select>
 
-                        <td class="p-3 text-gray-700">
-                            {{ i.message }}
-                        </td>
 
-                    </tr>
-                </tbody>
-            </table>
+                <input
+                    v-model="from"
+                    type="date"
+                    class="
+                        border
+                        rounded
+                        p-2
+                    "
+                >
 
-            <!-- Requests -->
-            <table v-if="tab === 'requests'" class="w-full bg-white shadow rounded">
-                <tbody>
-                    <tr v-for="i in requestLogs" :key="i.id"
-                        @click="openModal(i)"
-                        class="border-b hover:bg-gray-50 cursor-pointer">
 
-                        <td class="p-3 font-bold">{{ i.method }}</td>
+                <input
+                    v-model="to"
+                    type="date"
+                    class="
+                        border
+                        rounded
+                        p-2
+                    "
+                >
 
-                        <td class="p-3 text-xs text-gray-600">{{ i.url }}</td>
+            </div>
 
-                        <td class="p-3">
-                            <span :class="i.status_code >= 400
-                                ? 'bg-red-100 text-red-700'
-                                : 'bg-green-100 text-green-700'"
-                                  class="px-2 py-1 rounded text-xs">
-                                {{ i.status_code }}
-                            </span>
-                        </td>
 
-                    </tr>
-                </tbody>
-            </table>
+            <div class="flex gap-3 mt-4">
 
-        </div>
+                <button
+                    type="button"
+                    @click="applyFilters"
+                    class="
+                        bg-blue-600
+                        text-white
+                        px-4
+                        py-2
+                        rounded
+                    "
+                >
+                    اعمال فیلتر
+                </button>
 
-        <!-- PAGINATION -->
-        <div class="flex justify-center gap-2 mt-6" v-if="meta.last_page > 1">
-
-            <button class="px-3 py-1 bg-gray-200 rounded"
-                    @click="page--"
-                    :disabled="page <= 1">
-                قبلی
-            </button>
-
-            <span class="px-3 py-1">
-                صفحه {{ page }} از {{ meta.last_page }}
-            </span>
-
-            <button class="px-3 py-1 bg-gray-200 rounded"
-                    @click="page++"
-                    :disabled="page >= meta.last_page">
-                بعدی
-            </button>
-
-        </div>
-
-        <!-- MODAL -->
-        <div v-if="showModal"
-             class="fixed inset-0 bg-black/50 flex items-center justify-center">
-
-            <div class="bg-white w-1/2 p-6 rounded">
-
-                <h2 class="font-bold mb-4">جزئیات لاگ</h2>
-
-                <pre class="text-xs bg-gray-100 p-3 rounded overflow-auto">
-                    {{ selectedLog }}
-                </pre>
-
-                <button @click="showModal = false"
-                        class="mt-4 px-4 py-2 bg-red-600 text-white rounded">
-                    بستن
+                <button
+                    type="button"
+                    @click="resetFilters"
+                    class="
+                        border
+                        px-4
+                        py-2
+                        rounded
+                    "
+                >
+                    حذف فیلترها
                 </button>
 
             </div>
+
+        </div>
+
+
+        <div class="overflow-x-auto">
+
+            <table
+                class="
+                    w-full
+                    border-collapse
+                    border
+                "
+            >
+
+                <thead>
+
+                    <tr>
+
+                        <th class="border p-2">
+                            کاربر
+                        </th>
+
+                        <th class="border p-2">
+                            عملیات
+                        </th>
+
+                        <th class="border p-2">
+                            بخش
+                        </th>
+
+                        <th class="border p-2">
+                            تاریخ
+                        </th>
+
+                        <th class="border p-2">
+                            جزئیات
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody>
+
+                    <template
+                        v-for="log in logs.data"
+                        :key="log.id"
+                    >
+
+                        <tr>
+
+                            <td class="border p-2">
+
+                                {{
+                                    log.user?.name
+                                    ?? 'سیستم'
+                                }}
+
+                            </td>
+
+
+                            <td class="border p-2">
+
+                                {{
+                                    actionLabels[
+                                        log.action
+                                    ]
+                                    ?? log.action
+                                }}
+
+                            </td>
+
+
+                            <td class="border p-2">
+
+                                {{
+                                    moduleLabel(
+                                        log.module
+                                    )
+                                }}
+
+                            </td>
+
+
+                            <td class="border p-2">
+                                {{ log.created_at }}
+                            </td>
+
+
+                            <td class="border p-2">
+
+                                <button
+                                    type="button"
+                                    @click="
+                                        toggle(log.id)
+                                    "
+                                    class="text-blue-600"
+                                >
+                                    {{
+                                        expanded ===
+                                        log.id
+                                            ? 'بستن'
+                                            : 'نمایش'
+                                    }}
+                                </button>
+
+                            </td>
+
+                        </tr>
+
+
+                        <tr
+                            v-if="
+                                expanded ===
+                                log.id
+                            "
+                        >
+
+                            <td
+                                colspan="5"
+                                class="
+                                    border
+                                    p-4
+                                    bg-gray-50
+                                "
+                            >
+
+                                <pre
+                                    class="
+                                        text-sm
+                                        whitespace-pre-wrap
+                                        break-words
+                                        text-left
+                                    "
+                                    dir="ltr"
+                                >{{ JSON.stringify(log.meta ?? {}, null, 2) }}</pre>
+
+                            </td>
+
+                        </tr>
+
+                    </template>
+
+
+                    <tr
+                        v-if="!logs.data.length"
+                    >
+
+                        <td
+                            colspan="5"
+                            class="
+                                border
+                                p-6
+                                text-center
+                            "
+                        >
+                            فعالیتی یافت نشد
+                        </td>
+
+                    </tr>
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+
+        <div
+            v-if="
+                logs.links
+                &&
+                logs.links.length > 3
+            "
+            class="
+                flex
+                flex-wrap
+                gap-2
+                mt-6
+            "
+        >
+
+            <template
+                v-for="link in logs.links"
+                :key="link.label"
+            >
+
+                <Link
+                    v-if="link.url"
+                    :href="link.url"
+                    preserve-scroll
+                    class="
+                        border
+                        px-3
+                        py-2
+                        rounded
+                    "
+                    :class="{
+                        'bg-blue-600 text-white':
+                            link.active,
+                    }"
+                    v-html="link.label"
+                />
+
+                <span
+                    v-else
+                    class="
+                        border
+                        px-3
+                        py-2
+                        rounded
+                        opacity-40
+                    "
+                    v-html="link.label"
+                ></span>
+
+            </template>
 
         </div>
 
