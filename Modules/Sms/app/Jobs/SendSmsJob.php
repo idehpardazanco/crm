@@ -4,9 +4,8 @@ namespace Modules\Sms\app\Jobs;
 
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Foundation\Bus\Dispatchable;
-use Illuminate\Queue\InteractsWithQueue;
-use Illuminate\Queue\SerializesModels;
+use Illuminate\Foundation\Queue\Queueable as FoundationQueueable;
+use Modules\Monitoring\app\Services\MonitoringService;
 use Modules\Sms\app\Contracts\SmsProviderInterface;
 use Modules\Sms\app\Enums\SmsStatus;
 use Modules\Sms\app\Models\SmsLog;
@@ -15,14 +14,10 @@ use Throwable;
 
 class SendSmsJob implements ShouldQueue
 {
-    use Dispatchable;
-    use InteractsWithQueue;
+    use FoundationQueueable;
     use Queueable;
-    use SerializesModels;
 
     public int $tries = 3;
-
-    public int $timeout = 30;
 
     public function __construct(
         public readonly int $smsLogId
@@ -30,74 +25,129 @@ class SendSmsJob implements ShouldQueue
     }
 
     public function handle(
-        SmsProviderInterface $provider
+        SmsProviderInterface $provider,
+        MonitoringService $monitoringService
     ): void {
-        $log = SmsLog::query()->find(
-            $this->smsLogId
-        );
+        $smsLog =
+            SmsLog::query()
+                ->find(
+                    $this->smsLogId
+                );
 
-        if (! $log) {
+        if (! $smsLog) {
             return;
         }
 
-        if ($log->status === SmsStatus::SENT) {
+        if (
+            $smsLog->status ===
+            SmsStatus::SENT
+        ) {
             return;
         }
 
-        $result = $provider->send(
-            $log->mobile,
-            $log->message,
-            $log->from_number
-        );
+        $result =
+            $provider->send(
+                mobile:
+                    $smsLog->mobile,
 
-        $log->update([
-            'from_number' => $result['from']
-                ?? $log->from_number,
+                message:
+                    $smsLog->message,
 
-            'request_payload' => $result['payload']
+                from:
+                    $smsLog->from_number
+            );
+
+        $smsLog->update([
+            'request_payload' =>
+                $result['payload']
                 ?? null,
 
-            'provider_response' => $result['body']
-                ?? null,
+            'provider_response' =>
+                $result,
 
-            'response_code' => isset(
+            'response_code' =>
                 $result['status']
-            )
-                ? (string) $result['status']
-                : null,
+                ?? null,
         ]);
 
-        if (! ($result['ok'] ?? false)) {
+        if (
+            ! ($result['ok'] ?? false)
+        ) {
             throw new RuntimeException(
-                'SMS provider rejected the request.'
+                'ارسال پیامک توسط سرویس‌دهنده ناموفق بود.'
             );
         }
 
-        $log->update([
-            'status' => SmsStatus::SENT,
+        $smsLog->update([
+            'status' =>
+                SmsStatus::SENT,
 
-            'error_message' => null,
+            'error_message' =>
+                null,
 
-            'sent_at' => now(),
+            'sent_at' =>
+                now(),
         ]);
+
+        $monitoringService
+            ->activity(
+                'sms_sent',
+                'Sms',
+                [
+                    'sms_log_id' =>
+                        $smsLog->id,
+
+                    'contact_id' =>
+                        $smsLog->sendable_id,
+
+                    'mobile' =>
+                        $smsLog->mobile,
+                ],
+                $smsLog->user_id
+            );
     }
 
     public function failed(
-        ?Throwable $exception
+        Throwable $exception
     ): void {
-        $log = SmsLog::query()->find(
-            $this->smsLogId
-        );
+        $smsLog =
+            SmsLog::query()
+                ->find(
+                    $this->smsLogId
+                );
 
-        if (! $log) {
+        if (! $smsLog) {
             return;
         }
 
-        $log->update([
-            'status' => SmsStatus::FAILED,
+        $smsLog->update([
+            'status' =>
+                SmsStatus::FAILED,
 
-            'error_message' => $exception?->getMessage()
-                ?? 'SMS sending failed.',
+            'error_message' =>
+                $exception->getMessage(),
         ]);
+
+        app(
+            MonitoringService::class
+        )->activity(
+            'sms_failed',
+            'Sms',
+            [
+                'sms_log_id' =>
+                    $smsLog->id,
+
+                'contact_id' =>
+                    $smsLog->sendable_id,
+
+                'mobile' =>
+                    $smsLog->mobile,
+
+                'error' =>
+                    $exception
+                        ->getMessage(),
+            ],
+            $smsLog->user_id
+        );
     }
 }
