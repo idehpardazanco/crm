@@ -20,17 +20,24 @@ class FollowUpService
     ) {
         return FollowUp::query()
             ->with([
-                'contact:id,name,mobile,business_name',
+                'contact:id,name,mobile,business_name,assigned_user_id',
                 'user:id,name',
             ])
             ->when(
-                ! $user->hasRole(
-                    'super_admin'
-                ),
+                ! $this->isAdmin($user),
                 fn ($query) =>
-                    $query->where(
+                $query
+                    ->where(
                         'user_id',
                         $user->id
+                    )
+                    ->whereHas(
+                        'contact',
+                        fn ($query) =>
+                        $query->where(
+                            'assigned_user_id',
+                            $user->id
+                        )
                     )
             )
             ->when(
@@ -98,7 +105,9 @@ class FollowUpService
         $contact =
             Contact::query()
                 ->findOrFail(
-                    $data['contact_id']
+                    $data[
+                        'contact_id'
+                    ]
                 );
 
         $this->ensureContactAccess(
@@ -106,11 +115,13 @@ class FollowUpService
             $user
         );
 
-        $data['user_id'] =
-            $user->id;
+        $data[
+            'user_id'
+        ] = $user->id;
 
-        $data['notified_at'] =
-            null;
+        $data[
+            'notified_at'
+        ] = null;
 
         $followUp =
             FollowUp::query()
@@ -158,11 +169,6 @@ class FollowUpService
                 $status,
         ];
 
-        /*
-         * اگر پیگیری انجام‌شده یا لغوشده
-         * دوباره باز شود، Scheduler باید
-         * دوباره بتواند آن را پردازش کند.
-         */
         if (
             $status === 'pending'
             && $oldStatus !== 'pending'
@@ -198,7 +204,8 @@ class FollowUpService
                 $user->id
             );
 
-        return $followUp->refresh();
+        return $followUp
+            ->refresh();
     }
 
     public function delete(
@@ -216,7 +223,8 @@ class FollowUpService
                 $followUp->id,
 
             'contact_id' =>
-                $followUp->contact_id,
+                $followUp
+                    ->contact_id,
         ];
 
         $followUp->delete();
@@ -236,14 +244,22 @@ class FollowUpService
         User $user
     ): FollowUp {
         return FollowUp::query()
+            ->with('contact')
             ->when(
-                ! $user->hasRole(
-                    'super_admin'
-                ),
+                ! $this->isAdmin($user),
                 fn ($query) =>
-                    $query->where(
+                $query
+                    ->where(
                         'user_id',
                         $user->id
+                    )
+                    ->whereHas(
+                        'contact',
+                        fn ($query) =>
+                        $query->where(
+                            'assigned_user_id',
+                            $user->id
+                        )
                     )
             )
             ->findOrFail($id);
@@ -253,20 +269,25 @@ class FollowUpService
         Contact $contact,
         User $user
     ): void {
-        if (
-            $user->hasRole(
-                'super_admin'
-            )
-        ) {
+        if ($this->isAdmin($user)) {
             return;
         }
 
         abort_unless(
             (int)
-            $contact->assigned_user_id
+            $contact
+                ->assigned_user_id
             ===
             (int) $user->id,
             403
+        );
+    }
+
+    private function isAdmin(
+        User $user
+    ): bool {
+        return $user->hasRole(
+            'super_admin'
         );
     }
 }
