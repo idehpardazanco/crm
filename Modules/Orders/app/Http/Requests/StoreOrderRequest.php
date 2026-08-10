@@ -45,6 +45,40 @@ class StoreOrderRequest extends FormRequest
                 'nullable',
                 'string',
             ],
+
+            'return_to_contact' => [
+                'sometimes',
+                'boolean',
+            ],
+        ];
+    }
+
+    public function messages(): array
+    {
+        return [
+            'contact_id.required' =>
+                'انتخاب مشتری الزامی است.',
+
+            'contact_id.exists' =>
+                'مشتری انتخاب‌شده معتبر نیست.',
+
+            'product_name.required' =>
+                'نام محصول یا خدمت الزامی است.',
+
+            'amount.required' =>
+                'مبلغ سفارش الزامی است.',
+
+            'amount.numeric' =>
+                'مبلغ سفارش باید عدد باشد.',
+
+            'amount.min' =>
+                'مبلغ سفارش نمی‌تواند منفی باشد.',
+
+            'status.required' =>
+                'وضعیت سفارش الزامی است.',
+
+            'status.in' =>
+                'وضعیت سفارش معتبر نیست.',
         ];
     }
 }
