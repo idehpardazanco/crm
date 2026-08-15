@@ -14,7 +14,7 @@
                     Monitoring
                 </a>
 
-                <a href="/settings/sms" class="block p-2 hover:bg-gray-100 rounded">
+               <a href="/sms/settings" class="block p-2 hover:bg-gray-100 rounded">
                     SMS Settings
                 </a>
 
