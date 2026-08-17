@@ -1,20 +1,15 @@
 <script setup>
 import { useForm } from '@inertiajs/vue3'
 
-const props = defineProps({
-    roles: {
-        type: Array,
-        default: () => ['employee'],
-    },
-})
-
 const form = useForm({
     name: '',
     mobile: '',
     email: '',
     password: '',
-    status: 'active',
+
+    // مقادیر ثابت
     role: 'employee',
+    status: 'active',
 })
 
 function submit() {
@@ -28,7 +23,7 @@ function submit() {
     <div class="p-6" dir="rtl">
 
         <h1 class="text-xl mb-5">
-            ایجاد کاربر
+            ایجاد کاربر جدید
         </h1>
 
         <form @submit.prevent="submit">
@@ -126,70 +121,42 @@ function submit() {
             </div>
 
 
-            <!-- نقش -->
-            <div class="mb-4">
-                <label class="block mb-1">
-                    نقش کاربر
-                </label>
+            <!-- اطلاعات ثابت -->
+            <div class="mb-5 text-sm">
 
-                <select
-                    v-model="form.role"
-                    class="border border-gray-300 p-2 block w-full bg-white text-gray-900 rounded"
-                    style="color-scheme: light;"
-                >
-                    <option
-                        value="employee"
-                        style="color: #111827; background-color: #ffffff;"
-                    >
+                <div class="mb-2">
+                    نقش:
+                    <strong>
                         کارمند
-                    </option>
-                </select>
-
-                <div
-                    v-if="form.errors.role"
-                    class="text-red-600 text-sm mt-1"
-                >
-                    {{ form.errors.role }}
+                    </strong>
                 </div>
-            </div>
 
-
-            <!-- وضعیت -->
-            <div class="mb-4">
-                <label class="block mb-1">
-                    وضعیت کاربر
-                </label>
-
-                <select
-                    v-model="form.status"
-                    class="border border-gray-300 p-2 block w-full bg-white text-gray-900 rounded"
-                    style="color-scheme: light;"
-                >
-                    <option
-                        value="active"
-                        style="color: #111827; background-color: #ffffff;"
-                    >
+                <div>
+                    وضعیت:
+                    <strong class="text-green-600">
                         فعال
-                    </option>
-
-                    <option
-                        value="inactive"
-                        style="color: #111827; background-color: #ffffff;"
-                    >
-                        غیرفعال
-                    </option>
-                </select>
-
-                <div
-                    v-if="form.errors.status"
-                    class="text-red-600 text-sm mt-1"
-                >
-                    {{ form.errors.status }}
+                    </strong>
                 </div>
+
             </div>
 
 
-            <!-- خطای عمومی -->
+            <!-- خطاهای احتمالی Backend -->
+            <div
+                v-if="form.errors.role"
+                class="text-red-600 text-sm mb-2"
+            >
+                {{ form.errors.role }}
+            </div>
+
+            <div
+                v-if="form.errors.status"
+                class="text-red-600 text-sm mb-2"
+            >
+                {{ form.errors.status }}
+            </div>
+
+
             <div
                 v-if="form.hasErrors"
                 class="text-red-600 text-sm mb-4"
@@ -198,7 +165,7 @@ function submit() {
             </div>
 
 
-            <!-- دکمه ذخیره -->
+            <!-- ذخیره -->
             <button
                 type="submit"
                 class="bg-green-600 text-white px-5 py-2"
