@@ -17,7 +17,7 @@ mobile:'',
 email:'',
 password:'',
 status:'active',
-role:''
+role:'employee'
 
 })
 
