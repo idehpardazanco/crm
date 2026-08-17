@@ -162,13 +162,20 @@ function submit() {
 
                 <select
                     v-model="form.status"
-                    class="border p-2 block w-full"
+                    class="border border-gray-300 p-2 block w-full bg-white text-gray-900 rounded"
+                    style="color-scheme: light;"
                 >
-                    <option value="active">
+                    <option
+                        value="active"
+                        style="color: #111827; background-color: #ffffff;"
+                    >
                         فعال
                     </option>
 
-                    <option value="inactive">
+                    <option
+                        value="inactive"
+                        style="color: #111827; background-color: #ffffff;"
+                    >
                         غیرفعال
                     </option>
                 </select>
