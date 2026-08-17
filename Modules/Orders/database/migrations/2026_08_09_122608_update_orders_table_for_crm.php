@@ -9,70 +9,107 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::table('orders', function (Blueprint $table) {
-            $table->renameColumn(
-                'title',
-                'product_name'
-            );
-        });
+        /*
+        |--------------------------------------------------------------------------
+        | product_name
+        |--------------------------------------------------------------------------
+        */
 
-        Schema::table('orders', function (Blueprint $table) {
-            $table->foreignId('user_id')
-                ->nullable()
-                ->constrained('users')
-                ->nullOnDelete();
-        });
+        if (
+            Schema::hasColumn('orders', 'title') &&
+            ! Schema::hasColumn('orders', 'product_name')
+        ) {
+            Schema::table('orders', function (Blueprint $table) {
+                $table->renameColumn('title', 'product_name');
+            });
+        }
 
-        DB::table('orders')
-            ->where('status', 'pending')
-            ->update([
-                'status' => 'new',
-            ]);
+        if (
+            ! Schema::hasColumn('orders', 'title') &&
+            ! Schema::hasColumn('orders', 'product_name')
+        ) {
+            Schema::table('orders', function (Blueprint $table) {
+                $table->string('product_name')->nullable();
+            });
+        }
 
-        DB::table('orders')
-            ->where('status', 'failed')
-            ->update([
-                'status' => 'cancelled',
-            ]);
+        /*
+        |--------------------------------------------------------------------------
+        | user_id
+        |--------------------------------------------------------------------------
+        */
 
-        DB::table('orders')
-            ->where('status', 'shipped')
-            ->update([
-                'status' => 'completed',
-            ]);
+        if (! Schema::hasColumn('orders', 'user_id')) {
+            Schema::table('orders', function (Blueprint $table) {
+                $table->foreignId('user_id')
+                    ->nullable()
+                    ->constrained('users')
+                    ->nullOnDelete();
+            });
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | تبدیل وضعیت‌های قدیمی
+        |--------------------------------------------------------------------------
+        */
+
+        if (Schema::hasColumn('orders', 'status')) {
+            DB::table('orders')
+                ->where('status', 'pending')
+                ->update([
+                    'status' => 'new',
+                ]);
+
+            DB::table('orders')
+                ->where('status', 'failed')
+                ->update([
+                    'status' => 'cancelled',
+                ]);
+
+            DB::table('orders')
+                ->where('status', 'shipped')
+                ->update([
+                    'status' => 'completed',
+                ]);
+        }
     }
 
     public function down(): void
     {
-        DB::table('orders')
-            ->where('status', 'new')
-            ->update([
-                'status' => 'pending',
-            ]);
+        if (Schema::hasColumn('orders', 'status')) {
+            DB::table('orders')
+                ->where('status', 'new')
+                ->update([
+                    'status' => 'pending',
+                ]);
 
-        DB::table('orders')
-            ->where('status', 'cancelled')
-            ->update([
-                'status' => 'failed',
-            ]);
+            DB::table('orders')
+                ->where('status', 'cancelled')
+                ->update([
+                    'status' => 'failed',
+                ]);
 
-        DB::table('orders')
-            ->where('status', 'completed')
-            ->update([
-                'status' => 'shipped',
-            ]);
+            DB::table('orders')
+                ->where('status', 'completed')
+                ->update([
+                    'status' => 'shipped',
+                ]);
+        }
 
-        Schema::table('orders', function (Blueprint $table) {
-            $table->dropConstrainedForeignId(
-                'user_id'
-            );
-        });
+        if (Schema::hasColumn('orders', 'user_id')) {
+            Schema::table('orders', function (Blueprint $table) {
+                $table->dropConstrainedForeignId('user_id');
+            });
+        }
 
-        Schema::table('orders', function (Blueprint $table) {
-            $table->renameColumn(
-                'product_name',
-                'title'
-            );
-        });
+        if (
+            Schema::hasColumn('orders', 'product_name') &&
+            ! Schema::hasColumn('orders', 'title')
+        ) {
+            Schema::table('orders', function (Blueprint $table) {
+                $table->renameColumn('product_name', 'title');
+            });
+        }
     }
 };
