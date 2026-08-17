@@ -1,40 +1,21 @@
 <?php
 
+use App\Http\Middleware\EnsureSuperAdmin;
 use Illuminate\Support\Facades\Route;
 use Modules\Users\app\Http\Controllers\UsersController;
 
-Route::middleware('auth')
+Route::middleware([
+    'auth',
+    EnsureSuperAdmin::class,
+])
     ->prefix('users')
     ->name('users.')
     ->group(function () {
 
-        Route::get('/', [
-            UsersController::class,
-            'index',
-        ])->name('index');
-
-        Route::get('/create', [
-            UsersController::class,
-            'create',
-        ])->name('create');
-
-        Route::post('/', [
-            UsersController::class,
-            'store',
-        ])->name('store');
-
-        Route::get('/{id}/edit', [
-            UsersController::class,
-            'edit',
-        ])->name('edit');
-
-        Route::put('/{id}', [
-            UsersController::class,
-            'update',
-        ])->name('update');
-
-        Route::delete('/{id}', [
-            UsersController::class,
-            'destroy',
-        ])->name('destroy');
+        Route::get('/', [UsersController::class, 'index'])->name('index');
+        Route::get('/create', [UsersController::class, 'create'])->name('create');
+        Route::post('/', [UsersController::class, 'store'])->name('store');
+        Route::get('/{id}/edit', [UsersController::class, 'edit'])->name('edit');
+        Route::put('/{id}', [UsersController::class, 'update'])->name('update');
+        Route::delete('/{id}', [UsersController::class, 'destroy'])->name('destroy');
     });
