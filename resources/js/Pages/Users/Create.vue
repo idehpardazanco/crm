@@ -134,14 +134,14 @@ function submit() {
 
                 <select
                     v-model="form.role"
-                    class="border p-2 block w-full"
+                    class="border border-gray-300 p-2 block w-full bg-white text-gray-900 rounded"
+                    style="color-scheme: light;"
                 >
                     <option
-                        v-for="role in props.roles"
-                        :key="role"
-                        :value="role"
+                        value="employee"
+                        style="color: #111827; background-color: #ffffff;"
                     >
-                        {{ role === 'employee' ? 'کارمند' : role }}
+                        کارمند
                     </option>
                 </select>
 
