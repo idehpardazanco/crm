@@ -3,6 +3,7 @@ import {
     Link,
     useForm,
 } from '@inertiajs/vue3'
+import PersianDateTimePicker from '../../Components/PersianDateTimePicker.vue'
 
 const props = defineProps({
     contacts: Array,
@@ -152,16 +153,14 @@ const submit = () => {
                     زمان پیگیری
                 </label>
 
-                <input
+                <PersianDateTimePicker
                     v-model="form.follow_up_at"
-                    type="datetime-local"
-                    class="
-                        border
-                        p-2
-                        rounded
-                        w-full
-                    "
-                >
+                    placeholder="تاریخ و ساعت پیگیری را انتخاب کنید"
+                />
+
+                <div class="text-sm text-gray-500 mt-1">
+                    تاریخ برای شما شمسی نمایش داده می‌شود و در سیستم به‌صورت استاندارد ذخیره می‌شود.
+                </div>
 
                 <div
                     v-if="

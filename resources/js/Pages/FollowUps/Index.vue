@@ -2,6 +2,8 @@
 import { Link, router } from '@inertiajs/vue3'
 import { ref } from 'vue'
 
+import { formatPersianDateTime } from '../../utils/date'
+
 const props = defineProps({
     followUps: Object,
     filters: Object,
@@ -233,7 +235,7 @@ const isOverdue = (item) => {
                                     isOverdue(item),
                             }"
                         >
-                            {{ item.follow_up_at }}
+                            {{ formatPersianDateTime(item.follow_up_at) }}
                         </td>
 
 
