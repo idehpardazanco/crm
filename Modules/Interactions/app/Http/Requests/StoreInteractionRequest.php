@@ -18,7 +18,9 @@ class StoreInteractionRequest extends FormRequest
 
     protected function prepareForValidation(): void
     {
-        $nextFollowUp = $this->input('next_follow_up');
+        $nextFollowUp =
+            $this->input('next_follow_up');
+
 
         if (
             ! is_string($nextFollowUp)
@@ -27,21 +29,30 @@ class StoreInteractionRequest extends FormRequest
             return;
         }
 
+
         try {
+
             $this->merge([
-                'next_follow_up' => Carbon::parse(
-                    $nextFollowUp,
-                    'Asia/Tehran'
-                )
-                    ->utc()
-                    ->format('Y-m-d H:i:s'),
+
+                'next_follow_up' =>
+                    Carbon::parse(
+                        $nextFollowUp,
+                        'Asia/Tehran'
+                    )
+                        ->utc()
+                        ->format(
+                            'Y-m-d H:i:s'
+                        ),
+
             ]);
+
         } catch (\Throwable) {
+
             /*
-             * اگر مقدار تاریخ نامعتبر باشد،
-             * تغییرش نمی‌دهیم تا Validation
-             * خطای مناسب را برگرداند.
+             * مقدار را تغییر نمی‌دهیم
+             * تا Validation خطای مناسب بدهد.
              */
+
         }
     }
 
@@ -56,10 +67,12 @@ class StoreInteractionRequest extends FormRequest
                 'exists:contacts,id',
             ],
 
+
             'type' => [
                 'required',
                 'in:call,sms,email,note,meeting',
             ],
+
 
             'subject' => [
                 'nullable',
@@ -67,26 +80,32 @@ class StoreInteractionRequest extends FormRequest
                 'max:255',
             ],
 
+
             'description' => [
                 'nullable',
                 'string',
             ],
 
+
             'result' => [
                 'required_if:type,call',
                 'nullable',
+
                 Rule::in(
                     CallResult::values()
                 ),
             ],
 
+
             'status_after_call' => [
                 'required_if:type,call',
                 'nullable',
+
                 Rule::in(
                     ContactStatus::crmValues()
                 ),
             ],
+
 
             'next_follow_up' => [
                 'required_if:status_after_call,follow_up',
