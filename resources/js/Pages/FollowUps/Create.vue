@@ -10,9 +10,7 @@ import PersianDateTimePicker
 
 
 const props = defineProps({
-
     contacts: Array,
-
 })
 
 
@@ -44,239 +42,202 @@ const submit = () => {
 
     <div
         dir="rtl"
-        class="w-full p-6 text-right"
+        class="p-6 text-right"
     >
 
+        <h1 class="text-xl font-bold mb-6">
+            ایجاد پیگیری جدید
+        </h1>
 
-        <!--
-            ml-auto باعث می‌شود فرم
-            در سمت راست صفحه قرار بگیرد
-        -->
-        <div
-            class="ml-auto w-full max-w-2xl"
+
+        <form
+            @submit.prevent="submit"
+            class="max-w-xl ml-auto"
         >
 
 
-            <h1
-                class="mb-6 text-right text-xl font-bold"
-            >
-                ایجاد پیگیری جدید
-            </h1>
+            <!-- مخاطب -->
+
+            <div class="mb-4">
+
+                <label class="block mb-2">
+                    مخاطب
+                </label>
 
 
+                <select
+                    v-model="form.contact_id"
+                    class="border p-2 rounded w-full"
+                >
 
-            <form
-                @submit.prevent="submit"
-                class="w-full"
-            >
-
-
-                <!-- مخاطب -->
-                <div class="mb-5">
-
-                    <label
-                        class="mb-2 block text-right font-medium"
-                    >
-                        مخاطب
-                    </label>
+                    <option value="">
+                        انتخاب مخاطب
+                    </option>
 
 
-                    <select
-                        v-model="form.contact_id"
-
-                        class="w-full rounded border p-2 text-right"
-
-                        dir="rtl"
+                    <option
+                        v-for="contact in contacts"
+                        :key="contact.id"
+                        :value="contact.id"
                     >
 
-                        <option value="">
-                            انتخاب مخاطب
-                        </option>
+                        {{ contact.name }}
 
 
-                        <option
-                            v-for="contact in props.contacts"
-
-                            :key="contact.id"
-
-                            :value="contact.id"
+                        <template
+                            v-if="contact.business_name"
                         >
 
-                            {{ contact.name }}
-
-                            <template
-                                v-if="contact.business_name"
-                            >
-                                -
-                                {{ contact.business_name }}
-                            </template>
-
                             -
-                            {{ contact.mobile }}
+                            {{ contact.business_name }}
 
-                        </option>
-
-                    </select>
+                        </template>
 
 
-                    <div
-                        v-if="form.errors.contact_id"
+                        -
+                        {{ contact.mobile }}
 
-                        class="mt-1 text-right text-sm text-red-600"
-                    >
-                        {{ form.errors.contact_id }}
-                    </div>
+                    </option>
 
-                </div>
+                </select>
 
 
-
-                <!-- عنوان -->
-                <div class="mb-5">
-
-                    <label
-                        class="mb-2 block text-right font-medium"
-                    >
-                        عنوان
-                    </label>
-
-
-                    <input
-                        v-model="form.title"
-
-                        type="text"
-
-                        class="w-full rounded border p-2 text-right"
-
-                        dir="rtl"
-                    >
-
-
-                    <div
-                        v-if="form.errors.title"
-
-                        class="mt-1 text-right text-sm text-red-600"
-                    >
-                        {{ form.errors.title }}
-                    </div>
-
-                </div>
-
-
-
-                <!-- توضیحات -->
-                <div class="mb-5">
-
-                    <label
-                        class="mb-2 block text-right font-medium"
-                    >
-                        توضیحات
-                    </label>
-
-
-                    <textarea
-                        v-model="form.description"
-
-                        rows="5"
-
-                        class="w-full rounded border p-2 text-right"
-
-                        dir="rtl"
-                    ></textarea>
-
-
-                    <div
-                        v-if="form.errors.description"
-
-                        class="mt-1 text-right text-sm text-red-600"
-                    >
-                        {{ form.errors.description }}
-                    </div>
-
-                </div>
-
-
-
-                <!-- زمان پیگیری -->
-                <div class="mb-6">
-
-                    <label
-                        class="mb-3 block text-right font-medium"
-                    >
-                        زمان پیگیری
-                    </label>
-
-
-                    <PersianDateTimePicker
-                        v-model="form.follow_up_at"
-
-                        placeholder="تاریخ پیگیری را انتخاب کنید"
-                    />
-
-
-                    <div
-                        v-if="form.errors.follow_up_at"
-
-                        class="mt-2 text-right text-sm text-red-600"
-                    >
-                        {{ form.errors.follow_up_at }}
-                    </div>
-
-                </div>
-
-
-
-                <!-- وضعیت ثابت -->
-                <input
-                    v-model="form.status"
-
-                    type="hidden"
-                >
-
-
-
-                <!-- دکمه‌ها -->
                 <div
-                    class="flex flex-row justify-start gap-3"
+                    v-if="form.errors.contact_id"
+                    class="text-red-600 mt-1"
                 >
 
-                    <button
-                        type="submit"
-
-                        :disabled="form.processing"
-
-                        class="rounded bg-green-600 px-5 py-2 text-white"
-
-                        :class="{
-                            'cursor-not-allowed opacity-50':
-                                form.processing
-                        }"
-                    >
-
-                        {{
-                            form.processing
-                                ? 'در حال ذخیره...'
-                                : 'ذخیره'
-                        }}
-
-                    </button>
-
-
-                    <Link
-                        href="/followups"
-
-                        class="rounded border px-5 py-2"
-                    >
-                        بازگشت
-                    </Link>
+                    {{ form.errors.contact_id }}
 
                 </div>
 
+            </div>
 
-            </form>
 
 
-        </div>
+            <!-- عنوان -->
+
+            <div class="mb-4">
+
+                <label class="block mb-2">
+                    عنوان
+                </label>
+
+
+                <input
+                    v-model="form.title"
+                    type="text"
+                    class="border p-2 rounded w-full"
+                >
+
+
+                <div
+                    v-if="form.errors.title"
+                    class="text-red-600 mt-1"
+                >
+
+                    {{ form.errors.title }}
+
+                </div>
+
+            </div>
+
+
+
+            <!-- توضیحات -->
+
+            <div class="mb-4">
+
+                <label class="block mb-2">
+                    توضیحات
+                </label>
+
+
+                <textarea
+                    v-model="form.description"
+                    rows="4"
+                    class="border p-2 rounded w-full"
+                ></textarea>
+
+
+                <div
+                    v-if="form.errors.description"
+                    class="text-red-600 mt-1"
+                >
+
+                    {{ form.errors.description }}
+
+                </div>
+
+            </div>
+
+
+
+            <!-- زمان پیگیری -->
+
+            <div class="mb-4">
+
+                <label class="block mb-2">
+                    زمان پیگیری
+                </label>
+
+
+                <PersianDateTimePicker
+                    v-model="form.follow_up_at"
+                    placeholder="تاریخ و ساعت پیگیری را انتخاب کنید"
+                />
+
+
+                <div
+                    v-if="form.errors.follow_up_at"
+                    class="text-red-600 mt-1"
+                >
+
+                    {{ form.errors.follow_up_at }}
+
+                </div>
+
+            </div>
+
+
+
+            <input
+                v-model="form.status"
+                type="hidden"
+            >
+
+
+
+            <div class="flex gap-3">
+
+                <button
+                    type="submit"
+                    :disabled="form.processing"
+                    class="bg-green-600 text-white px-5 py-2 rounded"
+                >
+
+                    {{
+                        form.processing
+                            ? 'در حال ذخیره...'
+                            : 'ذخیره'
+                    }}
+
+                </button>
+
+
+                <Link
+                    href="/followups"
+                    class="border px-5 py-2 rounded"
+                >
+
+                    بازگشت
+
+                </Link>
+
+            </div>
+
+
+        </form>
 
     </div>
 
