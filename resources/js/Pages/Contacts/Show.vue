@@ -497,19 +497,13 @@ const removeInteraction = (id) => {
                         تاریخ و ساعت پیگیری
                     </label>
 
-                    <input
+                    <PersianDateTimePicker
                         v-model="
                             interactionForm
                                 .next_follow_up
                         "
-                        type="datetime-local"
-                        class="
-                            border
-                            p-2
-                            w-full
-                            rounded
-                        "
-                    >
+                        placeholder="تاریخ و ساعت پیگیری را انتخاب کنید"
+                    />
 
                     <div
                         v-if="
@@ -1040,20 +1034,36 @@ const removeInteraction = (id) => {
                 ></textarea>
 
 
-                <input
-                    v-model="
-                        followUpForm
-                            .follow_up_at
-                    "
-                    type="datetime-local"
-                    class="
-                        border
-                        p-2
-                        w-full
-                        rounded
-                        mb-3
-                    "
-                >
+                <div class="mb-3">
+
+                    <label class="block mb-2">
+                        تاریخ و ساعت پیگیری
+                    </label>
+
+                    <PersianDateTimePicker
+                        v-model="
+                            followUpForm
+                                .follow_up_at
+                        "
+                        placeholder="تاریخ و ساعت پیگیری را انتخاب کنید"
+                    />
+
+                    <div
+                        v-if="
+                            followUpForm
+                                .errors
+                                .follow_up_at
+                        "
+                        class="text-red-600 mt-1"
+                    >
+                        {{
+                            followUpForm
+                                .errors
+                                .follow_up_at
+                        }}
+                    </div>
+
+                </div>
 
 
                 <button
