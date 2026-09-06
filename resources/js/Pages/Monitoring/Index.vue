@@ -5,6 +5,8 @@ import {
 } from '@inertiajs/vue3'
 
 import { ref } from 'vue'
+import PersianDatePicker from '../../Components/PersianDatePicker.vue'
+import { formatPersianDateTime } from '../../utils/date'
 
 const props = defineProps({
     logs: Object,
@@ -503,16 +505,10 @@ const metaText = (meta) => {
                             از تاریخ
                         </label>
 
-                        <input
+                        <PersianDatePicker
                             v-model="from"
-                            type="date"
-                            class="
-                                border
-                                rounded
-                                p-2
-                                w-full
-                            "
-                        >
+                            placeholder="از تاریخ"
+                        />
 
                     </div>
 
@@ -530,16 +526,10 @@ const metaText = (meta) => {
                             تا تاریخ
                         </label>
 
-                        <input
+                        <PersianDatePicker
                             v-model="to"
-                            type="date"
-                            class="
-                                border
-                                rounded
-                                p-2
-                                w-full
-                            "
-                        >
+                            placeholder="تا تاریخ"
+                        />
 
                     </div>
 
@@ -814,7 +804,9 @@ const metaText = (meta) => {
                                 >
 
                                     {{
-                                        log.created_at
+                                        formatPersianDateTime(
+                                            log.created_at
+                                        )
                                     }}
 
                                 </td>

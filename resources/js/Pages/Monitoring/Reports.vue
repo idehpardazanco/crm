@@ -5,6 +5,8 @@ import {
 } from '@inertiajs/vue3'
 
 import { ref } from 'vue'
+import PersianDatePicker from '../../Components/PersianDatePicker.vue'
+import { formatPersianDateTime } from '../../utils/date'
 
 const props = defineProps({
     filters: Object,
@@ -197,18 +199,6 @@ const formatAmount = (amount) => {
     )
 }
 
-
-const formatDate = (date) => {
-    if (!date) {
-        return '-'
-    }
-
-    return new Date(
-        date
-    ).toLocaleString(
-        'fa-IR'
-    )
-}
 </script>
 
 
@@ -320,16 +310,10 @@ const formatDate = (date) => {
                             از تاریخ
                         </label>
 
-                        <input
+                        <PersianDatePicker
                             v-model="from"
-                            type="date"
-                            class="
-                                border
-                                rounded
-                                p-2
-                                w-full
-                            "
-                        >
+                            placeholder="از تاریخ"
+                        />
 
                     </div>
 
@@ -347,16 +331,10 @@ const formatDate = (date) => {
                             تا تاریخ
                         </label>
 
-                        <input
+                        <PersianDatePicker
                             v-model="to"
-                            type="date"
-                            class="
-                                border
-                                rounded
-                                p-2
-                                w-full
-                            "
-                        >
+                            placeholder="تا تاریخ"
+                        />
 
                     </div>
 
@@ -1268,7 +1246,7 @@ const formatDate = (date) => {
                             <td class="border p-2">
 
                                 {{
-                                    formatDate(
+                                    formatPersianDateTime(
                                         call.created_at
                                     )
                                 }}
@@ -1453,7 +1431,7 @@ const formatDate = (date) => {
                             <td class="border p-2">
 
                                 {{
-                                    formatDate(
+                                    formatPersianDateTime(
                                         order.created_at
                                     )
                                 }}

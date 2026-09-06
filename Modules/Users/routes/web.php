@@ -19,3 +19,4 @@ Route::middleware([
         Route::put('/{id}', [UsersController::class, 'update'])->name('update');
         Route::delete('/{id}', [UsersController::class, 'destroy'])->name('destroy');
     });
+    
