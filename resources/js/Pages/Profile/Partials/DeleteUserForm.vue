@@ -1,108 +1,149 @@
-<script setup lang="ts">
-import DangerButton from '@/Components/DangerButton.vue';
-import InputError from '@/Components/InputError.vue';
-import InputLabel from '@/Components/InputLabel.vue';
-import Modal from '@/Components/Modal.vue';
-import SecondaryButton from '@/Components/SecondaryButton.vue';
-import TextInput from '@/Components/TextInput.vue';
-import { useForm } from '@inertiajs/vue3';
-import { nextTick, ref } from 'vue';
+<script setup>
+import Modal from '@/Components/Modal.vue'
+import { useForm } from '@inertiajs/vue3'
+import { nextTick, ref } from 'vue'
 
-const confirmingUserDeletion = ref(false);
-const passwordInput = ref<HTMLInputElement | null>(null);
+const confirmingUserDeletion = ref(false)
+const passwordInput = ref(null)
 
 const form = useForm({
     password: '',
-});
+})
 
-const confirmUserDeletion = () => {
-    confirmingUserDeletion.value = true;
+const openModal = () => {
+    confirmingUserDeletion.value = true
 
-    nextTick(() => passwordInput.value?.focus());
-};
-
-const deleteUser = () => {
-    form.delete(route('profile.destroy'), {
-        preserveScroll: true,
-        onSuccess: () => closeModal(),
-        onError: () => passwordInput.value?.focus(),
-        onFinish: () => {
-            form.reset();
-        },
-    });
-};
+    nextTick(() => {
+        passwordInput.value?.focus()
+    })
+}
 
 const closeModal = () => {
-    confirmingUserDeletion.value = false;
+    confirmingUserDeletion.value = false
+    form.clearErrors()
+    form.reset()
+}
 
-    form.clearErrors();
-    form.reset();
-};
+const deleteUser = () => {
+    form.delete(
+        route('profile.destroy'),
+        {
+            preserveScroll: true,
+
+            onSuccess: () => {
+                closeModal()
+            },
+
+            onError: () => {
+                passwordInput.value?.focus()
+            },
+
+            onFinish: () => {
+                form.reset()
+            },
+        }
+    )
+}
 </script>
 
 <template>
-    <section class="space-y-6">
-        <header>
-            <h2 class="text-lg font-medium text-gray-900">
-                Delete Account
-            </h2>
+    <section>
+        <header class="flex items-start gap-3">
+            <div
+                class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-red-50 font-black text-red-600"
+            >
+                !
+            </div>
 
-            <p class="mt-1 text-sm text-gray-600">
-                Once your account is deleted, all of its resources and data will
-                be permanently deleted. Before deleting your account, please
-                download any data or information that you wish to retain.
-            </p>
-        </header>
-
-        <DangerButton @click="confirmUserDeletion">Delete Account</DangerButton>
-
-        <Modal :show="confirmingUserDeletion" @close="closeModal">
-            <div class="p-6">
-                <h2
-                    class="text-lg font-medium text-gray-900"
-                >
-                    Are you sure you want to delete your account?
+            <div>
+                <h2 class="text-base font-black text-slate-800">
+                    حذف حساب کاربری
                 </h2>
 
-                <p class="mt-1 text-sm text-gray-600">
-                    Once your account is deleted, all of its resources and data
-                    will be permanently deleted. Please enter your password to
-                    confirm you would like to permanently delete your account.
+                <p class="mt-1 text-xs leading-6 text-slate-500">
+                    با حذف حساب، اطلاعات مرتبط به‌صورت دائمی حذف می‌شود.
                 </p>
+            </div>
+        </header>
 
-                <div class="mt-6">
-                    <InputLabel
-                        for="password"
-                        value="Password"
-                        class="sr-only"
-                    />
+        <div
+            class="mt-6 rounded-xl border border-red-100 bg-red-50/50 p-4"
+        >
+            <p class="text-xs leading-7 text-red-700">
+                این عملیات قابل بازگشت نیست. قبل از حذف حساب از اطلاعات
+                موردنیاز خود نسخه پشتیبان تهیه کنید.
+            </p>
+        </div>
 
-                    <TextInput
-                        id="password"
-                        ref="passwordInput"
-                        v-model="form.password"
-                        type="password"
-                        class="mt-1 block w-3/4"
-                        placeholder="Password"
-                        @keyup.enter="deleteUser"
-                    />
+        <button
+            type="button"
+            class="mt-5 min-h-11 rounded-xl bg-red-600 px-6 text-sm font-extrabold text-white transition hover:bg-red-700"
+            @click="openModal"
+        >
+            حذف حساب
+        </button>
 
-                    <InputError :message="form.errors.password" class="mt-2" />
+        <Modal
+            :show="confirmingUserDeletion"
+            @close="closeModal"
+        >
+            <div
+                class="p-6"
+                dir="rtl"
+            >
+                <div
+                    class="flex h-12 w-12 items-center justify-center rounded-xl bg-red-50 text-xl font-black text-red-600"
+                >
+                    !
                 </div>
 
-                <div class="mt-6 flex justify-end">
-                    <SecondaryButton @click="closeModal">
-                        Cancel
-                    </SecondaryButton>
+                <h3 class="mt-5 text-lg font-black text-slate-900">
+                    از حذف حساب مطمئن هستید؟
+                </h3>
 
-                    <DangerButton
-                        class="ms-3"
-                        :class="{ 'opacity-25': form.processing }"
+                <p class="mt-3 text-sm leading-7 text-slate-500">
+                    این عملیات قابل بازگشت نیست. برای تأیید، رمز عبور خود
+                    را وارد کنید.
+                </p>
+
+                <input
+                    ref="passwordInput"
+                    v-model="form.password"
+                    type="password"
+                    class="mt-5 w-full"
+                    placeholder="رمز عبور"
+                    @keyup.enter="deleteUser"
+                >
+
+                <p
+                    v-if="form.errors.password"
+                    class="mt-2 text-xs font-bold text-red-600"
+                >
+                    {{ form.errors.password }}
+                </p>
+
+                <div class="mt-6 flex gap-3">
+                    <button
+                        type="button"
                         :disabled="form.processing"
+                        class="min-h-11 flex-1 rounded-xl border border-slate-200 font-bold text-slate-600"
+                        @click="closeModal"
+                    >
+                        انصراف
+                    </button>
+
+                    <button
+                        type="button"
+                        :disabled="form.processing"
+                        class="min-h-11 flex-1 rounded-xl bg-red-600 font-bold text-white disabled:opacity-50"
                         @click="deleteUser"
                     >
-                        Delete Account
-                    </DangerButton>
+                        {{
+                            form.processing
+                                ? 'در حال حذف...'
+                                : 'حذف دائمی'
+                        }}
+                    </button>
                 </div>
             </div>
         </Modal>
