@@ -1,122 +1,175 @@
-<script setup lang="ts">
-import InputError from '@/Components/InputError.vue';
-import InputLabel from '@/Components/InputLabel.vue';
-import PrimaryButton from '@/Components/PrimaryButton.vue';
-import TextInput from '@/Components/TextInput.vue';
-import { useForm } from '@inertiajs/vue3';
-import { ref } from 'vue';
+<script setup>
+import { useForm } from '@inertiajs/vue3'
+import { ref } from 'vue'
 
-const passwordInput = ref<HTMLInputElement | null>(null);
-const currentPasswordInput = ref<HTMLInputElement | null>(null);
+const passwordInput = ref(null)
+const currentPasswordInput = ref(null)
 
 const form = useForm({
     current_password: '',
     password: '',
     password_confirmation: '',
-});
+})
 
 const updatePassword = () => {
-    form.put(route('password.update'), {
-        preserveScroll: true,
-        onSuccess: () => {
-            form.reset();
-        },
-        onError: () => {
-            if (form.errors.password) {
-                form.reset('password', 'password_confirmation');
-                passwordInput.value?.focus();
-            }
-            if (form.errors.current_password) {
-                form.reset('current_password');
-                currentPasswordInput.value?.focus();
-            }
-        },
-    });
-};
+    form.put(
+        route('password.update'),
+        {
+            preserveScroll: true,
+
+            onSuccess: () => {
+                form.reset()
+            },
+
+            onError: () => {
+                if (form.errors.password) {
+                    form.reset(
+                        'password',
+                        'password_confirmation'
+                    )
+
+                    passwordInput.value?.focus()
+                }
+
+                if (form.errors.current_password) {
+                    form.reset('current_password')
+                    currentPasswordInput.value?.focus()
+                }
+            },
+        }
+    )
+}
 </script>
 
 <template>
     <section>
-        <header>
-            <h2 class="text-lg font-medium text-gray-900">
-                Update Password
-            </h2>
+        <header class="flex items-start gap-3">
+            <div
+                class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-violet-50 text-xs font-black text-violet-600"
+            >
+                02
+            </div>
 
-            <p class="mt-1 text-sm text-gray-600">
-                Ensure your account is using a long, random password to stay
-                secure.
-            </p>
+            <div>
+                <h2 class="text-base font-black text-slate-800">
+                    تغییر رمز عبور
+                </h2>
+
+                <p class="mt-1 text-xs leading-6 text-slate-500">
+                    برای امنیت بیشتر از یک رمز عبور قوی و متفاوت استفاده
+                    کنید.
+                </p>
+            </div>
         </header>
 
-        <form @submit.prevent="updatePassword" class="mt-6 space-y-6">
-            <div>
-                <InputLabel for="current_password" value="Current Password" />
+        <form
+            class="mt-6 grid gap-5 md:grid-cols-2"
+            @submit.prevent="updatePassword"
+        >
+            <div class="md:col-span-2">
+                <label
+                    for="current_password"
+                    class="mb-2 block text-sm font-bold text-slate-700"
+                >
+                    رمز عبور فعلی
+                </label>
 
-                <TextInput
+                <input
                     id="current_password"
                     ref="currentPasswordInput"
                     v-model="form.current_password"
                     type="password"
-                    class="mt-1 block w-full"
                     autocomplete="current-password"
-                />
+                    class="w-full"
+                    placeholder="رمز عبور فعلی"
+                >
 
-                <InputError
-                    :message="form.errors.current_password"
-                    class="mt-2"
-                />
+                <p
+                    v-if="form.errors.current_password"
+                    class="mt-2 text-xs font-bold text-red-600"
+                >
+                    {{ form.errors.current_password }}
+                </p>
             </div>
 
             <div>
-                <InputLabel for="password" value="New Password" />
+                <label
+                    for="new_password"
+                    class="mb-2 block text-sm font-bold text-slate-700"
+                >
+                    رمز عبور جدید
+                </label>
 
-                <TextInput
-                    id="password"
+                <input
+                    id="new_password"
                     ref="passwordInput"
                     v-model="form.password"
                     type="password"
-                    class="mt-1 block w-full"
                     autocomplete="new-password"
-                />
+                    class="w-full"
+                    placeholder="حداقل ۸ کاراکتر"
+                >
 
-                <InputError :message="form.errors.password" class="mt-2" />
+                <p
+                    v-if="form.errors.password"
+                    class="mt-2 text-xs font-bold text-red-600"
+                >
+                    {{ form.errors.password }}
+                </p>
             </div>
 
             <div>
-                <InputLabel
+                <label
                     for="password_confirmation"
-                    value="Confirm Password"
-                />
+                    class="mb-2 block text-sm font-bold text-slate-700"
+                >
+                    تکرار رمز عبور جدید
+                </label>
 
-                <TextInput
+                <input
                     id="password_confirmation"
                     v-model="form.password_confirmation"
                     type="password"
-                    class="mt-1 block w-full"
                     autocomplete="new-password"
-                />
+                    class="w-full"
+                    placeholder="تکرار رمز عبور"
+                >
 
-                <InputError
-                    :message="form.errors.password_confirmation"
-                    class="mt-2"
-                />
+                <p
+                    v-if="form.errors.password_confirmation"
+                    class="mt-2 text-xs font-bold text-red-600"
+                >
+                    {{ form.errors.password_confirmation }}
+                </p>
             </div>
 
-            <div class="flex items-center gap-4">
-                <PrimaryButton :disabled="form.processing">Save</PrimaryButton>
+            <div
+                class="flex flex-wrap items-center gap-4 md:col-span-2"
+            >
+                <button
+                    type="submit"
+                    :disabled="form.processing"
+                    class="min-h-11 rounded-xl bg-blue-600 px-6 text-sm font-extrabold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                    {{
+                        form.processing
+                            ? 'در حال ذخیره...'
+                            : 'تغییر رمز عبور'
+                    }}
+                </button>
 
                 <Transition
-                    enter-active-class="transition ease-in-out"
+                    enter-active-class="transition duration-200"
                     enter-from-class="opacity-0"
-                    leave-active-class="transition ease-in-out"
+                    leave-active-class="transition duration-200"
                     leave-to-class="opacity-0"
                 >
-                    <p
+                    <span
                         v-if="form.recentlySuccessful"
-                        class="text-sm text-gray-600"
+                        class="text-sm font-bold text-emerald-600"
                     >
-                        Saved.
-                    </p>
+                        رمز عبور تغییر کرد.
+                    </span>
                 </Transition>
             </div>
         </form>
