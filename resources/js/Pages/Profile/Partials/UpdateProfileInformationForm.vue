@@ -1,106 +1,158 @@
-<script setup lang="ts">
-import InputError from '@/Components/InputError.vue';
-import InputLabel from '@/Components/InputLabel.vue';
-import PrimaryButton from '@/Components/PrimaryButton.vue';
-import TextInput from '@/Components/TextInput.vue';
-import { Link, useForm, usePage } from '@inertiajs/vue3';
+<script setup>
+import { Link, useForm, usePage } from '@inertiajs/vue3'
 
-defineProps<{
-    mustVerifyEmail?: Boolean;
-    status?: String;
-}>();
+defineProps({
+    mustVerifyEmail: Boolean,
+    status: String,
+})
 
-const user = usePage().props.auth.user;
+const user = usePage().props.auth.user
 
 const form = useForm({
     name: user.name,
     email: user.email,
-});
+})
+
+const submit = () => {
+    form.patch(
+        route('profile.update'),
+        {
+            preserveScroll: true,
+        }
+    )
+}
 </script>
 
 <template>
     <section>
-        <header>
-            <h2 class="text-lg font-medium text-gray-900">
-                Profile Information
-            </h2>
+        <header class="flex items-start gap-3">
+            <div
+                class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-xs font-black text-blue-600"
+            >
+                01
+            </div>
 
-            <p class="mt-1 text-sm text-gray-600">
-                Update your account's profile information and email address.
-            </p>
+            <div>
+                <h2 class="text-base font-black text-slate-800">
+                    اطلاعات حساب
+                </h2>
+
+                <p class="mt-1 text-xs leading-6 text-slate-500">
+                    نام و ایمیل حساب کاربری خود را ویرایش کنید.
+                </p>
+            </div>
         </header>
 
         <form
-            @submit.prevent="form.patch(route('profile.update'))"
-            class="mt-6 space-y-6"
+            class="mt-6 grid gap-5 md:grid-cols-2"
+            @submit.prevent="submit"
         >
             <div>
-                <InputLabel for="name" value="Name" />
+                <label
+                    for="profile_name"
+                    class="mb-2 block text-sm font-bold text-slate-700"
+                >
+                    نام و نام خانوادگی
+                </label>
 
-                <TextInput
-                    id="name"
-                    type="text"
-                    class="mt-1 block w-full"
+                <input
+                    id="profile_name"
                     v-model="form.name"
+                    type="text"
                     required
-                    autofocus
                     autocomplete="name"
-                />
+                    class="w-full"
+                    placeholder="نام کامل"
+                >
 
-                <InputError class="mt-2" :message="form.errors.name" />
+                <p
+                    v-if="form.errors.name"
+                    class="mt-2 text-xs font-bold text-red-600"
+                >
+                    {{ form.errors.name }}
+                </p>
             </div>
 
             <div>
-                <InputLabel for="email" value="Email" />
+                <label
+                    for="profile_email"
+                    class="mb-2 block text-sm font-bold text-slate-700"
+                >
+                    ایمیل
+                </label>
 
-                <TextInput
-                    id="email"
-                    type="email"
-                    class="mt-1 block w-full"
+                <input
+                    id="profile_email"
                     v-model="form.email"
+                    type="email"
                     required
                     autocomplete="username"
-                />
+                    dir="ltr"
+                    class="w-full text-left"
+                    placeholder="user@example.com"
+                >
 
-                <InputError class="mt-2" :message="form.errors.email" />
+                <p
+                    v-if="form.errors.email"
+                    class="mt-2 text-xs font-bold text-red-600"
+                >
+                    {{ form.errors.email }}
+                </p>
             </div>
 
-            <div v-if="mustVerifyEmail && user.email_verified_at === null">
-                <p class="mt-2 text-sm text-gray-800">
-                    Your email address is unverified.
-                    <Link
-                        :href="route('verification.send')"
-                        method="post"
-                        as="button"
-                        class="rounded-md text-sm text-gray-600 underline hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-                    >
-                        Click here to re-send the verification email.
-                    </Link>
-                </p>
+            <div
+                v-if="
+                    mustVerifyEmail
+                    && user.email_verified_at === null
+                "
+                class="rounded-xl border border-amber-200 bg-amber-50 p-4 text-xs leading-7 text-amber-800 md:col-span-2"
+            >
+                ایمیل شما هنوز تأیید نشده است.
+
+                <Link
+                    :href="route('verification.send')"
+                    method="post"
+                    as="button"
+                    class="font-extrabold underline"
+                >
+                    ارسال مجدد لینک تأیید
+                </Link>
 
                 <div
-                    v-show="status === 'verification-link-sent'"
-                    class="mt-2 text-sm font-medium text-green-600"
+                    v-if="status === 'verification-link-sent'"
+                    class="mt-2 font-bold text-emerald-700"
                 >
-                    A new verification link has been sent to your email address.
+                    لینک تأیید جدید ارسال شد.
                 </div>
             </div>
 
-            <div class="flex items-center gap-4">
-                <PrimaryButton :disabled="form.processing">Save</PrimaryButton>
+            <div
+                class="flex flex-wrap items-center gap-4 md:col-span-2"
+            >
+                <button
+                    type="submit"
+                    :disabled="form.processing"
+                    class="min-h-11 rounded-xl bg-blue-600 px-6 text-sm font-extrabold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                    {{
+                        form.processing
+                            ? 'در حال ذخیره...'
+                            : 'ذخیره اطلاعات'
+                    }}
+                </button>
 
                 <Transition
-                    enter-active-class="transition ease-in-out"
+                    enter-active-class="transition duration-200"
                     enter-from-class="opacity-0"
-                    leave-active-class="transition ease-in-out"
+                    leave-active-class="transition duration-200"
                     leave-to-class="opacity-0"
                 >
-                    <p
+                    <span
                         v-if="form.recentlySuccessful"
-                        class="text-sm text-gray-600"
+                        class="text-sm font-bold text-emerald-600"
                     >
-                        Saved.
-                    </p>
+                        اطلاعات ذخیره شد.
+                    </span>
                 </Transition>
             </div>
         </form>
