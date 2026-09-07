@@ -1,97 +1,144 @@
-<script setup lang="ts">
-import GuestLayout from '@/Layouts/GuestLayout.vue';
-import InputError from '@/Components/InputError.vue';
-import InputLabel from '@/Components/InputLabel.vue';
-import PrimaryButton from '@/Components/PrimaryButton.vue';
-import TextInput from '@/Components/TextInput.vue';
-import { Head, useForm } from '@inertiajs/vue3';
+<script setup>
+import GuestLayout from '@/Layouts/GuestLayout.vue'
+import AuthCard from '@/Components/Auth/AuthCard.vue'
+import { Head, useForm } from '@inertiajs/vue3'
 
-const props = defineProps<{
-    email: string;
-    token: string;
-}>();
+const props = defineProps({
+    email: {
+        type: String,
+        required: true,
+    },
+
+    token: {
+        type: String,
+        required: true,
+    },
+})
 
 const form = useForm({
     token: props.token,
     email: props.email,
     password: '',
     password_confirmation: '',
-});
+})
 
 const submit = () => {
-    form.post(route('password.store'), {
-        onFinish: () => {
-            form.reset('password', 'password_confirmation');
-        },
-    });
-};
+    form.post(
+        route('password.store'),
+        {
+            onFinish: () => {
+                form.reset(
+                    'password',
+                    'password_confirmation'
+                )
+            },
+        }
+    )
+}
 </script>
 
 <template>
     <GuestLayout>
-        <Head title="Reset Password" />
+        <Head title="انتخاب رمز جدید" />
 
-        <form @submit.prevent="submit">
-            <div>
-                <InputLabel for="email" value="Email" />
+        <AuthCard
+            title="انتخاب رمز جدید"
+            description="برای حساب خود یک رمز عبور امن و جدید تعیین کنید."
+        >
+            <form
+                class="space-y-5"
+                @submit.prevent="submit"
+            >
+                <div>
+                    <label
+                        for="email"
+                        class="mb-2 block text-sm font-bold text-slate-700"
+                    >
+                        ایمیل
+                    </label>
 
-                <TextInput
-                    id="email"
-                    type="email"
-                    class="mt-1 block w-full"
-                    v-model="form.email"
-                    required
-                    autofocus
-                    autocomplete="username"
-                />
+                    <input
+                        id="email"
+                        v-model="form.email"
+                        type="email"
+                        required
+                        autocomplete="username"
+                        dir="ltr"
+                        class="w-full text-left"
+                    >
 
-                <InputError class="mt-2" :message="form.errors.email" />
-            </div>
+                    <p
+                        v-if="form.errors.email"
+                        class="mt-2 text-xs font-bold text-red-600"
+                    >
+                        {{ form.errors.email }}
+                    </p>
+                </div>
 
-            <div class="mt-4">
-                <InputLabel for="password" value="Password" />
+                <div>
+                    <label
+                        for="password"
+                        class="mb-2 block text-sm font-bold text-slate-700"
+                    >
+                        رمز عبور جدید
+                    </label>
 
-                <TextInput
-                    id="password"
-                    type="password"
-                    class="mt-1 block w-full"
-                    v-model="form.password"
-                    required
-                    autocomplete="new-password"
-                />
+                    <input
+                        id="password"
+                        v-model="form.password"
+                        type="password"
+                        required
+                        autocomplete="new-password"
+                        class="w-full"
+                        placeholder="حداقل ۸ کاراکتر"
+                    >
 
-                <InputError class="mt-2" :message="form.errors.password" />
-            </div>
+                    <p
+                        v-if="form.errors.password"
+                        class="mt-2 text-xs font-bold text-red-600"
+                    >
+                        {{ form.errors.password }}
+                    </p>
+                </div>
 
-            <div class="mt-4">
-                <InputLabel
-                    for="password_confirmation"
-                    value="Confirm Password"
-                />
+                <div>
+                    <label
+                        for="password_confirmation"
+                        class="mb-2 block text-sm font-bold text-slate-700"
+                    >
+                        تکرار رمز عبور جدید
+                    </label>
 
-                <TextInput
-                    id="password_confirmation"
-                    type="password"
-                    class="mt-1 block w-full"
-                    v-model="form.password_confirmation"
-                    required
-                    autocomplete="new-password"
-                />
+                    <input
+                        id="password_confirmation"
+                        v-model="form.password_confirmation"
+                        type="password"
+                        required
+                        autocomplete="new-password"
+                        class="w-full"
+                        placeholder="رمز عبور را دوباره وارد کنید"
+                    >
 
-                <InputError
-                    class="mt-2"
-                    :message="form.errors.password_confirmation"
-                />
-            </div>
+                    <p
+                        v-if="form.errors.password_confirmation"
+                        class="mt-2 text-xs font-bold text-red-600"
+                    >
+                        {{ form.errors.password_confirmation }}
+                    </p>
+                </div>
 
-            <div class="mt-4 flex items-center justify-end">
-                <PrimaryButton
-                    :class="{ 'opacity-25': form.processing }"
+                <button
+                    type="submit"
                     :disabled="form.processing"
+                    class="min-h-12 w-full rounded-xl bg-blue-600 px-5 text-sm font-extrabold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
                 >
-                    Reset Password
-                </PrimaryButton>
-            </div>
-        </form>
+                    {{
+                        form.processing
+                            ? 'در حال ذخیره...'
+                            : 'ذخیره رمز جدید'
+                    }}
+                </button>
+            </form>
+        </AuthCard>
     </GuestLayout>
 </template>
