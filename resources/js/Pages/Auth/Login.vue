@@ -1,6 +1,11 @@
 <script setup>
 import { ref } from 'vue'
-import { Head, useForm } from '@inertiajs/vue3'
+import {
+    Head,
+    Link,
+    useForm,
+} from '@inertiajs/vue3'
+
 import GuestLayout from '@/Layouts/GuestLayout.vue'
 
 defineProps({
@@ -16,11 +21,14 @@ const form = useForm({
 })
 
 const submit = () => {
-    form.post(route('login'), {
-        onFinish: () => {
-            form.reset('password')
-        },
-    })
+    form.post(
+        route('login'),
+        {
+            onFinish: () => {
+                form.reset('password')
+            },
+        }
+    )
 }
 </script>
 
@@ -30,33 +38,27 @@ const submit = () => {
 
         <div
             class="grid w-full max-w-5xl overflow-hidden rounded-[28px] border border-white/10 bg-white shadow-2xl shadow-black/30 lg:grid-cols-2"
+            dir="rtl"
         >
-            <!-- Right / Login -->
-            <div class="order-2 bg-white p-6 sm:p-10 lg:order-1 lg:p-12">
-                <!-- Mobile Logo -->
-                <div class="mb-8 flex items-center gap-3 lg:hidden">
+            <!-- Login form -->
+            <div
+                class="order-2 bg-white p-6 sm:p-10 lg:order-1 lg:p-12"
+            >
+                <!-- Mobile logo -->
+                <div
+                    class="mb-8 flex items-center gap-3 lg:hidden"
+                >
                     <div
-                        class="flex h-11 w-11 items-center justify-center rounded-xl bg-blue-600 text-white shadow-lg shadow-blue-600/25"
+                        class="flex h-11 w-11 items-center justify-center rounded-xl bg-blue-600 text-xs font-black text-white shadow-lg shadow-blue-600/25"
                     >
-                        <svg
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            class="h-6 w-6"
-                            stroke="currentColor"
-                            stroke-width="1.8"
-                        >
-                            <path
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                d="M4 19.5V9.75A2.75 2.75 0 0 1 6.75 7h10.5A2.75 2.75 0 0 1 20 9.75v9.75M8 7V5.75A1.75 1.75 0 0 1 9.75 4h4.5A1.75 1.75 0 0 1 16 5.75V7M3 19.5h18M8 11h.01M12 11h.01M16 11h.01M8 15h.01M12 15h.01M16 15h.01"
-                            />
-                        </svg>
+                        CRM
                     </div>
 
                     <div>
                         <div class="font-bold text-slate-900">
                             CRM ایده‌پردازان
                         </div>
+
                         <div class="text-xs text-slate-500">
                             سامانه مدیریت ارتباط با مشتریان
                         </div>
@@ -71,6 +73,7 @@ const submit = () => {
                         <span
                             class="h-2 w-2 rounded-full bg-blue-600"
                         ></span>
+
                         پنل داخلی شرکت
                     </div>
 
@@ -83,14 +86,15 @@ const submit = () => {
                     <p
                         class="mt-3 text-sm leading-7 text-slate-500"
                     >
-                        شماره موبایل و رمز عبور خود را برای ورود به سامانه وارد کنید.
+                        شماره موبایل و رمز عبور خود را برای ورود به سامانه
+                        وارد کنید.
                     </p>
                 </div>
 
                 <!-- Status -->
                 <div
                     v-if="status"
-                    class="mb-6 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-700"
+                    class="mb-6 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-medium leading-7 text-emerald-700"
                 >
                     {{ status }}
                 </div>
@@ -113,20 +117,21 @@ const submit = () => {
                                 class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-4 text-slate-400"
                             >
                                 <svg
+                                    class="h-5 w-5"
                                     viewBox="0 0 24 24"
                                     fill="none"
-                                    class="h-5 w-5"
-                                    stroke="currentColor"
-                                    stroke-width="1.8"
                                 >
                                     <path
-                                        stroke-linecap="round"
-                                        stroke-linejoin="round"
-                                        d="M8.25 3.75h7.5A2.25 2.25 0 0 1 18 6v12a2.25 2.25 0 0 1-2.25 2.25h-7.5A2.25 2.25 0 0 1 6 18V6a2.25 2.25 0 0 1 2.25-2.25Z"
+                                        d="M8.25 3.75H15.75C16.9926 3.75 18 4.75736 18 6V18C18 19.2426 16.9926 20.25 15.75 20.25H8.25C7.00736 20.25 6 19.2426 6 18V6C6 4.75736 7.00736 3.75 8.25 3.75Z"
+                                        stroke="currentColor"
+                                        stroke-width="1.8"
                                     />
+
                                     <path
+                                        d="M10 17.25H14"
+                                        stroke="currentColor"
+                                        stroke-width="1.8"
                                         stroke-linecap="round"
-                                        d="M10 17.25h4"
                                     />
                                 </svg>
                             </div>
@@ -142,7 +147,7 @@ const submit = () => {
                                 dir="ltr"
                                 placeholder="09121234567"
                                 class="block w-full rounded-xl border border-slate-200 bg-slate-50 py-3.5 pl-4 pr-12 text-left text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-500/10"
-                            />
+                            >
                         </div>
 
                         <p
@@ -155,23 +160,32 @@ const submit = () => {
 
                     <!-- Password -->
                     <div>
-                        <label
-                            for="password"
-                            class="mb-2 block text-sm font-semibold text-slate-700"
+                        <div
+                            class="mb-2 flex items-center justify-between gap-3"
                         >
-                            رمز عبور
-                        </label>
+                            <label
+                                for="password"
+                                class="text-sm font-semibold text-slate-700"
+                            >
+                                رمز عبور
+                            </label>
+
+                            <Link
+                                :href="route('password.request')"
+                                class="text-xs font-bold text-blue-600 transition hover:text-blue-800"
+                            >
+                                رمز عبور را فراموش کرده‌اید؟
+                            </Link>
+                        </div>
 
                         <div class="relative">
                             <div
                                 class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-4 text-slate-400"
                             >
                                 <svg
+                                    class="h-5 w-5"
                                     viewBox="0 0 24 24"
                                     fill="none"
-                                    class="h-5 w-5"
-                                    stroke="currentColor"
-                                    stroke-width="1.8"
                                 >
                                     <rect
                                         x="5"
@@ -179,10 +193,15 @@ const submit = () => {
                                         width="14"
                                         height="10"
                                         rx="2"
+                                        stroke="currentColor"
+                                        stroke-width="1.8"
                                     />
+
                                     <path
+                                        d="M8 10V7.5C8 5.29086 9.79086 3.5 12 3.5C14.2091 3.5 16 5.29086 16 7.5V10"
+                                        stroke="currentColor"
+                                        stroke-width="1.8"
                                         stroke-linecap="round"
-                                        d="M8 10V7.5a4 4 0 0 1 8 0V10"
                                     />
                                 </svg>
                             </div>
@@ -190,57 +209,73 @@ const submit = () => {
                             <input
                                 id="password"
                                 v-model="form.password"
-                                :type="showPassword ? 'text' : 'password'"
+                                :type="
+                                    showPassword
+                                        ? 'text'
+                                        : 'password'
+                                "
                                 autocomplete="current-password"
                                 required
                                 dir="ltr"
                                 placeholder="••••••••"
                                 class="block w-full rounded-xl border border-slate-200 bg-slate-50 py-3.5 pl-12 pr-12 text-left text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-500/10"
-                            />
+                            >
 
                             <button
                                 type="button"
                                 class="absolute inset-y-0 left-0 flex items-center pl-4 text-slate-400 transition hover:text-slate-700"
-                                @click="showPassword = !showPassword"
+                                :aria-label="
+                                    showPassword
+                                        ? 'مخفی‌کردن رمز عبور'
+                                        : 'نمایش رمز عبور'
+                                "
+                                @click="
+                                    showPassword =
+                                        !showPassword
+                                "
                             >
-                                <!-- Eye -->
                                 <svg
                                     v-if="!showPassword"
+                                    class="h-5 w-5"
                                     viewBox="0 0 24 24"
                                     fill="none"
-                                    class="h-5 w-5"
-                                    stroke="currentColor"
-                                    stroke-width="1.8"
                                 >
                                     <path
+                                        d="M2.5 12C2.5 12 6 6 12 6C18 6 21.5 12 21.5 12C21.5 12 18 18 12 18C6 18 2.5 12 2.5 12Z"
+                                        stroke="currentColor"
+                                        stroke-width="1.8"
                                         stroke-linecap="round"
                                         stroke-linejoin="round"
-                                        d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z"
                                     />
+
                                     <circle
                                         cx="12"
                                         cy="12"
                                         r="2.5"
+                                        stroke="currentColor"
+                                        stroke-width="1.8"
                                     />
                                 </svg>
 
-                                <!-- Eye off -->
                                 <svg
                                     v-else
+                                    class="h-5 w-5"
                                     viewBox="0 0 24 24"
                                     fill="none"
-                                    class="h-5 w-5"
-                                    stroke="currentColor"
-                                    stroke-width="1.8"
                                 >
                                     <path
+                                        d="M3 3L21 21"
+                                        stroke="currentColor"
+                                        stroke-width="1.8"
                                         stroke-linecap="round"
-                                        d="M3 3l18 18"
                                     />
+
                                     <path
+                                        d="M10.6 6.2C11.056 6.06667 11.5227 6 12 6C18 6 21.5 12 21.5 12C20.9394 12.9478 20.2645 13.8232 19.49 14.61M6.2 6.2C3.8 8 2.5 12 2.5 12C2.5 12 6 18 12 18C13.02 18 14 17.82 14.9 17.5"
+                                        stroke="currentColor"
+                                        stroke-width="1.8"
                                         stroke-linecap="round"
                                         stroke-linejoin="round"
-                                        d="M10.6 6.2A10.7 10.7 0 0 1 12 6c6 0 9.5 6 9.5 6a15 15 0 0 1-2.2 2.8M6.2 6.2C3.8 8 2.5 12 2.5 12s3.5 6 9.5 6a9.7 9.7 0 0 0 3-.45"
                                     />
                                 </svg>
                             </button>
@@ -262,20 +297,18 @@ const submit = () => {
                             v-model="form.remember"
                             type="checkbox"
                             class="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
-                        />
-
-                        <span
-                            class="text-sm text-slate-600"
                         >
+
+                        <span class="text-sm text-slate-600">
                             مرا به خاطر بسپار
                         </span>
                     </label>
 
-                    <!-- Button -->
+                    <!-- Submit -->
                     <button
                         type="submit"
                         :disabled="form.processing"
-                        class="flex w-full items-center justify-center gap-2 rounded-xl bg-blue-600 px-5 py-3.5 text-sm font-bold text-white shadow-lg shadow-blue-600/20 transition hover:bg-blue-700 hover:shadow-xl hover:shadow-blue-600/25 focus:outline-none focus:ring-4 focus:ring-blue-500/20 disabled:cursor-not-allowed disabled:opacity-60"
+                        class="flex min-h-[52px] w-full items-center justify-center gap-2 rounded-xl bg-blue-600 px-5 text-sm font-bold text-white shadow-lg shadow-blue-600/20 transition hover:bg-blue-700 hover:shadow-xl hover:shadow-blue-600/25 focus:outline-none focus:ring-4 focus:ring-blue-500/20 disabled:cursor-not-allowed disabled:opacity-60"
                     >
                         <svg
                             v-if="form.processing"
@@ -291,29 +324,34 @@ const submit = () => {
                                 stroke="currentColor"
                                 stroke-width="4"
                             />
+
                             <path
                                 class="opacity-75"
                                 fill="currentColor"
-                                d="M4 12a8 8 0 0 1 8-8v4a4 4 0 0 0-4 4H4Z"
+                                d="M4 12A8 8 0 0 1 12 4V8A4 4 0 0 0 8 12H4Z"
                             />
                         </svg>
 
                         <span>
-                            {{ form.processing ? 'در حال ورود...' : 'ورود به سیستم' }}
+                            {{
+                                form.processing
+                                    ? 'در حال ورود...'
+                                    : 'ورود به سیستم'
+                            }}
                         </span>
 
                         <svg
                             v-if="!form.processing"
+                            class="h-5 w-5 rotate-180"
                             viewBox="0 0 24 24"
                             fill="none"
-                            class="h-5 w-5 rotate-180"
-                            stroke="currentColor"
-                            stroke-width="2"
                         >
                             <path
+                                d="M5 12H19M13 6L19 12L13 18"
+                                stroke="currentColor"
+                                stroke-width="2"
                                 stroke-linecap="round"
                                 stroke-linejoin="round"
-                                d="M5 12h14m-6-6 6 6-6 6"
                             />
                         </svg>
                     </button>
@@ -322,13 +360,14 @@ const submit = () => {
                 <div
                     class="mt-8 border-t border-slate-100 pt-6 text-center"
                 >
-                    <p class="text-xs text-slate-400">
-                        دسترسی به این سامانه فقط برای کاربران مجاز شرکت امکان‌پذیر است.
+                    <p class="text-xs leading-6 text-slate-400">
+                        دسترسی به این سامانه فقط برای کاربران مجاز شرکت
+                        امکان‌پذیر است.
                     </p>
                 </div>
             </div>
 
-            <!-- Left / Brand -->
+            <!-- Brand panel -->
             <div
                 class="relative order-1 hidden min-h-[620px] overflow-hidden bg-gradient-to-br from-blue-700 via-blue-600 to-indigo-700 p-12 text-white lg:flex lg:flex-col lg:justify-between"
             >
@@ -346,26 +385,9 @@ const submit = () => {
 
                 <div class="relative">
                     <div
-                        class="mb-8 flex h-14 w-14 items-center justify-center rounded-2xl border border-white/20 bg-white/10 backdrop-blur"
+                        class="mb-8 flex h-14 w-14 items-center justify-center rounded-2xl border border-white/20 bg-white/10 text-sm font-black backdrop-blur"
                     >
-                        <svg
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            class="h-8 w-8"
-                            stroke="currentColor"
-                            stroke-width="1.6"
-                        >
-                            <path
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                d="M4 19.5V9.75A2.75 2.75 0 0 1 6.75 7h10.5A2.75 2.75 0 0 1 20 9.75v9.75M8 7V5.75A1.75 1.75 0 0 1 9.75 4h4.5A1.75 1.75 0 0 1 16 5.75V7M3 19.5h18"
-                            />
-
-                            <path
-                                stroke-linecap="round"
-                                d="M8 11h.01M12 11h.01M16 11h.01M8 15h.01M12 15h.01M16 15h.01"
-                            />
-                        </svg>
+                        CRM
                     </div>
 
                     <p
@@ -382,86 +404,43 @@ const submit = () => {
                     </h2>
 
                     <p
-                        class="mt-5 max-w-md text-sm leading-7 text-blue-100/90"
+                        class="mt-5 max-w-md text-sm leading-8 text-blue-100/90"
                     >
-                        مدیریت مخاطبین، تماس‌ها، پیگیری‌ها، پیامک‌ها و سفارش‌ها در یک محیط یکپارچه.
+                        مدیریت مخاطبین، تماس‌ها، پیگیری‌ها، پیامک‌ها و
+                        سفارش‌ها در یک محیط یکپارچه.
                     </p>
                 </div>
 
-                <div class="relative">
+                <div
+                    class="relative grid grid-cols-2 gap-3"
+                >
                     <div
-                        class="mb-6 grid grid-cols-3 gap-3"
+                        class="rounded-2xl border border-white/10 bg-white/10 p-4 backdrop-blur"
                     >
-                        <div
-                            class="rounded-2xl border border-white/10 bg-white/10 p-4 backdrop-blur-sm"
-                        >
-                            <svg
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                class="mb-3 h-6 w-6 text-blue-100"
-                                stroke="currentColor"
-                                stroke-width="1.7"
-                            >
-                                <path
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    d="M8 7V5a4 4 0 0 1 8 0v2M5 9h14v10H5V9Z"
-                                />
-                            </svg>
-
-                            <span class="text-xs text-blue-50">
-                                مدیریت امن
-                            </span>
+                        <div class="text-2xl font-black">
+                            ۱۰۰٪
                         </div>
 
                         <div
-                            class="rounded-2xl border border-white/10 bg-white/10 p-4 backdrop-blur-sm"
+                            class="mt-1 text-xs text-blue-100/70"
                         >
-                            <svg
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                class="mb-3 h-6 w-6 text-blue-100"
-                                stroke="currentColor"
-                                stroke-width="1.7"
-                            >
-                                <path
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    d="M5 5h14v10H8l-3 3V5Z"
-                                />
-                            </svg>
-
-                            <span class="text-xs text-blue-50">
-                                پیامک سریع
-                            </span>
-                        </div>
-
-                        <div
-                            class="rounded-2xl border border-white/10 bg-white/10 p-4 backdrop-blur-sm"
-                        >
-                            <svg
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                class="mb-3 h-6 w-6 text-blue-100"
-                                stroke="currentColor"
-                                stroke-width="1.7"
-                            >
-                                <path
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    d="M5 19V9m7 10V5m7 14v-7"
-                                />
-                            </svg>
-
-                            <span class="text-xs text-blue-50">
-                                گزارش دقیق
-                            </span>
+                            مدیریت یکپارچه
                         </div>
                     </div>
 
-                    <p class="text-xs text-blue-200/80">
-                        CRM Idehpardazan
-                    </p>
+                    <div
+                        class="rounded-2xl border border-white/10 bg-white/10 p-4 backdrop-blur"
+                    >
+                        <div class="text-2xl font-black">
+                            ۲۴/۷
+                        </div>
+
+                        <div
+                            class="mt-1 text-xs text-blue-100/70"
+                        >
+                            دسترسی به اطلاعات
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
